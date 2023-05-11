@@ -50,6 +50,20 @@ def get_next_name(input_file):
 
     Return the name string (or None) and the next non-alphanumeric character.
     """
+    name = ""
+    next_character = input_file.read(1)
+    while not next_character == "":
+        if next_character.isalpha():
+            name = name + next_character
+            next_character = input_file.read(1)
+            while next_character.isalnum():
+                name = name + next_character
+                next_character = input_file.read(1)
+            if not next_character.isalnum():
+                return [name, next_character]
+        else:
+            next_character = input_file.read(1)
+    return [None, ""]
 
 
 def main():
@@ -95,6 +109,12 @@ def main():
 
         print("\nNow reading names...")
         # Print out all the names in the file
+        file.seek(0)
+        char = "initialise"
+        while char is not None:
+            char = get_next_name(file)[0]
+            if char is not None:
+                print(char)
 
         print("\nNow censoring bad names...")
         # Print out only the good names in the file
