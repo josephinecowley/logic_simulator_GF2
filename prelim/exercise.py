@@ -5,6 +5,14 @@ import sys
 
 def open_file(path):
     """Open and return the file specified by path."""
+    try:
+        # Try to open the file for reading
+        file = open(path, "r")
+    except:
+        # Exit the program with error message
+        sys.exit("Error: can\'t find specified file - check file name is correct")
+    else:
+        return file
 
 
 def get_next_character(input_file):
@@ -42,6 +50,9 @@ def main():
 
         print("\nNow opening file...")
         # Print the path provided and try to open the file for reading
+        file_path = arguments[0]
+        print(file_path)
+        file = open_file(file_path)
 
         print("\nNow reading file...")
         # Print out all the characters in the file, until the end of file
@@ -60,6 +71,7 @@ def main():
         # name = MyNames()
         # bad_name_ids = [name.lookup("Terrible"), name.lookup("Horrid"),
         #                 name.lookup("Ghastly"), name.lookup("Awful")]
+
 
 if __name__ == "__main__":
     main()
