@@ -33,6 +33,16 @@ def get_next_number(input_file):
 
     Return the number (or None) and the next non-numeric character.
     """
+    num = ""
+    next_character = input_file.read(1)
+    while not next_character == "":
+        while next_character.isdigit():
+            num = num + next_character
+            next_character = input_file.read(1)
+            if not next_character.isdigit():
+                return [int(num), next_character]
+        next_character = input_file.read(1)
+    return [None, ""]
 
 
 def get_next_name(input_file):
@@ -76,6 +86,12 @@ def main():
 
         print("\nNow reading numbers...")
         # Print out all the numbers in the file
+        file.seek(0)
+        char = "initialise"
+        while char is not None:
+            char = get_next_number(file)[0]
+            if char is not None:
+                print(char)
 
         print("\nNow reading names...")
         # Print out all the names in the file
