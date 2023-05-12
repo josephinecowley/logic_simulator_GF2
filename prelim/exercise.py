@@ -88,20 +88,22 @@ def main():
         # Print out all the characters in the file, until the end of file
         file_length = len(file.read())
         file.seek(0, 0)
-        for i in range(file_length):
-            next_character = get_next_character(file)
-            print(next_character, end='')
+        next_char = "initialse"
+        while next_char is not "":
+            next_char = get_next_character(file)
+            print(next_char, end='')
 
         print("\nNow skipping spaces...")
         # Print out all the characters in the file, without spaces
         file.seek(0, 0)
-        for i in range(file_length):
+        next_char = "initialise"
+        while next_char is not "":
             next_char = get_next_non_whitespace_character(file)
             print(next_char, end='')
 
         print("\nNow reading numbers...")
         # Print out all the numbers in the file
-        file.seek(0)
+        file.seek(0, 0)
         char = "initialise"
         while char is not None:
             char = get_next_number(file)[0]
@@ -110,7 +112,7 @@ def main():
 
         print("\nNow reading names...")
         # Print out all the names in the file
-        file.seek(0)
+        file.seek(0, 0)
         char = "initialise"
         while char is not None:
             char = get_next_name(file)[0]
