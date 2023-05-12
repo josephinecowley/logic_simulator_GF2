@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Preliminary exercises for Part IIA Project GF2."""
 import sys
+import mynames
 
 
 def open_file(path):
@@ -118,9 +119,19 @@ def main():
 
         print("\nNow censoring bad names...")
         # Print out only the good names in the file
-        # name = MyNames()
-        # bad_name_ids = [name.lookup("Terrible"), name.lookup("Horrid"),
-        #                 name.lookup("Ghastly"), name.lookup("Awful")]
+        file.seek(0, 0)
+        name = mynames.MyNames()
+        bad_name_ids = [name.lookup("Terrible"), name.lookup(
+            "Horrid"), name.lookup("Ghastly"), name.lookup("Awful")]
+        char = "initialise"
+        while char is not None:
+            char = get_next_name(file)[0]
+            if char is not None:
+                # For testing purposes, have used the get_string() method despite there being more direct ways
+                name_id = name.lookup(char)
+                if name_id not in bad_name_ids:
+                    name_string = name.get_string(name_id)
+                    print(name_string)
 
 
 if __name__ == "__main__":
