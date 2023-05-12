@@ -35,6 +35,19 @@ def test_get_string_raises_exceptions(used_names):
         used_names.get_string(-1)
 
 
+def test_lookup_raises_exceptions(used_names):
+    """Test if lookup raises expected exceptiions."""
+    with pytest.raises(TypeError):
+        used_names.lookup(1)
+
+
+def test_lookup_appends_new_name(used_names):
+    """Test if new name is correctly appended"""
+    # New name is appended
+    used_names.lookup("Patrick")
+    assert used_names.get_string(3) == "Patrick"
+
+
 @pytest.mark.parametrize("name_id, expected_string", [
     (0, "Alice"),
     (1, "Bob"),
@@ -47,3 +60,14 @@ def test_get_string(used_names, new_names, name_id, expected_string):
     assert used_names.get_string(name_id) == expected_string
     # Name is absent
     assert new_names.get_string(name_id) is None
+
+
+@pytest.mark.parametrize("name_id, expected_string", [
+    (0, "Alice"),
+    (1, "Bob"),
+    (2, "Eve")
+])
+def test_lookup_returns_correct_id(used_names, name_id, expected_string):
+    """Test if lookup returns the corresponding name ID for the given name_string."""
+    # Correct ID is returned
+    assert used_names.lookup(expected_string) == name_id

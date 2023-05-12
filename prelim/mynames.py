@@ -32,7 +32,9 @@ class MyNames:
 
         If the name string is not present in the names list, add it.
         """
-        if name_string not in self.names:
+        if not isinstance(name_string, str):
+            raise TypeError('Please provide a string argument')
+        elif name_string not in self.names:
             self.names.append(name_string)
         return self.names.index(name_string)
 

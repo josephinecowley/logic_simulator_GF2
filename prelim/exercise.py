@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Preliminary exercises for Part IIA Project GF2."""
 import sys
-import mynames
+from mynames import MyNames
 
 
 def open_file(path):
@@ -120,7 +120,7 @@ def main():
         print("\nNow censoring bad names...")
         # Print out only the good names in the file
         file.seek(0, 0)
-        name = mynames.MyNames()
+        name = MyNames()
         bad_name_ids = [name.lookup("Terrible"), name.lookup(
             "Horrid"), name.lookup("Ghastly"), name.lookup("Awful")]
         char = "initialise"
