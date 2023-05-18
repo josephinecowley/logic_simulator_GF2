@@ -1,0 +1,26 @@
+DEVICES {
+dtype1 = DTYPE;
+dtype2 = DTYPE;
+dtype3 = DTYPE;
+dtype4 = DTYPE;
+clock = CLK(25);
+data = SWITCH(0);
+}
+
+CONNECTIONS {
+data = dtype1.DATA;
+dtype1.Q = dtype2.DATA;
+dtype2.Q = dtype3.DATA;
+dtype3.Q = dtype4.DATA;
+clock = dtype1.CLOCK;
+clock = dtype2.CLOCK;
+clock = dtype3.CLOCK;
+clock = dtype4.CLOCK;
+}
+
+MONITORS {
+Q1 = dtype1.DATA;
+Q2 = dtype2.DATA;
+Q3 = dtype3.DATA;
+Q4 = dtype4.DATA;
+}
