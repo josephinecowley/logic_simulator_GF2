@@ -1,41 +1,25 @@
-* Input options *
-
-sixteen_numbers  = “1” | “2” | “3” | “4” | “5” | “6” | “7” | “8” | “9” | “10” | “11” | “12” | “13” | “14” | “15” | “16” ;
-two_numbers = “1” | “2”;
-binary_numbers = “0” | “1”;
-integer =  [+|-]digit{digit} ;
-digit = “1” | “2” | “3” | “4” | “5” | “6” | “7” | “8” | “9” ;
-letter = “a”| “b” | “c” | “d” | “e” | “f” | “g” | “h” | “i” | “j” | “k” | “l” | “m” | “o” | “n” | “p” | “q” | “r” | “s” | “t” | “u” | “v” | “w” | “x” | “y” | “z” ;
-name = letter{letter};
-
-* Network definition *
-
 network = device_list , connection_list , monitor_list, "END" ;
 
-* Device list *
+device_list = "DEVICES” , “{“ , name , “=” , component , { “;” , name , “=” , component } , “;”  “}” ;
 
-device_list = "DEVICE", "{", dev , { “,” , dev }, “}”, “;” ;
-dev = name, “(” , component , “)” ;
-component = sixteen_input_component, “,” , sixteen_numbers | two_input_component , ”,” ,  two_numbers | special_component ;
+component =  “AND” , “(“ , number , “)”  |
+		“NAND” , “(“ , number , “)” |
+		“OR” , “(“ , number , “)” |
+		“NOR” , “(“ , number , “)” |
+		“XOR” |
+		“SWITCH” , “(“ , number , “)” |
+		“DTYPE” |
+“CLK” , “(“ , number , “)” ;
 
-sixteen_input_component= “AND” | “NAND” | “OR” | “NOR” ;
-two_input_component = “XOR” ;
-special_component = switch | clock | “DTYPE”;
-switch = “SWITCH”, “,” , bin_number ; 
-clock = “CLK” , “,” , integer ;
+connection_list = "CONNECT" , “{”, input , "=" , output , { “;” , input , "=" , output } , “;” ,  ”}” ;
+input = name , “.” , input_suffix ;
+input_suffix = “I” , number ;
+output =  name , [ “.” , “Q” | “QBAR” ] ;
 
-* Connection list *
+monitor_list = “MONITOR”, “{“, name , “=” , output , { “,” , name , “=” , output} , “;” ,  “}” ;
 
-connection_list = "CONNECT" , “{”, connection , { "," , connection } , ”}” , ";" ;
-connection = sig_name , "=" , sig_name ;
-sig_name = dev_name, [ “.” , input | output ] ;
-input = gate_input | “CLK” | “SET” | “CLEAR” | “DATA”  ;
-gate_input = “I”, sixteen_numbers
-output = “Q” | “QBAR” ;
-
-* Monitor list *
-
-monitor_list = “MONITOR”, “{“, monitor, { “,” , monitor} , “}” , “;” ;
-monitor = monitor_name, “(“ , devname , “)”, “;” ;
-monitor_name = name ;
+digit = “0” | “1” | “2” | “3” | “4” | “5” | “6” | “7” | “8” | “9” ;
+number =  digit , {digit} ;
+letter = “a” | “b” | “c” | “d” | “e” | “f” | “g” | “h” | “i” | “j” | “k” | “l” | “m” | “o” | “n” | “p” | “q” | “r” | “s” | “t” | “u” | “v” | “w” | “x” | “y” | “z” |  “A” | “B” | “C” | “D”| “E” | “F” | “G” | “H” | “I” | “J” | “K” | “L” | “M” | “N” | “O” | “P” | “Q” | “R” | “S” | “T” | “U” | “V” | “W” | “X” | “Y” | “Z”  ;
+name = letter , {letter | digit} ;
 
