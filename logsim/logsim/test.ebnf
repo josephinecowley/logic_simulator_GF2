@@ -1,6 +1,6 @@
 network = device_list , connection_list , monitor_list, "END" ;
 
-device_list = "DEVICES” , “{“ , name , “=” , component , { “;” , name , “=” , component } , “;”  “}” ;
+device_list = "DEVICES” , “{“ , name , “=” , component , { “;” , name , “=” , component } , “;” , “}” ;
 
 component =  “AND” , “(“ , number , “)”  |
 		“NAND” , “(“ , number , “)” |
@@ -9,7 +9,7 @@ component =  “AND” , “(“ , number , “)”  |
 		“XOR” |
 		“SWITCH” , “(“ , number , “)” |
 		“DTYPE” |
-“CLK” , “(“ , number , “)” ;
+		“CLK” , “(“ , number , “)” ;
 
 connection_list = "CONNECT" , “{”, input , "=" , output , { “;” , input , "=" , output } , “;” ,  ”}” ;
 input = name , “.” , input_suffix ;
