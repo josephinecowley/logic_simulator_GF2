@@ -1,6 +1,6 @@
 # logic_simulator_GF2
 
-Welcome to our logic simulator! This programme takes a logic description file which follows the EBNF syntax defined in the file: https://github.com/josephinecowley/logic_simulator_GF2/blob/main/logsim/logsim/test.ebnf and creates a simulator to help users map out signals in any given circuit.
+Welcome to our logic simulator! This program takes a logic description file which follows the EBNF syntax defined in the file: https://github.com/josephinecowley/logic_simulator_GF2/blob/main/logsim/logsim/test.ebnf and creates a simulator to help users map out signals in any given circuit.
 
 ## Devlopers: Project Kanban board
 
