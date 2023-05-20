@@ -11,12 +11,12 @@ component =  “AND” , “(“ , number , “)”  |
 		“DTYPE” |
 		“CLK” , “(“ , number , “)” ;
 
-connection_list = "CONNECT" , “{”, input , "=" , output , { “;” , input , "=" , output } , “;” ,  ”}” ;
+connection_list = "CONNECTIONS" , “{”, input , "=" , output , { “;” , input , "=" , output } , “;” ,  ”}” ;
 input = name , “.” , input_suffix ;
 input_suffix = “I” , number ;
 output =  name , [ “.” , “Q” | “QBAR” ] ;
 
-monitor_list = “MONITOR”, “{“, name , “=” , output , { “,” , name , “=” , output} , “;” ,  “}” ;
+monitor_list = “MONITORS”, “{“, name , “=” , output , { “,” , name , “=” , output} , “;” ,  “}” ;
 
 digit = “0” | “1” | “2” | “3” | “4” | “5” | “6” | “7” | “8” | “9” ;
 number =  digit , {digit} ;
