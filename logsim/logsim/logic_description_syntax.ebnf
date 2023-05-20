@@ -13,7 +13,7 @@ component =  “AND” , “(“ , number , “)”  |
 
 connection_list = "CONNECTIONS" , “{”, output , "=" , input , { “;” , output , "=" , input } , “;” ,  ”}” ;
 input = name , “.” , input_suffix ;
-input_suffix = “I” , number ;
+input_suffix = ( "I" , number | "DATA" | "CLK" | "SET" | "CLEAR" ) ;
 output =  name , [ “.” , “Q” | “QBAR” ] ;
 
 monitor_list = “MONITORS”, “{“, name , “=” , output , { “,” , name , “=” , output} , “;” ,  “}” ;
