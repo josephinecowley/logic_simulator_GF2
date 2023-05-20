@@ -11,7 +11,7 @@ component =  “AND” , “(“ , number , “)”  |
 		“DTYPE” |
 		“CLK” , “(“ , number , “)” ;
 
-connection_list = "CONNECTIONS" , “{”, input , "=" , output , { “;” , input , "=" , output } , “;” ,  ”}” ;
+connection_list = "CONNECTIONS" , “{”, output , "=" , input , { “;” , output , "=" , input } , “;” ,  ”}” ;
 input = name , “.” , input_suffix ;
 input_suffix = “I” , number ;
 output =  name , [ “.” , “Q” | “QBAR” ] ;
