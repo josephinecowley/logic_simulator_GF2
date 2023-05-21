@@ -23,14 +23,17 @@ def used_names(name_string_list):
     return my_name
 
 
-def test_get_name_string_raises_exceptions(used_names):
-    """Test if get_name_string raises expected exceptions."""
+def test_query_raises_exceptions(used_names):
+    """Test if query raises expected exceptiions."""
     with pytest.raises(TypeError):
-        used_names.get_name_string(1.4)
-    with pytest.raises(TypeError):
-        used_names.get_name_string("hello")
-    with pytest.raises(ValueError):
-        used_names.get_name_string(-1)
+        used_names.query(1)
+
+
+def test_query_returns_name_ID(used_names):
+    """Test if query returns correct ID"""
+    assert used_names.query("Tom") == 2
+    # Test None is returned for undefined name
+    assert used_names.query("Patrick") is None
 
 
 def test_lookup_raises_exceptions(used_names):
@@ -48,15 +51,20 @@ def test_lookup_appends_new_name(used_names):
     assert used_names.get_name_string(3) == "Patrick"
 
 
-def test_query_raises_exceptions(used_names):
-    """Test if query raises expected exceptiions."""
+def test_lookup_returns_correct_id_list(used_names):
+    """Test if lookup returns the corresponding name ID list for the given name_string list."""
+    # Correct ID list is returned
+    assert used_names.lookup(["Khalid", "Josephine", "Tom"]) == [1, 0, 2]
+
+
+def test_get_name_string_raises_exceptions(used_names):
+    """Test if get_name_string raises expected exceptions."""
     with pytest.raises(TypeError):
-        used_names.query(1)
-
-
-def test_query_returns_name_ID(used_names):
-    """Test if query returns correct ID"""
-    assert used_names.query("Tom") == 2
+        used_names.get_name_string(1.4)
+    with pytest.raises(TypeError):
+        used_names.get_name_string("hello")
+    with pytest.raises(ValueError):
+        used_names.get_name_string(-1)
 
 
 def test_get_name_string_returns_string(used_names):
@@ -64,9 +72,3 @@ def test_get_name_string_returns_string(used_names):
     assert used_names.get_name_string(2) == "Tom"
     # Name is absent
     assert used_names.get_name_string(4) is None
-
-
-def test_lookup_returns_correct_id_list(used_names):
-    """Test if lookup returns the corresponding name ID list for the given name_string list."""
-    # Correct ID list is returned
-    assert used_names.lookup(["Khalid", "Josephine", "Tom"]) == [1, 0, 2]
