@@ -27,9 +27,8 @@ class Symbol:
         """Initialise symbol properties."""
         self.type = None
         self.id = None
-        self.line_number = 0
-        self.start_position = 0
-        self.end_position = 0
+        self.line_number = None
+        self.end_position = None
 
 class Scanner:
 
@@ -55,13 +54,17 @@ class Scanner:
         """Open specified file and initialise reserved words and IDs."""
         # open the definition file using path
         self.file = self.open_file(path)
+
+        # keep track of current location in file
+        self.line_number = 1 # one-based indexing for error reporting
+        self.position = 0
         
         # assign the instance of the names class to self.names
         self.names = names
 
         # initialises a list of symbol types
-        self.symbol_type_list = [self.BRACE_OPEN, self.BRACE_CLOSE, self.COMMA, self.SEMICOLON, self.EQUALS,
-            self.KEYWORD, self.NUMBER, self.NAME, self.EOF] = range(9)
+        self.symbol_type_list = [self.BRACKET_OPEN, self.BRACKET_CLOSE, self.BRACE_OPEN, self.BRACE_CLOSE, self.COMMA, self.FULLSTOP, 
+            self.SEMICOLON, self.EQUALS, self.KEYWORD, self.NUMBER, self.NAME, self.EOF] = range(12)
         self.keywords_list = ["DEVICES", "CONNECTIONS", "MONITORS", "END"]
 
         # populates name table with keywords and assigns keywork IDs
@@ -80,39 +83,68 @@ class Scanner:
             name_string = self.get_name()
             if name_string in self.keywords_list:
                 symbol.type = self.KEYWORD
+                self.load_scanner_data(symbol)
             else:
                 symbol.type = self.NAME
-            [symbol.id] = self.names.lookup([name_string]) # lookup a symbol id
+                self.load_scanner_data(symbol)
+            symbol.id = self.names.lookup([name_string])[0] # lookup a symbol id
 
         elif self.current_character.isdigit():  # number
-            symbol.id = self.get_number()
+            number = self.get_number()
             symbol.type = self.NUMBER
+            symbol.id = self.names.lookup([number])[0]
+            self.load_scanner_data(symbol)
 
         elif self.current_character == "=":  # punctuation
             symbol.type = self.EQUALS
+            self.load_scanner_data(symbol)
             self.advance()
 
         elif self.current_character == ",":
             symbol.type = self.COMMA
+            self.load_scanner_data(symbol)
+            self.advance()
+
+        elif self.current_character == ".":
+            symbol.type = self.FULLSTOP
+            self.load_scanner_data(symbol)
+            self.advance()
+        
+        elif self.current_character == ";":
+            symbol.type = self.SEMICOLON
+            self.load_scanner_data(symbol)
             self.advance()
 
         elif self.current_character == "{":
             symbol.type = self.BRACE_OPEN
+            self.load_scanner_data(symbol)
             self.advance()
 
         elif self.current_character == "}":
             symbol.type = self.BRACE_CLOSE
+            self.load_scanner_data(symbol)
+            self.advance()
+        
+        elif self.current_character == "(":
+            symbol.type = self.BRACKET_OPEN
+            self.load_scanner_data(symbol)
+            self.advance()
+
+        elif self.current_character == ")":
+            symbol.type = self.BRACKET_CLOSE
+            self.load_scanner_data(symbol)
             self.advance()
 
         elif self.current_character == "\n": # new line symbol, update line number and position
-            symbol.line_number += 1
-            symbol.position = 0
+            self.line_number += 1
+            self.position = 0
             # skip all spaces after new line
             # will catch any subsequent new lines
             self.skip_spaces() 
 
         elif self.current_character == "":  # end of file
             symbol.type = self.EOF
+            self.load_scanner_data(symbol)
 
         else:  # not a valid character
             self.advance()
@@ -129,18 +161,19 @@ class Scanner:
             sys.exit("Error: can\'t find specified file - check file name is correct")
         else:
             return file
-    
-    '''def update_position(self, symbol):
-        # update position in line
-        symbol.start_position += 1
-    '''
-    def advance(self, symbol):
+
+    def load_scanner_data(self, symbol):
+        """Update the location attributes of symbol using Scanner's current location attributes."""
+        symbol.line_number = self.line_number
+        symbol.end_position = self.position
+
+    def advance(self):
         """Reads the next character in file and places it in current_character.
            Increments position in line for every call.
         """
         self.current_character = self.file.read(1)
         # update position in line
-        symbol.start_position += 1
+        self.position += 1
 
     def skip_spaces(self):
         """Calls advance() method until current character is not space or is '\n'."""
@@ -160,29 +193,58 @@ class Scanner:
         return name
 
     def get_number(self):
-        """Assumes that current character is a number"""
+        """Assumes that current character is a number and returns a string of integer number."""
         num = f"{self.current_character}" # put first digit in string
         self.advance() # get next character
         while self.current_character.isdigit(): # updating digits to string
             num += self.current_character
             self.advance()
-        return int(num)
+        return num #returns the number as a string 
 
     def display_line_and_marker(self, symbol):
-        """Takes a symbol instance and prints its line in file and a caret underneath"""
+        """Takes a symbol instance and prints its line in the file. 
+        If the 'name' is over length one, use tildes, otherwise use caret."""
+
         # find the whole line where that symbol appears
         for i, line in enumerate(self.file, start=1):
             if i == symbol.line_number:
                 line_text = line
                 break
-
+        
         line_length = len(line_text)
-        caret_position = symbol.position
 
-        caret_string = " " * line_length
-        caret_list = list(caret_string)
-        caret_list[caret_position] = "^"
+        if symbol.type in [self.KEYWORD, self.NAME, self.NUMBER]:
+            name = self.names.get_name_string(symbol.id)
+            name_length = len(name)
 
-        print(line_text)
-        print( "".join(caret_list))
+            if name_length == 1:
+                caret_position = symbol.end_position
+                caret_string = " " * line_length
+                caret_list = list(caret_string)
+                caret_list[caret_position] = "^"
+
+                print(line_text)
+                print("".join(caret_list))
+            
+            else:
+                start_position = symbol.end_position - name_length + 1
+                tilde_string = " " * line_length
+                tilde_list = list(tilde_string)
+                tilde_list[start_position: start_position + name_length] = list("~" * name_length)
+
+                print(line_text)
+                print("".join(tilde_list))
+        else:
+                caret_position = symbol.end_position
+                caret_string = " " * line_length
+                caret_list = list(caret_string)
+                caret_list[caret_position] = "^"
+
+                print(line_text)
+                print("".join(caret_list))            
+
+
+
+
+
 
