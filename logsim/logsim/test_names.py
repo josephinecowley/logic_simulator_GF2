@@ -64,11 +64,21 @@ def test_query_raises_exceptions(used_names):
     """Test if query raises expected exceptiions."""
     with pytest.raises(TypeError):
         used_names.query(1)
+    with pytest.raises(TypeError):
+        used_names.query(1.55)
+    with pytest.raises(TypeError):
+        used_names.query(["Josephine", "Khalid"])
 
 
-def test_query_returns_name_ID(used_names):
+@pytest.mark.parametrize("name_string, expected_id", [
+    ("Josephine", 0),
+    ("Khalid", 1),
+    ("Tom", 2),
+])
+def test_query_returns_name_ID(used_names, name_string, expected_id):
     """Test if query returns correct ID"""
-    assert used_names.query("Tom") == 2
+    assert used_names.query(name_string) == expected_id
+    assert isinstance(used_names.query("Josephine"), int)
     assert used_names.query("Patrick") is None
 
 
@@ -76,6 +86,10 @@ def test_lookup_raises_exceptions(used_names):
     """Test if lookup raises expected exceptiions."""
     with pytest.raises(TypeError):
         used_names.lookup("hello")
+    with pytest.raises(TypeError):
+        used_names.lookup(1)
+    with pytest.raises(TypeError):
+        used_names.lookup(1.5)
     with pytest.raises(TypeError):
         used_names.lookup(["hello", 2])
 
