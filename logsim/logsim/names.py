@@ -47,6 +47,9 @@ class Names:
         """Return a list of unique integer error codes."""
         if not isinstance(num_error_codes, int):
             raise TypeError("Expected num_error_codes to be an integer.")
+        elif num_error_codes < 0:
+            raise ValueError(
+                "Expected num_error_codes to be a positive integer.")
         self.error_code_count += num_error_codes
         return range(self.error_code_count - num_error_codes,
                      self.error_code_count)
