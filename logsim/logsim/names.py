@@ -56,8 +56,10 @@ class Names:
 
         If the name string is not present in the names list, return None.
         """
+        # Check if name_string is a string
         if not isinstance(name_string, str):
             raise TypeError('Expected name_string to be a string argument.')
+        # Return None if name_string is not in names_list
         elif name_string not in self.names_list:
             return None
         return self.names_list.index(name_string)
@@ -99,5 +101,4 @@ class Names:
         # Check if name_id is within the index range of names_list, else return None
         elif name_id >= len(self.names_list):
             return None
-        # Return name ID
         return self.names_list[name_id]
