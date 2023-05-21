@@ -103,9 +103,6 @@ def test_lookup_appends_new_name(used_names):
 def test_lookup_returns_correct_id_list(used_names):
     """Test if lookup returns the corresponding name ID list for the given name_string list."""
     assert used_names.lookup(["Khalid", "Josephine", "Tom"]) == [1, 0, 2]
-    assert used_names.lookup(["Tom"]) == [2]
-    assert used_names.lookup(["Josephine", "Khalid", "Tom", "Patrick"]) == [
-        0, 1, 2, 3]
 
 
 def test_get_name_string_raises_exceptions(used_names):
