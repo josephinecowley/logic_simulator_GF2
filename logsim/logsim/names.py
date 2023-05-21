@@ -67,9 +67,32 @@ class Names:
 
         If the name string is not present in the names list, add it.
         """
+        name_ID_list = []
+        # Check if name_string_list is a list
+        if not isinstance(name_string_list, list):
+            raise TypeError('Expected name_string_list to be a list argument.')
+        else:
+            for name in name_string_list:
+                # Check if name in name_string_list is a string
+                if not isinstance(name, str):
+                    raise TypeError(
+                        'Expected name in name_string_list to be a string argument.')
+                # If name is not in names_list, append it
+                elif name not in self.names_list:
+                    self.names_list.append(name)
+                # Append name ID to name_ID_list
+                name_ID_list.append(self.names_list.index(name))
+            return name_ID_list
 
     def get_name_string(self, name_id):
         """Return the corresponding name string for name_id.
 
         If the name_id is not an index in the names list, return None.
         """
+
+
+names = Names()
+my_names_list = ["hello", "goodbye"]
+my_names_id_list = names.lookup(my_names_list)
+print(names.names_list[1])
+print(my_names_id_list[1])
