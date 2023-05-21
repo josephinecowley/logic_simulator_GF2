@@ -89,10 +89,15 @@ class Names:
 
         If the name_id is not an index in the names list, return None.
         """
-
-
-names = Names()
-my_names_list = ["hello", "goodbye"]
-my_names_id_list = names.lookup(my_names_list)
-print(names.names_list[1])
-print(my_names_id_list[1])
+        # Check if name_id is an integer, else raise an error
+        if not isinstance(name_id, int):
+            raise TypeError('Expected name_id to be an integer argument.')
+        # Check if name_id is positive, else raise an error
+        elif name_id < 0:
+            raise ValueError(
+                'Expected name_id to be a positive integer argument.')
+        # Check if name_id is within the index range of names_list, else return None
+        elif name_id >= len(self.names_list):
+            return None
+        # Return name ID
+        return self.names_list[name_id]
