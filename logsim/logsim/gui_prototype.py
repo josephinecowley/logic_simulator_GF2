@@ -126,15 +126,18 @@ class Gui(wx.Frame):
         # Bind events to widgets
         self.Bind(wx.EVT_MENU, self.on_menu)
 
-        # Configure sizers for layout
+        # Configure sizers for layout of Frame
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
+        # Instantiate MyGLCanvas (widget?) with ScrolledCanvas widget
         self.canvas = MyGLCanvas(self.scrollable, wx.ID_ANY, wx.DefaultPosition,  wx.Size(300,200))
         self.canvas.SetSizeHints(500, 500)
 
+        # Instantiate SwitchesPanel widget and add to Frame
         self.switches_panel = SwitchesPanel(self)
         main_sizer.Add(self.switches_panel, 1, wx.EXPAND, 0)
 
+        # Add MyGLCanvas(ScrolledCanvas) instance to Frame 
         main_sizer.Add(self.scrollable, 1,  wx.EXPAND+wx.TOP, 5)
 
         self.SetSizeHints(200, 200)
@@ -164,7 +167,7 @@ class SwitchesPanel(wxscrolledpanel.ScrolledPanel):
         self.switches_panel_title = wx.StaticText(self, wx.ID_ANY, "INPUTS", style=wx.ALIGN_CENTER)
         vbox.Add(self.switches_panel_title, 0, wx.EXPAND)
 
-        # Instantiate the ScrolledPanel widget
+        # Instantiate ScrolledPanel widget
         panel = wxscrolledpanel.ScrolledPanel(self, name="panel")
 
         # Configure sizer of ScrolledPanel widget
