@@ -139,9 +139,10 @@ class Gui(wx.Frame):
         side_sizer.Add(self.text, 1, wx.TOP, 10)
 
         # Add switch toggle buttons
-        side_sizer.Add(wx.ToggleButton(self, wx.ID_ANY, "switch 1"), 0)
-        side_sizer.Add(wx.ToggleButton(self, wx.ID_ANY, "switch 2"), 0)
-        side_sizer.Add(wx.ToggleButton(self, wx.ID_ANY, "switch 3"), 0)
+        for switch_number in range(4):
+            switch = wx.ToggleButton(self, wx.ID_ANY, f"switch {switch_number}") # create switch toggle button object with appropriate label
+            self.Bind(wx.EVT_TOGGLEBUTTON, self.on_switch_toggle_button, switch) # bind switch toggle button to its event
+            side_sizer.Add(switch, 0) # add on to side sizer
 
         side_sizer.Add(self.run_button, 1, wx.ALL, 5)
         main_sizer.Add(self.scrollable, 1,  wx.EXPAND+wx.TOP, 5)
@@ -160,6 +161,11 @@ class Gui(wx.Frame):
         """Handle the event when the user clicks the run button."""
         text = "Button pressed."
         self.canvas.render(text)
+
+    def on_switch_toggle_button(self, event):
+        """Handle the event when the user clicks the toggle button for a switch."""
+        switch_selected = event.GetEventObject()
+        print(f'{switch_selected.GetLabel()} has been pressed.')
 
 
 if __name__ == '__main__':
