@@ -19,8 +19,8 @@ CONNECTIONS {
 }
 
 MONITORS {
-    Q1 = dtype1.Q;
-    Q2 = dtype2.Q;
-    Q3 = dtype3.Q;
-    Q4 = dtype4.Q;
+    dtype1.Q;
+    dtype2.Q;
+    dtype3.Q;
+    dtype4.Q;
 }
