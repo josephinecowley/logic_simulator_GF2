@@ -130,7 +130,7 @@ class Gui(wx.Frame):
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
         # Instantiate MyGLCanvas (widget?) with ScrolledCanvas widget
-        self.canvas = MyGLCanvas(self.scrollable, wx.ID_ANY, wx.DefaultPosition,  wx.Size(300,200))
+        self.canvas = MyGLCanvas(self.scrollable, wx.ID_ANY, wx.DefaultPosition,  wx.Size(300, 200))
         self.canvas.SetSizeHints(500, 500)
 
         # Instantiate SwitchesPanel widget and add to Frame
@@ -158,14 +158,21 @@ class Gui(wx.Frame):
 
 class SwitchesPanel(wxscrolledpanel.ScrolledPanel):
     def __init__(self, parent):
-        super(SwitchesPanel, self).__init__(parent)
+        super(SwitchesPanel, self).__init__(parent, size=(300, 200))
 
          # Configure sizers for layout of SwitchesPanel panel
         vbox = wx.BoxSizer(wx.VERTICAL)
 
         # Create and add the title to SwitchesPanel panel
-        self.switches_panel_title = wx.StaticText(self, wx.ID_ANY, "INPUTS", style=wx.ALIGN_CENTER)
-        vbox.Add(self.switches_panel_title, 0, wx.EXPAND)
+        str = "INPUTS"
+        text = wx.StaticText(self, -1, str, style=wx.ALIGN_CENTER)
+        font = wx.Font(18, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        text.SetFont(font)
+        vbox.Add(text, 0, wx.EXPAND)
+
+        # Create and add a separating line between switches title and switch toggle buttons
+        static_line = wx.StaticLine(self, wx.ID_ANY)
+        vbox.Add(static_line, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
 
         # Instantiate ScrolledPanel widget
         panel = wxscrolledpanel.ScrolledPanel(self, name="panel")
@@ -190,6 +197,8 @@ class SwitchesPanel(wxscrolledpanel.ScrolledPanel):
         self.SetSizer(vbox)
         self.SetAutoLayout(1)
         self.SetupScrolling()
+
+        print(self.GetSize())
 
     def on_switch_toggle_button(self, event):
         """Handle the event when the user clicks the toggle button for a switch."""
