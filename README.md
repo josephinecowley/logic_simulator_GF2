@@ -6,7 +6,7 @@ Welcome to our logic simulator! This program takes a logic description file whic
 
 Our project Kanban board can be found here https://github.com/users/josephinecowley/projects/1.
 
-## Instalation and running
+## Installation and running
 
 - download wxpython 
 - supply logic description file
