@@ -123,12 +123,6 @@ class Gui(wx.Frame):
         self.scrollable.SetScrollbars(20, 20, 15, 10)
         # Configure the widgets
         self.text = wx.StaticText(self, wx.ID_ANY, "Inputs")
-
-        '''wx.StaticText(self, wx.ID_ANY, "switch 1", (0, 0))
-        wx.StaticText(self, wx.ID_ANY, "switch 2", (0, 30))
-        wx.StaticText(self, wx.ID_ANY, "switch 3", (0, 60))'''
-
-    
         self.run_button = wx.Button(self, wx.ID_ANY, "Run")
 
         # Bind events to widgets
@@ -145,9 +139,9 @@ class Gui(wx.Frame):
         side_sizer.Add(self.text, 1, wx.TOP, 10)
 
         # Add switch text
-        side_sizer.Add(wx.StaticText(self, wx.ID_ANY, "switch 1"), 0)
-        side_sizer.Add(wx.StaticText(self, wx.ID_ANY, "switch 2"), 0)
-        side_sizer.Add(wx.StaticText(self, wx.ID_ANY, "switch 3"), 0)
+        side_sizer.Add(wx.Button(self, wx.ID_ANY, "switch 1"), 0)
+        side_sizer.Add(wx.Button(self, wx.ID_ANY, "switch 2"), 0)
+        side_sizer.Add(wx.Button(self, wx.ID_ANY, "switch 3"), 0)
 
         side_sizer.Add(self.run_button, 1, wx.ALL, 5)
         main_sizer.Add(self.scrollable, 1,  wx.EXPAND+wx.TOP, 5)
@@ -164,7 +158,7 @@ class Gui(wx.Frame):
  
     def on_run_button(self, event):
         """Handle the event when the user clicks the run button."""
-        text = "Run button pressed."
+        text = "Button pressed."
         self.canvas.render(text)
 
 
