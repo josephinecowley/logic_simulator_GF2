@@ -1,5 +1,6 @@
 import wx
 import wx.glcanvas as wxcanvas
+import wx.lib.scrolledpanel as wxscrolledpanel
 from OpenGL import GL, GLUT
 
 class MyGLCanvas(wxcanvas.GLCanvas):
@@ -117,7 +118,7 @@ class Gui(wx.Frame):
         fileMenu.Append(wx.ID_EXIT, "&Exit")
         menuBar.Append(fileMenu, "&File")
         self.SetMenuBar(menuBar)
-        self.scrollable = wx.ScrolledCanvas(self, wx.ID_ANY )
+        self.scrollable = wx.ScrolledCanvas(self, wx.ID_ANY)
         self.scrollable.SetSizeHints(200, 200)
         self.scrollable.ShowScrollbars(wx.SHOW_SB_ALWAYS, wx.SHOW_SB_DEFAULT)
         self.scrollable.SetScrollbars(20, 20, 15, 10)
@@ -134,15 +135,21 @@ class Gui(wx.Frame):
         side_sizer = wx.BoxSizer(wx.VERTICAL)
        
         main_sizer.Add(side_sizer, 1, wx.ALL, 5)
+        #side_sizer.Add(panel_sizer, 0, wx.ALL)
         self.canvas = MyGLCanvas(self.scrollable, wx.ID_ANY, wx.DefaultPosition,  wx.Size(300,200))
         self.canvas.SetSizeHints(500, 500)
         side_sizer.Add(self.text, 1, wx.TOP, 10)
 
+        '''panel = wxscrolledpanel.ScrolledPanel(self, style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER, name="panel")
+        panel.SetupScrolling()'''
+
+        self.switches_panel = SwitchesPanel(self)
+
         # Add switch toggle buttons
-        for switch_number in range(4):
-            switch = wx.ToggleButton(self, wx.ID_ANY, f"switch {switch_number}") # create switch toggle button object with appropriate label
+        for switch_number in range(1, 20):
+            switch = wx.ToggleButton(parent=self, id=wx.ID_ANY, label=f"switch {switch_number}") # create switch toggle button object with appropriate label
             self.Bind(wx.EVT_TOGGLEBUTTON, self.on_switch_toggle_button, switch) # bind switch toggle button to its event
-            side_sizer.Add(switch, 0) # add on to side sizer
+            side_sizer.Add(switch, 0, wx.ALL, border=20) # add on to side sizer
 
         side_sizer.Add(self.run_button, 1, wx.ALL, 5)
         main_sizer.Add(self.scrollable, 1,  wx.EXPAND+wx.TOP, 5)
@@ -168,8 +175,19 @@ class Gui(wx.Frame):
         print(f'{switch_selected.GetLabel()} has been pressed.')
 
 
+class SwitchesPanel(wx.Panel):
+    def __init__(self, parent):
+        super(SwitchesPanel, self).__init__(parent)
+
+
+class LogicSimApp(wx.App):
+    def OnInit(self):
+        self.frame = Gui("GF2 Team 7 Logic Simulator GUI")
+        self.frame.Show()
+
+        return True
+
+
 if __name__ == '__main__':
-    app = wx.App()
-    gui = Gui("GF2 Team 7 Logic Simulator GUI")
-    gui.Show(True)
+    app = LogicSimApp()
     app.MainLoop()
