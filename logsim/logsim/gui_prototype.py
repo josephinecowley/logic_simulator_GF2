@@ -138,7 +138,7 @@ class Gui(wx.Frame):
         main_sizer.Add(self.switches_panel, 1, wx.EXPAND, 0)
 
         # Add MyGLCanvas(ScrolledCanvas) instance to Frame 
-        main_sizer.Add(self.scrollable, 1,  wx.EXPAND+wx.TOP, 5)
+        main_sizer.Add(self.scrollable, 2,  wx.EXPAND, 5)
 
         self.SetSizeHints(200, 200)
         self.SetSizer(main_sizer)
