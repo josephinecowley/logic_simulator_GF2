@@ -132,9 +132,6 @@ class Gui(wx.Frame):
         self.canvas = MyGLCanvas(self.scrollable, wx.ID_ANY, wx.DefaultPosition,  wx.Size(300,200))
         self.canvas.SetSizeHints(500, 500)
 
-        '''panel = wxscrolledpanel.ScrolledPanel(self, style=wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER, name="panel")
-        panel.SetupScrolling()'''
-
         self.switches_panel = SwitchesPanel(self)
         main_sizer.Add(self.switches_panel, 1, wx.EXPAND, 0)
 
@@ -156,23 +153,31 @@ class Gui(wx.Frame):
         self.canvas.render(text)
 
 
-class SwitchesPanel(wx.Panel):
+class SwitchesPanel(wxscrolledpanel.ScrolledPanel):
     def __init__(self, parent):
         super(SwitchesPanel, self).__init__(parent)
 
          # Configure sizers for layout
         vbox = wx.BoxSizer(wx.VERTICAL)
 
-        self.switches_panel_title = wx.StaticText(self, wx.ID_ANY, "INPUTS", style=wx.ALIGN_CENTER)
-        vbox.Add(self.switches_panel_title, 0, wx.EXPAND)
+        panel = wxscrolledpanel.ScrolledPanel(self, name="panel")
 
-        for switch_number in range(1, 8):
-            switch = wx.ToggleButton(parent=self, id=wx.ID_ANY, label=f"switch {switch_number}") # create switch toggle button object with appropriate label
+        fgs = wx.FlexGridSizer(cols=1, rows=30, vgap=4, hgap=4)
+
+        for switch_number in range(1, 30):
+            switch = wx.ToggleButton(parent=panel, id=wx.ID_ANY, label=f"switch {switch_number}") # create switch toggle button object with appropriate label
             self.Bind(wx.EVT_TOGGLEBUTTON, self.on_switch_toggle_button, switch) # bind switch toggle button to its event
-            vbox.Add(switch, 0, wx.ALL, border=20) # add on to side sizer
+            fgs.Add(switch, flag=wx.RIGHT, border=10) # add on to side sizer
 
-        self.SetSizeHints(200, 200)
+        panel.SetSizer(fgs)
+        panel.SetAutoLayout(1)
+        panel.SetupScrolling()
+
+        vbox.Add(panel, 1, wx.EXPAND)
+
         self.SetSizer(vbox)
+        self.SetAutoLayout(1)
+        self.SetupScrolling()
 
     def on_switch_toggle_button(self, event):
         """Handle the event when the user clicks the toggle button for a switch."""
