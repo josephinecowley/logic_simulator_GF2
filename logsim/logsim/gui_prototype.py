@@ -138,10 +138,10 @@ class Gui(wx.Frame):
         self.canvas.SetSizeHints(500, 500)
         side_sizer.Add(self.text, 1, wx.TOP, 10)
 
-        # Add switch text
-        side_sizer.Add(wx.Button(self, wx.ID_ANY, "switch 1"), 0)
-        side_sizer.Add(wx.Button(self, wx.ID_ANY, "switch 2"), 0)
-        side_sizer.Add(wx.Button(self, wx.ID_ANY, "switch 3"), 0)
+        # Add switch toggle buttons
+        side_sizer.Add(wx.ToggleButton(self, wx.ID_ANY, "switch 1"), 0)
+        side_sizer.Add(wx.ToggleButton(self, wx.ID_ANY, "switch 2"), 0)
+        side_sizer.Add(wx.ToggleButton(self, wx.ID_ANY, "switch 3"), 0)
 
         side_sizer.Add(self.run_button, 1, wx.ALL, 5)
         main_sizer.Add(self.scrollable, 1,  wx.EXPAND+wx.TOP, 5)
