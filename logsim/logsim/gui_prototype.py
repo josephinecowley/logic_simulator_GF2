@@ -152,8 +152,8 @@ class Gui(wx.Frame):
         self.canvas.render(text)
 
 class SignalTrace(wx.ScrolledWindow):
-    def __init_(self, parent):
-        super(SignalTrace, self).__init__(parent)
+    def __init__(self, parent, id=wx.ID_ANY, size=(300, 200)):
+        super(SignalTrace, self).__init__(parent, id, size=size)
 
         self.lines = []
         self.maxWidth  = 1000
@@ -162,7 +162,7 @@ class SignalTrace(wx.ScrolledWindow):
         self.curLine = []
         self.drawing = False
 
-        self.SetBackgroundColour("WHITE")
+        self.SetBackgroundColour("RED")
 
         self.SetVirtualSize((self.maxWidth, self.maxHeight))
         self.SetScrollRate(20,20)
@@ -199,8 +199,9 @@ class SignalTracesPanel(wx.Panel):
         
         for signal_trace_num in range(1, num_of_signal_traces + 1):
             signal_trace = SignalTrace(signal_traces_scrolled_panel, wx.ID_ANY)
-            signal_trace_canvas = MyGLCanvas(signal_trace, wx.ID_ANY, wx.DefaultPosition,  wx.Size(*signal_trace_size))
-            fgs.Add(signal_trace, 1, flag=wx.EXPAND, border=10)
+            #signal_trace_canvas = MyGLCanvas(signal_trace, wx.ID_ANY, wx.DefaultPosition,  wx.Size(*signal_trace_size))
+            signal_trace.SetBackgroundColour(wx.Colour(255, 0, 0))
+            fgs.Add(signal_trace, 0, flag=wx.EXPAND, border=10)
 
         signal_traces_scrolled_panel.SetSizer(fgs)
         signal_traces_scrolled_panel.SetAutoLayout(1)
