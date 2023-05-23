@@ -18,15 +18,20 @@ def scanner_fixture(path_fixture, names_fixture):
 
 
 @pytest.fixture
-def set_scanner_location(scanner_fixture, line_number, position):
-    scanner = scanner_fixture
-    # find move the pointer to the correct line and then seek to the position
-    for i, line in enumerate(scanner.file, start=1):
-        if i == line_number:
-            scanner.file.seek(position, 1)
+def set_scanner_location(scanner_fixture):
+    def _set_scanner_location(location):
+        line_number, position = location
+        scanner = scanner_fixture
+        # Move the pointer to the correct line and then seek to the position
+        for i, line in enumerate(scanner.file, start=1):
+            if i == line_number:
+                scanner.file.seek(position, 1)
 
-    scanner.line_number = line_number
-    scanner.position = position
+        scanner.line_number = line_number
+        scanner.position = position
+        scanner.current_character = scanner.file.read(1)
+
+    return _set_scanner_location
 
 
 # Test Symbol class
@@ -89,22 +94,23 @@ def test_scanner_advance(scanner_fixture):
 ])
 def test_scanner_skip_spaces(scanner_fixture, set_scanner_location, location, expected_character):
     scanner = scanner_fixture
-    set_scanner_location(*location)
+    set_scanner_location(location)
     scanner.skip_spaces()
     assert scanner.current_character == expected_character
 
 
-
-def test_scanner_get_name(scanner_fixture):
+def test_scanner_get_name(scanner_fixture, set_scanner_location):
+    location = (1,0)
     scanner = scanner_fixture
-    set_scanner_location(1, 0)
+    set_scanner_location(location)
     name = scanner.get_name()
     assert name == "DEVICES"
 
 
-def test_scanner_get_number(scanner_fixture):
+def test_scanner_get_number(scanner_fixture, set_scanner_location):
+    location = (6, 16) # to '25'
     scanner = scanner_fixture
-    set_scanner_location(6, 16) # to 25
+    set_scanner_location(location) 
     number = scanner.get_number()
     assert number == "25"
 
@@ -124,4 +130,4 @@ def test_scanner_display_line_and_marker(scanner_fixture, capfd):
     assert output_lines[1] == "          ^  "  
 
 
-
+"""Still need to write lots of tests for get_symbol """
