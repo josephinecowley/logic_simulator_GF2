@@ -126,18 +126,16 @@ class Gui(wx.Frame):
         vbox = wx.BoxSizer(wx.VERTICAL)
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
-        canvas_1_panel = wx.Panel(self)
-        vbox.Add(canvas_1_panel, 8, wx.EXPAND)
-        canvas_1_panel.SetSizer(hbox)
-
-        #canvas_2_panel = wx.Panel(self)
+        data_panel = wx.Panel(self)
+        vbox.Add(data_panel, 8, wx.EXPAND)
+        data_panel.SetSizer(hbox)
 
         # Instantiate SwitchesPanel widget and add to Frame
-        switches_panel = SwitchesPanel(canvas_1_panel)
+        switches_panel = SwitchesPanel(data_panel)
         hbox.Add(switches_panel, 1, wx.EXPAND, 0)
 
         # Instantiate SignalTracesPanel widget and add to Frame
-        signal_traces_panel = SignalTracesPanel(canvas_1_panel)
+        signal_traces_panel = SignalTracesPanel(data_panel)
         hbox.Add(signal_traces_panel, 3, wx.EXPAND, 0)
 
         simulation_panel = RunSimulationPanel(self)
@@ -158,19 +156,23 @@ class RunSimulationPanel(wx.Panel):
 
         self.SetBackgroundColour("RED")
 
+        # Configure sizers for layout of RunSimulationPanel
+        vbox = wx.BoxSizer(wx.VERTICAL)
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
+        # Create, bind and add the "Run simulation" button
         run_button = wxbuttons.GenButton(self, wx.ID_ANY, 'RUN')
         self.Bind(wx.EVT_BUTTON, self.on_run_button, run_button)
         run_button.SetFont(wx.Font(20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
         run_button.SetBezelWidth(5)
         run_button.SetMinSize(wx.DefaultSize)
-        run_button.SetBackgroundColour("MEDIUM FOREST GREEN")
+        run_button.SetBackgroundColour(wx.Colour(4, 84, 14))
         run_button.SetForegroundColour(wx.WHITE)
         run_button.SetToolTip("Run the simulation")
-        # let the sizer set best size
+        # Let the sizer set best size
         hbox.Add(run_button, flag=wx.ADJUST_MINSIZE | wx.ALIGN_BOTTOM, border=5)
 
+        # Set sizer of RunSimulationPanel
         self.SetSizer(hbox)
 
     def on_run_button(self, event):
@@ -184,6 +186,7 @@ class SignalTrace(wx.ScrolledWindow):
 
         size = self.GetClientSize()
 
+        # Useful variables for ScrolledWindow
         self.lines = []
         self.maxWidth  = size.width * 2
         self.maxHeight = size.height
@@ -193,6 +196,7 @@ class SignalTrace(wx.ScrolledWindow):
 
         self.SetBackgroundColour("PURPLE") # layout identifier colour for visualisation purposes
 
+        # Set settings for ScrolledWindow
         self.SetVirtualSize((self.maxWidth, self.maxHeight))
         self.SetScrollRate(20,20)
 
