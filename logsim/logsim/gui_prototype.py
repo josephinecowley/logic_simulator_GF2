@@ -161,20 +161,23 @@ class RunSimulationPanel(wx.Panel):
         vbox = wx.BoxSizer(wx.VERTICAL)
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
-        # Create and set sizer of cycles_panel and left buttons panel
+        # Create and set sizer of overall cycles + left buttons panel
         cycles_and_left_buttons_panel = wx.Panel(self)
         cycles_and_left_buttons_panel.SetSizer(vbox)
 
+        # Create, configure, set and add cycles panel to overall cycles + left buttons panel
         cycles_panel = wx.Panel(cycles_and_left_buttons_panel)
         cycles_hbox = wx.BoxSizer(wx.HORIZONTAL)
         cycles_panel.SetSizer(cycles_hbox)
         vbox.Add(cycles_panel)
 
+        # Create, configure, set and add left buttons panel to overall cycles + left buttons panel
         left_buttons_panel = wx.Panel(cycles_and_left_buttons_panel)
         left_buttons_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
         left_buttons_panel.SetSizer(left_buttons_panel_hbox)
         vbox.Add(left_buttons_panel)
         
+        # Create number of cycles text to cycles panel
         str = "No. Cycles"
         text = wx.StaticText(cycles_panel, wx.ID_ANY, str, style=wx.ALIGN_LEFT)
         font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
@@ -201,9 +204,9 @@ class RunSimulationPanel(wx.Panel):
         run_button.SetBackgroundColour(wx.Colour(4, 84, 14))
         run_button.SetForegroundColour(wx.WHITE)
         run_button.SetToolTip("Run the simulation")
-        # Let the sizer set best size
         left_buttons_panel_hbox.Add(run_button, 1, flag=wx.ALIGN_LEFT, border=5)
 
+        # Create and add cycles + left buttons panel to RunSimulationPanel
         hbox.Add(cycles_and_left_buttons_panel, 1, flag=wx.ALIGN_LEFT, border=5)
 
         str = "TEST RIGHT SIDE"
