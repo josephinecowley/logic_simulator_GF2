@@ -77,7 +77,7 @@ class Scanner:
     def get_symbol(self):
         """Translate the next sequence of characters into a symbol."""
         symbol = Symbol()
-        self.skip_spaces()  # current character now not whitespace
+        self.skip_spaces()  # current character now not whitespace or \n
 
         if self.current_character.isalpha():  # name
             name_string = self.get_name()
@@ -140,7 +140,7 @@ class Scanner:
             self.position = 0
             # skip all spaces after new line
             # will catch any subsequent new lines
-            self.skip_spaces() 
+            self.get_symbol() # call get_symbol recursively
 
         elif self.current_character == "":  # end of file
             symbol.type = self.EOF
@@ -157,8 +157,8 @@ class Scanner:
             # Try to open the file for reading
             file = open(path, "r")
         except:
-            # Exit the program with error message
-            sys.exit("Error: can\'t find specified file - check file name is correct")
+            # raise a value error
+            raise ValueError("Error: can\'t find specified file - check file name is correct")
         else:
             return file
 
