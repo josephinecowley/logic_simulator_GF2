@@ -161,7 +161,7 @@ class RunSimulationPanel(wx.Panel):
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
         # Create, bind and add the "Run simulation" button
-        run_button = wxbuttons.GenButton(self, wx.ID_ANY, 'RUN')
+        run_button = wxbuttons.GenButton(self, wx.ID_ANY, 'RUN', name="run button")
         self.Bind(wx.EVT_BUTTON, self.on_run_button, run_button)
         run_button.SetFont(wx.Font(20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
         run_button.SetBezelWidth(5)
@@ -177,9 +177,9 @@ class RunSimulationPanel(wx.Panel):
 
     def on_run_button(self, event):
         """Handle the event when the user clicks the run button."""
-        text = "Run simulation button pressed."
-        print(text)
         run_button_pressed = event.GetEventObject()
+        text = f"{run_button_pressed.GetLabel()} simulation button pressed."
+        print(text)
         run_button_pressed.SetLabel("CONTINUE")
         run_button_pressed.SetBackgroundColour(wx.Colour(181, 150, 27))
         self.GetSizer().Layout()
