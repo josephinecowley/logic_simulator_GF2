@@ -207,7 +207,7 @@ class RunSimulationPanel(wx.Panel):
         left_buttons_panel_hbox.Add(run_button, 1, flag=wx.ALIGN_LEFT, border=5)
 
         quit_button = wxbuttons.GenButton(left_buttons_panel, wx.ID_ANY, "QUIT", name="quit button")
-        #self.Bind(wx.EVT_BUTTON, self.on_quit_button, quit_button)
+        self.Bind(wx.EVT_BUTTON, self.on_quit_button, quit_button)
         quit_button.SetFont(wx.Font(20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
         quit_button.SetBezelWidth(5)
         quit_button.SetMinSize(wx.DefaultSize)
@@ -236,6 +236,13 @@ class RunSimulationPanel(wx.Panel):
         run_button_pressed.SetLabel("CONTINUE")
         run_button_pressed.SetBackgroundColour(wx.Colour(181, 150, 27))
         self.GetSizer().Layout()
+
+    def on_quit_button(self, event):
+        """Handle the event when the user clicks the quit button."""
+        quit_button_pressed = event.GetEventObject()
+        text = "QUIT button pressed"
+        print(text)
+        quit_button_pressed.SetBackgroundColour(wx.Colour(148, 148, 148))
 
 
 class SignalTrace(wx.ScrolledWindow):
