@@ -195,7 +195,7 @@ class RunSimulationPanel(wx.Panel):
         cycles_hbox.Add(text, 0, flag=wx.LEFT, border=10)
         cycles_hbox.Add(spin, 0, flag=wx.LEFT, border=10)
 
-        # Create, bind and add the "Run simulation" button
+        # Create, bind running simulation event to and add the "Run simulation" button
         run_button = wxbuttons.GenButton(left_buttons_panel, wx.ID_ANY, "RUN", name="run button")
         self.Bind(wx.EVT_BUTTON, self.on_run_button, run_button)
         run_button.SetFont(wx.Font(20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
@@ -206,6 +206,7 @@ class RunSimulationPanel(wx.Panel):
         run_button.SetToolTip("Run the simulation")
         left_buttons_panel_hbox.Add(run_button, 1, flag=wx.ALIGN_LEFT, border=5)
 
+        # Create, bind quitting event to and add the "Quit simulation" button
         quit_button = wxbuttons.GenButton(left_buttons_panel, wx.ID_ANY, "QUIT", name="quit button")
         self.Bind(wx.EVT_BUTTON, self.on_quit_button, quit_button)
         quit_button.SetFont(wx.Font(20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
