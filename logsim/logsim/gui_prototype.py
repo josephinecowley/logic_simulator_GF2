@@ -184,12 +184,12 @@ class RunSimulationPanel(wx.Panel):
         font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         text.SetFont(font)
         panel_1_hbox.Add(text, 0, flag=wx.LEFT, border=10)'''
-        self.text = wx.TextCtrl(panel_1, wx.ID_ANY, "1", pos=wx.DefaultPosition, size=wx.DefaultSize)
-        self.spin = wx.SpinButton(panel_1, wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.SP_HORIZONTAL)
-        self.spin.SetRange(1, 100)
-        self.spin.SetValue(1)
-        panel_1_hbox.Add(self.text, 0, flag=wx.LEFT, border=10)
-        panel_1_hbox.Add(self.spin, 0, flag=wx.LEFT, border=10)
+        text = wx.TextCtrl(panel_1, wx.ID_ANY, "1", pos=wx.DefaultPosition, size=(60, -1))
+        spin = wx.SpinButton(panel_1, wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.SP_VERTICAL)
+        spin.SetRange(1, 100)
+        spin.SetValue(1)
+        panel_1_hbox.Add(text, 0, flag=wx.LEFT, border=10)
+        panel_1_hbox.Add(spin, 0, flag=wx.LEFT, border=10)
 
         # Create, bind and add the "Run simulation" button
         run_button = wxbuttons.GenButton(panel_2, wx.ID_ANY, 'RUN', name="run button")
