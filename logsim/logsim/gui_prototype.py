@@ -4,8 +4,7 @@ import wx.lib.scrolledpanel as wxscrolledpanel
 from OpenGL import GL, GLUT
 
 class MyGLCanvas(wxcanvas.GLCanvas):
-
-    def __init__(self, parent,id,pos,size):
+    def __init__(self, parent, id, pos, size):
         """Initialise canvas properties and useful variables."""
         super().__init__(parent, -1,pos=pos,size=size,
                          attribList=[wxcanvas.WX_GL_RGBA,
@@ -118,10 +117,6 @@ class Gui(wx.Frame):
         fileMenu.Append(wx.ID_EXIT, "&Exit")
         menuBar.Append(fileMenu, "&File")
         self.SetMenuBar(menuBar)
-        self.scrollable = wx.ScrolledCanvas(self, wx.ID_ANY)
-        self.scrollable.SetSizeHints(200, 200)
-        self.scrollable.ShowScrollbars(wx.SHOW_SB_ALWAYS, wx.SHOW_SB_DEFAULT)
-        self.scrollable.SetScrollbars(20, 20, 15, 10)
 
         # Bind events to widgets
         self.Bind(wx.EVT_MENU, self.on_menu)
@@ -129,16 +124,17 @@ class Gui(wx.Frame):
         # Configure sizers for layout of Frame
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        # Instantiate MyGLCanvas (widget?) with ScrolledCanvas widget
-        self.canvas = MyGLCanvas(self.scrollable, wx.ID_ANY, wx.DefaultPosition,  wx.Size(300, 200))
-        self.canvas.SetSizeHints(500, 500)
 
         # Instantiate SwitchesPanel widget and add to Frame
         self.switches_panel = SwitchesPanel(self)
         main_sizer.Add(self.switches_panel, 1, wx.EXPAND, 0)
 
-        # Add MyGLCanvas(ScrolledCanvas) instance to Frame 
-        main_sizer.Add(self.scrollable, 2,  wx.EXPAND, 5)
+        # Instantiate SignalTracesPanel widget and add to Frame
+        self.signal_traces_panel = SignalTracesPanel(self)
+        main_sizer.Add(self.signal_traces_panel, 2, wx.EXPAND, 5)
+
+        '''# Add MyGLCanvas(ScrolledCanvas) instance to Frame 
+        main_sizer.Add(self.scrollable, 2,  wx.EXPAND, 5)'''
 
         self.SetSizeHints(200, 200)
         self.SetSizer(main_sizer)
@@ -155,12 +151,47 @@ class Gui(wx.Frame):
         text = "Button pressed."
         self.canvas.render(text)
 
+class SignalTracesPanel(wxscrolledpanel.ScrolledPanel):
+    def __init__(self, parent):
+        super(SignalTracesPanel, self).__init__(parent, size=(300, 200))
+
+        # Configure sizers for layout of SwitchesPanel panel
+        vbox = wx.BoxSizer(wx.VERTICAL)
+        hbox = wx.BoxSizer(wx.HORIZONTAL)
+
+        '''self.scrollable = wx.ScrolledCanvas(self, wx.ID_ANY)
+        self.scrollable.SetSizeHints(200, 200)
+        self.scrollable.ShowScrollbars(wx.SHOW_SB_ALWAYS, wx.SHOW_SB_DEFAULT)
+        self.scrollable.SetScrollbars(20, 20, 15, 10)'''
+
+        '''self.canvas = MyGLCanvas(self, wx.ID_ANY, wx.DefaultPosition,  wx.Size(300, 200))
+        self.canvas.SetSizeHints(500, 500)'''
+
+        signal_traces_scrolled_panel = wxscrolledpanel.ScrolledPanel(self, name="signal traces scrolled panel")
+
+        num_of_signal_traces = 7
+        fgs = wx.FlexGridSizer(cols=1, rows=num_of_signal_traces, vgap=4, hgap=4)
+
+        for signal_trace in range(1, num_of_signal_traces):
+            test = MyGLCanvas(signal_traces_scrolled_panel, wx.ID_ANY, wx.DefaultPosition,  wx.Size(300, 100))
+            fgs.Add(test, 1, flag=wx.ALL, border=10)
+
+        signal_traces_scrolled_panel.SetSizer(fgs)
+        signal_traces_scrolled_panel.SetAutoLayout(1)
+        signal_traces_scrolled_panel.SetupScrolling()
+
+        vbox.Add(signal_traces_scrolled_panel, 2, wx.EXPAND)
+
+        self.SetSizer(vbox)
+        self.SetAutoLayout(1)
+        self.SetupScrolling()
+
 
 class SwitchesPanel(wxscrolledpanel.ScrolledPanel):
     def __init__(self, parent):
         super(SwitchesPanel, self).__init__(parent, size=(300, 200))
 
-         # Configure sizers for layout of SwitchesPanel panel
+        # Configure sizers for layout of SwitchesPanel panel
         vbox = wx.BoxSizer(wx.VERTICAL)
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
