@@ -160,8 +160,17 @@ class RunSimulationPanel(wx.Panel):
         vbox = wx.BoxSizer(wx.VERTICAL)
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
+        cycles_and_button_panel = wx.Panel(self)
+        cycles_and_button_panel.SetSizer(vbox)
+
+        str = "No. Cycles"
+        text = wx.StaticText(cycles_and_button_panel, wx.ID_ANY, str, style=wx.ALIGN_LEFT)
+        font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        text.SetFont(font)
+        vbox.Add(text, 1, flag=wx.TOP)
+
         # Create, bind and add the "Run simulation" button
-        run_button = wxbuttons.GenButton(self, wx.ID_ANY, 'RUN', name="run button")
+        run_button = wxbuttons.GenButton(cycles_and_button_panel, wx.ID_ANY, 'RUN', name="run button")
         self.Bind(wx.EVT_BUTTON, self.on_run_button, run_button)
         run_button.SetFont(wx.Font(20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
         run_button.SetBezelWidth(5)
@@ -170,8 +179,10 @@ class RunSimulationPanel(wx.Panel):
         run_button.SetForegroundColour(wx.WHITE)
         run_button.SetToolTip("Run the simulation")
         # Let the sizer set best size
-        hbox.Add(run_button, flag=wx.ADJUST_MINSIZE | wx.ALIGN_BOTTOM, border=5)
+        vbox.Add(run_button, 1, flag=wx.ALIGN_LEFT, border=5)
 
+        hbox.Add(cycles_and_button_panel, 1, flag=wx.ALIGN_LEFT, border=5)
+        
         # Set sizer of RunSimulationPanel
         self.SetSizer(hbox)
 
