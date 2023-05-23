@@ -151,7 +151,7 @@ class Gui(wx.Frame):
         text = "Button pressed."
         self.canvas.render(text)
 
-class SignalTracesPanel(wxscrolledpanel.ScrolledPanel):
+class SignalTracesPanel(wx.Panel):
     def __init__(self, parent):
         super(SignalTracesPanel, self).__init__(parent, size=(300, 200))
 
@@ -183,11 +183,9 @@ class SignalTracesPanel(wxscrolledpanel.ScrolledPanel):
         vbox.Add(signal_traces_scrolled_panel, 2, wx.EXPAND)
 
         self.SetSizer(vbox)
-        self.SetAutoLayout(1)
-        self.SetupScrolling()
 
 
-class SwitchesPanel(wxscrolledpanel.ScrolledPanel):
+class SwitchesPanel(wx.Panel):
     def __init__(self, parent):
         super(SwitchesPanel, self).__init__(parent, size=(300, 200))
 
@@ -258,8 +256,6 @@ class SwitchesPanel(wxscrolledpanel.ScrolledPanel):
 
         # Set sizer of SwitchesPanel panel
         self.SetSizer(vbox)
-        self.SetAutoLayout(1)
-        self.SetupScrolling()
 
     def on_switch_toggle_button(self, event):
         """Handle the event when the user clicks the toggle button for a switch."""
