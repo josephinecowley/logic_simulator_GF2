@@ -196,7 +196,7 @@ class RunSimulationPanel(wx.Panel):
         cycles_hbox.Add(spin, 0, flag=wx.LEFT, border=10)
 
         # Create, bind and add the "Run simulation" button
-        run_button = wxbuttons.GenButton(left_buttons_panel, wx.ID_ANY, 'RUN', name="run button")
+        run_button = wxbuttons.GenButton(left_buttons_panel, wx.ID_ANY, "RUN", name="run button")
         self.Bind(wx.EVT_BUTTON, self.on_run_button, run_button)
         run_button.SetFont(wx.Font(20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
         run_button.SetBezelWidth(5)
@@ -205,6 +205,16 @@ class RunSimulationPanel(wx.Panel):
         run_button.SetForegroundColour(wx.WHITE)
         run_button.SetToolTip("Run the simulation")
         left_buttons_panel_hbox.Add(run_button, 1, flag=wx.ALIGN_LEFT, border=5)
+
+        quit_button = wxbuttons.GenButton(left_buttons_panel, wx.ID_ANY, "QUIT", name="quit button")
+        #self.Bind(wx.EVT_BUTTON, self.on_quit_button, quit_button)
+        quit_button.SetFont(wx.Font(20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
+        quit_button.SetBezelWidth(5)
+        quit_button.SetMinSize(wx.DefaultSize)
+        quit_button.SetBackgroundColour(wx.Colour(139, 26, 26))
+        quit_button.SetForegroundColour(wx.WHITE)
+        quit_button.SetToolTip("Quit the simulation")
+        left_buttons_panel_hbox.Add(quit_button, 1, flag=wx.ALIGN_LEFT, border=5)
 
         # Create and add cycles + left buttons panel to RunSimulationPanel
         hbox.Add(cycles_and_left_buttons_panel, 1, flag=wx.ALIGN_LEFT, border=5)
