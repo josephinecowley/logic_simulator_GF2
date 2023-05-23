@@ -75,32 +75,39 @@ def test_scanner_advance():
 
 def test_scanner_skip_spaces():
     scanner = Scanner(path, names)
-    set_scanner_location(1, 9) # Move scanner position to first open brace
+    set_scanner_location(1, 9) # Move scanner location to first open brace
     scanner.skip_spaces()
     assert scanner.current_character == "\n"
-    set_scanner_location()
+    set_scanner_location(2, 0) # Move scanner location to line 2 
+    scanner.skip_spaces()
+    assert not scanner.current_character.isspace()
 
 
 def test_scanner_get_name():
     scanner = Scanner(path, names)
-    set_scanner_location()
-    scanner.current_character = "a"
+    set_scanner_location(1, 0)
     name = scanner.get_name()
-    assert name == "a"
+    assert name == "DEVICES"
 
 
 def test_scanner_get_number():
-    scanner = Scanner("example.txt", None)
-    scanner.current_character = "1"
+    scanner = Scanner(path, names)
+    set_scanner_location(6, 16) # to 25
     number = scanner.get_number()
-    assert number == "1"
+    assert number == "25"
 
 
-def test_scanner_display_line_and_marker():
-    scanner = Scanner("example.txt", None)
+def test_scanner_display_line_and_marker(capfd):
+    scanner = Scanner(path, names)
     symbol = Symbol()
-    symbol.line_number = 1
-    symbol.end_position = 5
+    symbol.line_number = 10
+    symbol.end_position = 10
     scanner.display_line_and_marker(symbol)
-    # Additional assertions can be added to check the printed output
+
+    # Capture the printed output
+    captured = capfd.readouterr()
+    output_lines = captured.out.splitlines()
+
+    assert output_lines[0] == "CONNECTIONS {" 
+    assert output_lines[1] == "          ^  "  
 
