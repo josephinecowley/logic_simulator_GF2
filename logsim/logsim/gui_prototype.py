@@ -177,24 +177,27 @@ class SignalTracesPanel(wx.Panel):
         vbox = wx.BoxSizer(wx.VERTICAL)
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
+        # Instantiate ScrolledPanel
         signal_traces_scrolled_panel = wxscrolledpanel.ScrolledPanel(self, name="signal traces scrolled panel")
 
+        # Configure sizer of ScrolledPanel
         signal_trace_size = (500, 200)
         num_of_signal_traces = 7
         fgs = wx.FlexGridSizer(cols=1, rows=num_of_signal_traces, vgap=4, hgap=4)
         
         for signal_trace_num in range(1, num_of_signal_traces + 1):
-            signal_trace = SignalTrace(signal_traces_scrolled_panel, wx.ID_ANY, size=signal_trace_size)
-            signal_trace_canvas = MyGLCanvas(signal_trace, wx.ID_ANY, wx.DefaultPosition,  wx.Size(*signal_trace_size))
-            #signal_trace.SetBackgroundColour(wx.Colour(255, 0, 0))
-            fgs.Add(signal_trace, 0, flag=wx.EXPAND, border=10)
+            signal_trace = SignalTrace(signal_traces_scrolled_panel, wx.ID_ANY, size=signal_trace_size) # create signal trace scrolled window
+            signal_trace_canvas = MyGLCanvas(signal_trace, wx.ID_ANY, wx.DefaultPosition,  wx.Size(*signal_trace_size)) # draw canvas onto signal trace scrolled window
+            fgs.Add(signal_trace, 0, flag=wx.EXPAND, border=10) # add signal trace plot to ScrolledPanel
 
+        # Set sizer of ScrolledPanel
         signal_traces_scrolled_panel.SetSizer(fgs)
         signal_traces_scrolled_panel.SetAutoLayout(1)
         signal_traces_scrolled_panel.SetupScrolling(scroll_x=True, scroll_y=True, rate_x=20, rate_y=20, scrollToTop=True, scrollIntoView=True)
 
         vbox.Add(signal_traces_scrolled_panel, 1, wx.EXPAND)
 
+        # Set sizer of SignalTracesPanel
         self.SetSizer(vbox)
 
 
@@ -217,24 +220,25 @@ class SwitchesPanel(wx.Panel):
         static_line = wx.StaticLine(self, wx.ID_ANY)
         vbox.Add(static_line, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
 
+        # Create panel for switch toggle buttons
         switches_panel = wx.Panel(self)
         #switches_panel.SetBackgroundColour(wx.Colour(255, 0, 0))
         vbox.Add(switches_panel, 1, wx.EXPAND)
         switches_panel.SetSizer(hbox)
 
-        # Instantiate ScrolledPanel widget
+        # Instantiate ScrolledPanel
         switch_buttons_scrolled_panel = wxscrolledpanel.ScrolledPanel(switches_panel, name="switch buttons scrolled panel")
 
-        # Configure sizer of ScrolledPanel widget
+        # Configure sizer of ScrolledPanel
         num_of_switches = 30
         fgs = wx.FlexGridSizer(cols=1, rows=num_of_switches, vgap=4, hgap=4)
 
         for switch_num in range(1, num_of_switches + 1):
             switch = wx.ToggleButton(parent=switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"switch {switch_num}") # create switch toggle button object with appropriate label
             self.Bind(wx.EVT_TOGGLEBUTTON, self.on_switch_toggle_button, switch) # bind switch toggle button to its event
-            fgs.Add(switch, 1, flag=wx.ALL, border=10) # add switch toggle buttons to ScrolledPanel widget
+            fgs.Add(switch, 1, flag=wx.ALL, border=10) # add switch toggle buttons to ScrolledPanel
 
-        # Set sizer of ScrolledPanel widget
+        # Set sizer of ScrolledPanel
         switch_buttons_scrolled_panel.SetSizer(fgs)
         switch_buttons_scrolled_panel.SetAutoLayout(1)
         switch_buttons_scrolled_panel.SetupScrolling(scroll_x=True, scroll_y=True, rate_x=20, rate_y=20, scrollToTop=True, scrollIntoView=True)
@@ -267,7 +271,7 @@ class SwitchesPanel(wx.Panel):
         right_panel.SetBackgroundColour(wx.Colour(0, 0, 255)) # blue for layout visualisation purposes
         hbox.Add(right_panel, 1, wx.EXPAND)
 
-        # Set sizer of SwitchesPanel panel
+        # Set sizer of SwitchesPanel
         self.SetSizer(vbox)
 
     def on_switch_toggle_button(self, event):
