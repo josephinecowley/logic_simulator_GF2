@@ -190,7 +190,7 @@ class SwitchesPanel(wxscrolledpanel.ScrolledPanel):
         for switch_number in range(1, num_of_switches):
             switch = wx.ToggleButton(parent=switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"switch {switch_number}") # create switch toggle button object with appropriate label
             self.Bind(wx.EVT_TOGGLEBUTTON, self.on_switch_toggle_button, switch) # bind switch toggle button to its event
-            fgs.Add(switch, 0, flag=wx.ALIGN_CENTER) # add switch toggle buttons to ScrolledPanel widget
+            fgs.Add(switch, 1, flag=wx.ALL, border=10) # add switch toggle buttons to ScrolledPanel widget
 
         # Set sizer of ScrolledPanel widget
         switch_buttons_scrolled_panel.SetSizer(fgs)
@@ -225,16 +225,6 @@ class SwitchesPanel(wxscrolledpanel.ScrolledPanel):
         right_panel = wx.Panel(switches_panel)
         right_panel.SetBackgroundColour(wx.Colour(0, 0, 255))
         hbox.Add(right_panel, 1, wx.EXPAND)
-
-        '''left_panel = wx.Panel(switches_panel)
-        hbox.Add(left_panel, 0, wx.EXPAND)
-        left_panel.SetSizer(hbox)
-
-        hbox.Add(switch_buttons_scrolled_panel, 1, wx.EXPAND)
-
-        right_panel = wx.Panel(switches_panel)
-        hbox.Add(right_panel, 0, wx.EXPAND)
-        right_panel.SetSizer(hbox)'''
 
         # Set sizer of SwitchesPanel panel
         self.SetSizer(vbox)
