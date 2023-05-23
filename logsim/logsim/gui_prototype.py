@@ -1,6 +1,7 @@
 import wx
 import wx.glcanvas as wxcanvas
 import wx.lib.scrolledpanel as wxscrolledpanel
+import wx.lib.buttons as wxbuttons
 from OpenGL import GL, GLUT
 
 class MyGLCanvas(wxcanvas.GLCanvas):
@@ -122,22 +123,30 @@ class Gui(wx.Frame):
         self.Bind(wx.EVT_MENU, self.on_menu)
 
         # Configure sizers for layout of Frame
-        main_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        vbox = wx.BoxSizer(wx.VERTICAL)
+        hbox = wx.BoxSizer(wx.HORIZONTAL)
 
+        canvas_1_panel = wx.Panel(self)
+        vbox.Add(canvas_1_panel, 5, wx.EXPAND)
+        canvas_1_panel.SetSizer(hbox)
+
+        #canvas_2_panel = wx.Panel(self)
 
         # Instantiate SwitchesPanel widget and add to Frame
-        self.switches_panel = SwitchesPanel(self)
-        main_sizer.Add(self.switches_panel, 1, wx.EXPAND, 0)
+        self.switches_panel = SwitchesPanel(canvas_1_panel)
+        hbox.Add(self.switches_panel, 1, wx.EXPAND, 0)
 
         # Instantiate SignalTracesPanel widget and add to Frame
-        self.signal_traces_panel = SignalTracesPanel(self)
-        main_sizer.Add(self.signal_traces_panel, 2, wx.EXPAND, 0)
+        self.signal_traces_panel = SignalTracesPanel(canvas_1_panel)
+        hbox.Add(self.signal_traces_panel, 2, wx.EXPAND, 0)
 
-        '''# Add MyGLCanvas(ScrolledCanvas) instance to Frame 
-        main_sizer.Add(self.scrollable, 2,  wx.EXPAND, 5)'''
+        simulation_panel = wx.Panel(self)
+        simulation_panel.SetBackgroundColour("RED")
+        vbox.Add(simulation_panel, 1, wx.EXPAND)
+        #main_sizer.Add(simulation_panel, 1, wx.EXPAND)
 
         self.SetSizeHints(200, 200)
-        self.SetSizer(main_sizer)
+        self.SetSizer(vbox)
        
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
@@ -197,10 +206,6 @@ class SignalTracesPanel(wx.Panel):
 
         vbox.Add(signal_traces_scrolled_panel, 4, wx.EXPAND)
 
-        bottom_panel = wx.Panel(self)
-        bottom_panel.SetBackgroundColour("ORANGE RED") # layout identifier colour for visualisation purposes
-        vbox.Add(bottom_panel, 1, flag=wx.EXPAND)
-
         # Set sizer of SignalTracesPanel
         self.SetSizer(vbox)
 
@@ -227,7 +232,7 @@ class SwitchesPanel(wx.Panel):
         # Create panel for switch toggle buttons
         switches_panel = wx.Panel(self)
         #switches_panel.SetBackgroundColour(wx.Colour(255, 0, 0))
-        vbox.Add(switches_panel, 1, wx.EXPAND)
+        vbox.Add(switches_panel, 7, wx.EXPAND)
         switches_panel.SetSizer(hbox)
 
         # Instantiate ScrolledPanel
