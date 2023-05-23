@@ -159,28 +159,26 @@ class SignalTracesPanel(wx.Panel):
         vbox = wx.BoxSizer(wx.VERTICAL)
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
-        '''self.scrollable = wx.ScrolledCanvas(self, wx.ID_ANY)
-        self.scrollable.SetSizeHints(200, 200)
-        self.scrollable.ShowScrollbars(wx.SHOW_SB_ALWAYS, wx.SHOW_SB_DEFAULT)
-        self.scrollable.SetScrollbars(20, 20, 15, 10)'''
-
-        '''self.canvas = MyGLCanvas(self, wx.ID_ANY, wx.DefaultPosition,  wx.Size(300, 200))
-        self.canvas.SetSizeHints(500, 500)'''
-
         signal_traces_scrolled_panel = wxscrolledpanel.ScrolledPanel(self, name="signal traces scrolled panel")
 
+        signal_trace_size = (800, 200)
         num_of_signal_traces = 5
         fgs = wx.FlexGridSizer(cols=1, rows=num_of_signal_traces, vgap=4, hgap=4)
 
-        for signal_trace in range(1, num_of_signal_traces + 1):
-            test = MyGLCanvas(signal_traces_scrolled_panel, wx.ID_ANY, wx.DefaultPosition,  wx.Size(250*signal_trace, 200))
-            fgs.Add(test, 1, flag=wx.ALL, border=10)
+        for signal_trace_num in range(1, num_of_signal_traces + 1):
+            scrollable = wx.ScrolledCanvas(signal_traces_scrolled_panel, wx.ID_ANY)
+            scrollable.SetSizeHints(*signal_trace_size)
+            scrollable.ShowScrollbars(wx.SHOW_SB_ALWAYS, wx.SHOW_SB_DEFAULT)
+            scrollable.SetScrollbars(20, 20, 15, 10)
+            signal_trace = MyGLCanvas(scrollable, wx.ID_ANY, wx.DefaultPosition,  wx.Size(*signal_trace_size))
+            #print(scrollable.GetSize())
+            fgs.Add(scrollable, 1, flag=wx.EXPAND, border=10)
 
         signal_traces_scrolled_panel.SetSizer(fgs)
         signal_traces_scrolled_panel.SetAutoLayout(1)
         signal_traces_scrolled_panel.SetupScrolling()
 
-        vbox.Add(signal_traces_scrolled_panel, 2, wx.EXPAND)
+        vbox.Add(signal_traces_scrolled_panel, 1, wx.EXPAND)
 
         self.SetSizer(vbox)
 
@@ -216,15 +214,15 @@ class SwitchesPanel(wx.Panel):
         num_of_switches = 30
         fgs = wx.FlexGridSizer(cols=1, rows=num_of_switches, vgap=4, hgap=4)
 
-        for switch_number in range(1, num_of_switches + 1):
-            switch = wx.ToggleButton(parent=switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"switch {switch_number}") # create switch toggle button object with appropriate label
+        for switch_num in range(1, num_of_switches + 1):
+            switch = wx.ToggleButton(parent=switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"switch {switch_num}") # create switch toggle button object with appropriate label
             self.Bind(wx.EVT_TOGGLEBUTTON, self.on_switch_toggle_button, switch) # bind switch toggle button to its event
             fgs.Add(switch, 1, flag=wx.ALL, border=10) # add switch toggle buttons to ScrolledPanel widget
 
         # Set sizer of ScrolledPanel widget
         switch_buttons_scrolled_panel.SetSizer(fgs)
         switch_buttons_scrolled_panel.SetAutoLayout(1)
-        switch_buttons_scrolled_panel.SetupScrolling()
+        switch_buttons_scrolled_panel.SetupScrolling(scroll_x=True, scroll_y=True, rate_x=20, rate_y=20, scrollToTop=True, scrollIntoView=True)
 
         '''### Sizer Tutorial
         switches_panel = wx.Panel(self)
