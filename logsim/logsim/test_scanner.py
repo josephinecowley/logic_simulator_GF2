@@ -41,12 +41,12 @@ def test_symbol_initialization():
 
 # Test Scanner class
 
-def test_scanner_initialisation(scanner_fixture):
+def test_scanner_initialisation(scanner_fixture, names_fixture):
     scanner = scanner_fixture
     assert scanner.file is not None
     assert scanner.line_number == 1
     assert scanner.position == 0
-    assert scanner.names is Names()
+    assert scanner.names is names_fixture
     assert scanner.symbol_type_list == range(0, 12)
     assert scanner.keywords_list == ["DEVICES", "CONNECTIONS", "MONITORS", "END"]
     assert scanner.DEVICES_ID is not None
@@ -56,15 +56,15 @@ def test_scanner_initialisation(scanner_fixture):
     assert scanner.current_character == ""
 
 
-def test_scanner_open_file(scanner_fixture):
+def test_scanner_open_file(scanner_fixture, names_fixture):
     # Test with an existing file
     scanner = scanner_fixture
     assert scanner.file is not None
 
     # Test with a non-existent file
-    with pytest.raises(SystemExit):
+    with pytest.raises(ValueError):
         path = "nonexistent.txt"
-        scanner = Scanner(path, names)
+        scanner = Scanner(path, names_fixture)
 
 
 def test_scanner_load_scanner_data(scanner_fixture):
@@ -83,15 +83,16 @@ def test_scanner_advance(scanner_fixture):
     assert scanner.current_character != ""
     assert scanner.position == position1 + 1
 
-
-def test_scanner_skip_spaces(scanner_fixture):
+@pytest.mark.parametrize("location, expected_character", [
+    ((1, 9), "\n"),
+    ((2, 0), "d"),
+])
+def test_scanner_skip_spaces(scanner_fixture, set_scanner_location, location, expected_character):
     scanner = scanner_fixture
-    set_scanner_location(1, 9) # Move scanner location to first open brace
+    set_scanner_location(*location)
     scanner.skip_spaces()
-    assert scanner.current_character == "\n"
-    set_scanner_location(2, 0) # Move scanner location to line 2 
-    scanner.skip_spaces()
-    assert not scanner.current_character.isspace()
+    assert scanner.current_character == expected_character
+
 
 
 def test_scanner_get_name(scanner_fixture):
