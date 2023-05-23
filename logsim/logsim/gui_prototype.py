@@ -161,6 +161,7 @@ class RunSimulationPanel(wx.Panel):
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
         run_button = wxbuttons.GenButton(self, wx.ID_ANY, 'RUN')
+        self.Bind(wx.EVT_BUTTON, self.on_run_button, run_button)
         run_button.SetFont(wx.Font(20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
         run_button.SetBezelWidth(5)
         run_button.SetMinSize(wx.DefaultSize)
@@ -171,6 +172,11 @@ class RunSimulationPanel(wx.Panel):
         hbox.Add(run_button, flag=wx.ADJUST_MINSIZE | wx.ALIGN_BOTTOM, border=5)
 
         self.SetSizer(hbox)
+
+    def on_run_button(self, event):
+        """Handle the event when the user clicks the run button."""
+        text = "Run simulation button pressed."
+        print(text)
 
 class SignalTrace(wx.ScrolledWindow):
     def __init__(self, parent, id=wx.ID_ANY, size=wx.DefaultSize):
