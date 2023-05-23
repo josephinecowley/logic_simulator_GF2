@@ -179,6 +179,11 @@ class RunSimulationPanel(wx.Panel):
         """Handle the event when the user clicks the run button."""
         text = "Run simulation button pressed."
         print(text)
+        run_button_pressed = event.GetEventObject()
+        run_button_pressed.SetLabel("CONTINUE")
+        run_button_pressed.SetBackgroundColour(wx.Colour(181, 150, 27))
+        self.GetSizer().Layout()
+
 
 class SignalTrace(wx.ScrolledWindow):
     def __init__(self, parent, id=wx.ID_ANY, size=wx.DefaultSize):
