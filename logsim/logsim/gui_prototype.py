@@ -127,23 +127,21 @@ class Gui(wx.Frame):
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
         canvas_1_panel = wx.Panel(self)
-        vbox.Add(canvas_1_panel, 5, wx.EXPAND)
+        vbox.Add(canvas_1_panel, 8, wx.EXPAND)
         canvas_1_panel.SetSizer(hbox)
 
         #canvas_2_panel = wx.Panel(self)
 
         # Instantiate SwitchesPanel widget and add to Frame
-        self.switches_panel = SwitchesPanel(canvas_1_panel)
-        hbox.Add(self.switches_panel, 1, wx.EXPAND, 0)
+        switches_panel = SwitchesPanel(canvas_1_panel)
+        hbox.Add(switches_panel, 1, wx.EXPAND, 0)
 
         # Instantiate SignalTracesPanel widget and add to Frame
-        self.signal_traces_panel = SignalTracesPanel(canvas_1_panel)
-        hbox.Add(self.signal_traces_panel, 2, wx.EXPAND, 0)
+        signal_traces_panel = SignalTracesPanel(canvas_1_panel)
+        hbox.Add(signal_traces_panel, 3, wx.EXPAND, 0)
 
-        simulation_panel = wx.Panel(self)
-        simulation_panel.SetBackgroundColour("RED")
+        simulation_panel = RunSimulationPanel(self)
         vbox.Add(simulation_panel, 1, wx.EXPAND)
-        #main_sizer.Add(simulation_panel, 1, wx.EXPAND)
 
         self.SetSizeHints(200, 200)
         self.SetSizer(vbox)
@@ -154,14 +152,28 @@ class Gui(wx.Frame):
         if Id == wx.ID_EXIT:
             self.Close(True)
 
- 
-    def on_run_button(self, event):
-        """Handle the event when the user clicks the run button."""
-        text = "Button pressed."
-        self.canvas.render(text)
+class RunSimulationPanel(wx.Panel):
+    def __init__(self, parent, id=wx.ID_ANY, size=wx.DefaultSize):
+        super(RunSimulationPanel, self).__init__(parent, id, size=size)
+
+        self.SetBackgroundColour("RED")
+
+        hbox = wx.BoxSizer(wx.HORIZONTAL)
+
+        run_button = wxbuttons.GenButton(self, wx.ID_ANY, 'RUN')
+        run_button.SetFont(wx.Font(20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
+        run_button.SetBezelWidth(5)
+        run_button.SetMinSize(wx.DefaultSize)
+        run_button.SetBackgroundColour("MEDIUM FOREST GREEN")
+        run_button.SetForegroundColour(wx.WHITE)
+        run_button.SetToolTip("Run the simulation")
+        # let the sizer set best size
+        hbox.Add(run_button, flag=wx.ADJUST_MINSIZE | wx.ALIGN_BOTTOM, border=5)
+
+        self.SetSizer(hbox)
 
 class SignalTrace(wx.ScrolledWindow):
-    def __init__(self, parent, id=wx.ID_ANY, size=(300, 200)):
+    def __init__(self, parent, id=wx.ID_ANY, size=wx.DefaultSize):
         super(SignalTrace, self).__init__(parent, id, size=size)
 
         size = self.GetClientSize()
@@ -180,7 +192,7 @@ class SignalTrace(wx.ScrolledWindow):
 
 class SignalTracesPanel(wx.Panel):
     def __init__(self, parent):
-        super(SignalTracesPanel, self).__init__(parent, size=(300, 200), style=wx.SUNKEN_BORDER)
+        super(SignalTracesPanel, self).__init__(parent, size=wx.DefaultSize, style=wx.SUNKEN_BORDER)
 
         # Configure sizers for layout of SwitchesPanel panel
         vbox = wx.BoxSizer(wx.VERTICAL)
