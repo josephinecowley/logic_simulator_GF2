@@ -6,7 +6,7 @@ from OpenGL import GL, GLUT
 class MyGLCanvas(wxcanvas.GLCanvas):
     def __init__(self, parent, id, pos, size):
         """Initialise canvas properties and useful variables."""
-        super().__init__(parent, -1,pos=pos,size=size,
+        super().__init__(parent, -1, pos=pos, size=size,
                          attribList=[wxcanvas.WX_GL_RGBA,
                                      wxcanvas.WX_GL_DOUBLEBUFFER,
                                      wxcanvas.WX_GL_DEPTH_SIZE, 16, 0])
@@ -131,7 +131,7 @@ class Gui(wx.Frame):
 
         # Instantiate SignalTracesPanel widget and add to Frame
         self.signal_traces_panel = SignalTracesPanel(self)
-        main_sizer.Add(self.signal_traces_panel, 2, wx.EXPAND, 5)
+        main_sizer.Add(self.signal_traces_panel, 2, wx.EXPAND, 0)
 
         '''# Add MyGLCanvas(ScrolledCanvas) instance to Frame 
         main_sizer.Add(self.scrollable, 2,  wx.EXPAND, 5)'''
@@ -169,11 +169,11 @@ class SignalTracesPanel(wxscrolledpanel.ScrolledPanel):
 
         signal_traces_scrolled_panel = wxscrolledpanel.ScrolledPanel(self, name="signal traces scrolled panel")
 
-        num_of_signal_traces = 7
+        num_of_signal_traces = 5
         fgs = wx.FlexGridSizer(cols=1, rows=num_of_signal_traces, vgap=4, hgap=4)
 
-        for signal_trace in range(1, num_of_signal_traces):
-            test = MyGLCanvas(signal_traces_scrolled_panel, wx.ID_ANY, wx.DefaultPosition,  wx.Size(300, 100))
+        for signal_trace in range(1, num_of_signal_traces + 1):
+            test = MyGLCanvas(signal_traces_scrolled_panel, wx.ID_ANY, wx.DefaultPosition,  wx.Size(250*signal_trace, 200))
             fgs.Add(test, 1, flag=wx.ALL, border=10)
 
         signal_traces_scrolled_panel.SetSizer(fgs)
@@ -197,7 +197,7 @@ class SwitchesPanel(wxscrolledpanel.ScrolledPanel):
 
         # Create and add the title to SwitchesPanel panel
         str = "INPUTS"
-        text = wx.StaticText(self, -1, str, style=wx.ALIGN_CENTER)
+        text = wx.StaticText(self, wx.ID_ANY, str, style=wx.ALIGN_CENTER)
         font = wx.Font(18, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         text.SetFont(font)
         vbox.Add(text, 0, wx.EXPAND)
@@ -218,7 +218,7 @@ class SwitchesPanel(wxscrolledpanel.ScrolledPanel):
         num_of_switches = 30
         fgs = wx.FlexGridSizer(cols=1, rows=num_of_switches, vgap=4, hgap=4)
 
-        for switch_number in range(1, num_of_switches):
+        for switch_number in range(1, num_of_switches + 1):
             switch = wx.ToggleButton(parent=switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"switch {switch_number}") # create switch toggle button object with appropriate label
             self.Bind(wx.EVT_TOGGLEBUTTON, self.on_switch_toggle_button, switch) # bind switch toggle button to its event
             fgs.Add(switch, 1, flag=wx.ALL, border=10) # add switch toggle buttons to ScrolledPanel widget
