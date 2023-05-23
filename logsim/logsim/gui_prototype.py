@@ -151,6 +151,22 @@ class Gui(wx.Frame):
         text = "Button pressed."
         self.canvas.render(text)
 
+class SignalTrace(wx.ScrolledWindow):
+    def __init_(self, parent):
+        super(SignalTrace, self).__init__(parent)
+
+        self.lines = []
+        self.maxWidth  = 1000
+        self.maxHeight = 1000
+        self.x = self.y = 0
+        self.curLine = []
+        self.drawing = False
+
+        self.SetBackgroundColour("WHITE")
+
+        self.SetVirtualSize((self.maxWidth, self.maxHeight))
+        self.SetScrollRate(20,20)
+
 class SignalTracesPanel(wx.Panel):
     def __init__(self, parent):
         super(SignalTracesPanel, self).__init__(parent, size=(300, 200))
@@ -161,22 +177,34 @@ class SignalTracesPanel(wx.Panel):
 
         signal_traces_scrolled_panel = wxscrolledpanel.ScrolledPanel(self, name="signal traces scrolled panel")
 
-        signal_trace_size = (800, 200)
-        num_of_signal_traces = 5
+        signal_trace_size = (1000, 200)
+        num_of_signal_traces = 7
         fgs = wx.FlexGridSizer(cols=1, rows=num_of_signal_traces, vgap=4, hgap=4)
 
+        '''test_flag = True
         for signal_trace_num in range(1, num_of_signal_traces + 1):
             scrollable = wx.ScrolledCanvas(signal_traces_scrolled_panel, wx.ID_ANY)
-            scrollable.SetSizeHints(*signal_trace_size)
+            scrollable.SetSizeHints(800, 200)
+            scrollable.SetVirtualSize(1000, 300)
+            if test_flag:
+                print(f'Virtual Size: {scrollable.GetVirtualSize()}')
+                print(f'Actual Size: {scrollable.GetSize()}')
+                test_flag = False
+            #scrollable.SetVirtualSize(200, 200)
             scrollable.ShowScrollbars(wx.SHOW_SB_ALWAYS, wx.SHOW_SB_DEFAULT)
             scrollable.SetScrollbars(20, 20, 15, 10)
             signal_trace = MyGLCanvas(scrollable, wx.ID_ANY, wx.DefaultPosition,  wx.Size(*signal_trace_size))
             #print(scrollable.GetSize())
-            fgs.Add(scrollable, 1, flag=wx.EXPAND, border=10)
+            fgs.Add(scrollable, 1, flag=wx.EXPAND, border=10)'''
+        
+        for signal_trace_num in range(1, num_of_signal_traces + 1):
+            signal_trace = SignalTrace(signal_traces_scrolled_panel, wx.ID_ANY)
+            signal_trace_canvas = MyGLCanvas(signal_trace, wx.ID_ANY, wx.DefaultPosition,  wx.Size(*signal_trace_size))
+            fgs.Add(signal_trace, 1, flag=wx.EXPAND, border=10)
 
         signal_traces_scrolled_panel.SetSizer(fgs)
         signal_traces_scrolled_panel.SetAutoLayout(1)
-        signal_traces_scrolled_panel.SetupScrolling()
+        signal_traces_scrolled_panel.SetupScrolling(scroll_x=True, scroll_y=True, rate_x=20, rate_y=20, scrollToTop=True, scrollIntoView=True)
 
         vbox.Add(signal_traces_scrolled_panel, 1, wx.EXPAND)
 
