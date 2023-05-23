@@ -175,35 +175,39 @@ class SwitchesPanel(wxscrolledpanel.ScrolledPanel):
         vbox.Add(static_line, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
 
         # Instantiate ScrolledPanel widget
-        panel = wxscrolledpanel.ScrolledPanel(self, name="panel")
+        switch_buttons_panel = wxscrolledpanel.ScrolledPanel(self, name="panel")
 
         # Configure sizer of ScrolledPanel widget
-        fgs = wx.FlexGridSizer(cols=1, rows=30, vgap=4, hgap=4)
+        num_of_switches = 30
+        fgs = wx.FlexGridSizer(cols=1, rows=num_of_switches, vgap=4, hgap=4)
 
-        for switch_number in range(1, 30):
-            switch = wx.ToggleButton(parent=panel, id=wx.ID_ANY, label=f"switch {switch_number}") # create switch toggle button object with appropriate label
+        for switch_number in range(1, num_of_switches):
+            switch = wx.ToggleButton(parent=switch_buttons_panel, id=wx.ID_ANY, label=f"switch {switch_number}") # create switch toggle button object with appropriate label
             self.Bind(wx.EVT_TOGGLEBUTTON, self.on_switch_toggle_button, switch) # bind switch toggle button to its event
-            fgs.Add(switch, flag=wx.RIGHT, border=10) # add switch toggle buttons to ScrolledPanel widget
+            fgs.Add(switch, 1, flag=wx.CENTER) # add switch toggle buttons to ScrolledPanel widget
 
         # Set sizer of ScrolledPanel widget
-        panel.SetSizer(fgs)
-        panel.SetAutoLayout(1)
-        panel.SetupScrolling()
+        switch_buttons_panel.SetSizer(fgs)
+        switch_buttons_panel.SetAutoLayout(1)
+        switch_buttons_panel.SetupScrolling()
 
         # Add the ScrolledPanel widget to SwitchesPanel panel
-        vbox.Add(panel, 1, wx.EXPAND)
+        vbox.Add(switch_buttons_panel, 1, wx.EXPAND)
 
         # Set sizer of SwitchesPanel panel
         self.SetSizer(vbox)
         self.SetAutoLayout(1)
         self.SetupScrolling()
 
-        print(self.GetSize())
-
     def on_switch_toggle_button(self, event):
         """Handle the event when the user clicks the toggle button for a switch."""
         switch_selected = event.GetEventObject()
         print(f'{switch_selected.GetLabel()} has been pressed.')
+
+
+class SimulationPanel(wx.Panel):
+    def __init__(self, parent):
+        super(SimulationPanel, self).__init__(parent)
 
 
 class LogicSimApp(wx.App):
