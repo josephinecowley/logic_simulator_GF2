@@ -165,19 +165,20 @@ class Scanner:
            Increments position in line for every call.
         """
         self.current_character = self.file.read(1)
-        # update position in line
-        self.position += 1
+        if self.current_character == "\n":
+            self.line_number += 1
+            self.position = 0
+        else:
+            self.position += 1
 
     def skip_spaces(self):
         """Calls advance() method until current character is not space or is '\n'. 
         If character is '\n', update line number and position"""
         while self.current_character.isspace():
-            if self.current_character == '\n':
-                self.line_number = self.line_number + 1
-                self.position = 0
-                self.advance()
-            else:
-                self.advance()
+            self.advance()
+    
+    def skip_comment(self):
+        """Assumes current character is a # or " and """
 
     def get_name(self):
         """Assumes that current character is alphabetical and returns an alphanumeric name."""
