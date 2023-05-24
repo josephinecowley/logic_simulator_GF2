@@ -135,13 +135,6 @@ class Scanner:
             self.load_scanner_data(symbol)
             self.advance()
 
-        elif self.current_character == "\n": # new line symbol, update line number and position
-            self.line_number += 1
-            self.position = 0
-            # skip all spaces after new line
-            # will catch any subsequent new lines
-            self.get_symbol() # call get_symbol recursively
-
         elif self.current_character == "":  # end of file
             symbol.type = self.EOF
             self.load_scanner_data(symbol)
@@ -176,10 +169,13 @@ class Scanner:
         self.position += 1
 
     def skip_spaces(self):
-        """Calls advance() method until current character is not space or is '\n'."""
+        """Calls advance() method until current character is not space or is '\n'. 
+        If character is '\n', update line number and position"""
         while self.current_character.isspace():
             if self.current_character == '\n':
-                break
+                self.line_number = self.line_number + 1
+                self.position = 0
+                self.advance()
             else:
                 self.advance()
 
