@@ -28,7 +28,7 @@ class Symbol:
         self.type = None
         self.id = None
         self.line_number = None
-        self.end_position = None
+        self.start_position = None
 
 class Scanner:
 
@@ -77,70 +77,71 @@ class Scanner:
     def get_symbol(self):
         """Translate the next sequence of characters into a symbol."""
         symbol = Symbol()
-        self.skip_spaces()  # current character now not whitespace or \n
+        self.skip_spaces()  # current character now not whitespace 
 
         if self.current_character.isalpha():  # name
+            self.load_scanner_data(symbol)
             name_string = self.get_name()
             if name_string in self.keywords_list:
                 symbol.type = self.KEYWORD
-                self.load_scanner_data(symbol)
+                
             else:
                 symbol.type = self.NAME
-                self.load_scanner_data(symbol)
             symbol.id = self.names.lookup([name_string])[0] # lookup a symbol id
 
         elif self.current_character.isdigit():  # number
+            self.load_scanner_data(symbol)
             number = self.get_number()
             symbol.type = self.NUMBER
             symbol.id = self.names.lookup([number])[0]
-            self.load_scanner_data(symbol)
+            
 
         elif self.current_character == "=":  # punctuation
-            symbol.type = self.EQUALS
             self.load_scanner_data(symbol)
+            symbol.type = self.EQUALS
             self.advance()
 
         elif self.current_character == ",":
-            symbol.type = self.COMMA
             self.load_scanner_data(symbol)
+            symbol.type = self.COMMA
             self.advance()
 
         elif self.current_character == ".":
-            symbol.type = self.FULLSTOP
             self.load_scanner_data(symbol)
+            symbol.type = self.FULLSTOP
             self.advance()
         
         elif self.current_character == ";":
+            self.load_scanner_data(symbol)            
             symbol.type = self.SEMICOLON
-            self.load_scanner_data(symbol)
             self.advance()
 
         elif self.current_character == "{":
-            symbol.type = self.BRACE_OPEN
             self.load_scanner_data(symbol)
+            symbol.type = self.BRACE_OPEN
             self.advance()
 
         elif self.current_character == "}":
-            symbol.type = self.BRACE_CLOSE
             self.load_scanner_data(symbol)
+            symbol.type = self.BRACE_CLOSE
             self.advance()
         
         elif self.current_character == "(":
-            symbol.type = self.BRACKET_OPEN
             self.load_scanner_data(symbol)
+            symbol.type = self.BRACKET_OPEN
             self.advance()
 
         elif self.current_character == ")":
-            symbol.type = self.BRACKET_CLOSE
             self.load_scanner_data(symbol)
+            symbol.type = self.BRACKET_CLOSE
             self.advance()
         
         elif self.current_character in ['#', '"']: # comment openers
             self.skip_comment()
 
         elif self.current_character == "":  # end of file
-            symbol.type = self.EOF
             self.load_scanner_data(symbol)
+            symbol.type = self.EOF
 
         else:  # not a valid character
             self.advance()
@@ -161,7 +162,7 @@ class Scanner:
     def load_scanner_data(self, symbol):
         """Update the location attributes of symbol using Scanner's current location attributes."""
         symbol.line_number = self.line_number
-        symbol.end_position = self.position
+        symbol.start_position = self.position
 
     def advance(self):
         """Reads the next character in file and places it in current_character.
@@ -176,6 +177,7 @@ class Scanner:
 
     def skip_spaces(self):
         """Calls advance() method until current character is not space"""
+        self.advance()
         while self.current_character.isspace():
             self.advance()
     
@@ -226,7 +228,7 @@ class Scanner:
             name_length = len(name)
 
             if name_length == 1:
-                caret_position = symbol.end_position
+                caret_position = symbol.start_position
                 caret_string = " " * line_length
                 caret_list = list(caret_string)
                 caret_list[caret_position] = "^"
@@ -235,15 +237,15 @@ class Scanner:
                 print("".join(caret_list))
             
             else:
-                start_position = symbol.end_position - name_length + 1
+                start_position = symbol.start_position
                 tilde_string = " " * line_length
                 tilde_list = list(tilde_string)
-                tilde_list[start_position: start_position + name_length] = list("~" * name_length)
+                tilde_list[start_position: start_position + name_length - 1] = list("~" * name_length)
 
                 print(line_text)
                 print("".join(tilde_list))
         else:
-                caret_position = symbol.end_position
+                caret_position = symbol.start_position
                 caret_string = " " * line_length
                 caret_list = list(caret_string)
                 caret_list[caret_position] = "^"
