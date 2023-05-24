@@ -48,14 +48,32 @@ class Parser:
         self.error_count = 0
 
         # List of syntax errors
+        # JC! come back and change this to a dictionary such that manual changes to number of errors is unecessary
+        number_of_error_types = 19
         [self.NO_DEVICES_KEYWORD, self.NO_CONNECTIONS_KEYWORD, self.NO_MONITORS_KEYWORD, self.NO_END_KEYWORD, self.NO_BRACE_OPEN, self.NO_BRACE_CLOSE,
             self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_LEFT_BRACKET, self.NO_RIGHT_BRACKET, self.NO_NUMBER, self.OUT_OF_RANGE,
-            self.UNDEFINED_NAME, self.NO_FULLSTOP, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE] = self.names.unique_error_codes(19)
+            self.UNDEFINED_NAME, self.NO_FULLSTOP, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE] = self.names.unique_error_codes(number_of_errors)
 
-    def display_error(self, error_type, symbol, syntax_error=True):
+    def display_error(self, error_type, symbol, syntax_error=True, stopping_symbol):
         """Display the error message and where it occured
 
         Calls the error handling method to resume from the next available point."""
+
+        # Exception handling
+        if not isinstance(error_type, int):
+            raise TypeError(
+                "Expected error_type to be an integer type argument")
+        elif error_type >= number_of_error_types:
+            raise ValueError(
+                "Expected an error code within range of error types")
+        elif error_type < 0:
+            raise ValueError("Cannot have a negative error code")
+        elif not isinstance(symbol, Symbol):
+            raise TypeError("Expected an instance of the Symbol class")
+        elif not isinstance(stopping_symbol, str):
+            raise TypeError(
+                "Expected stopping symbol to be a string type argument")
+
         # Increase error count by one
         self.error_count += 1
 
@@ -104,11 +122,21 @@ class Parser:
             raise ValueError("Expected a valid error code")
 
         self.scanner.display_line_and_marker(self.symbol)
-        self.error_recovery(error_type)
+        self.error_recovery(error_type, stopping_symbol)
 
-    def error_recovery(self, error_type):
+    def error_recovery(self, error_type, stopping_symbol):
         """Recovers from an error by resuming parsing at an appropriate point."""
-        pass
+
+        if not isinstance(stopping_symbol, str):
+            raise TypeError(
+                "Expected stopping symbol to be a string type argument")
+        if not isinstance(error_type, int):
+            raise TypeError("Expected error_type to be an integer")
+        elif error_type >= number_of_error_types:
+            raise ValueError(
+                "Expected an error code within range of error types")
+        elif error_type < 0:
+            raise ValueError("Cannot have a negative error code")
 
     def device_list(self):
         """Parse device list"""
