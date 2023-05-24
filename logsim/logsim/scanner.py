@@ -134,6 +134,9 @@ class Scanner:
             symbol.type = self.BRACKET_CLOSE
             self.load_scanner_data(symbol)
             self.advance()
+        
+        elif self.current_character in ['#', '"']: # comment openers
+            self.skip_comment()
 
         elif self.current_character == "":  # end of file
             symbol.type = self.EOF
@@ -172,13 +175,21 @@ class Scanner:
             self.position += 1
 
     def skip_spaces(self):
-        """Calls advance() method until current character is not space or is '\n'. 
-        If character is '\n', update line number and position"""
+        """Calls advance() method until current character is not space"""
         while self.current_character.isspace():
             self.advance()
     
     def skip_comment(self):
-        """Assumes current character is a # or " and """
+        """Assumes current character is a # or " and advances until comments are closed """
+        if self.current_character == "#":
+            self.advance() # get first character in comment
+            while not self.current_character == "\n": # closed by new line
+                self.advance() 
+        else:
+            self.advance() # get first character in comment
+            while not self.current_character == '"': # closed by " (have to break PEP8 for this)
+                self.advance()
+            self.advance() # advance once more to leave comment
 
     def get_name(self):
         """Assumes that current character is alphabetical and returns an alphanumeric name."""
