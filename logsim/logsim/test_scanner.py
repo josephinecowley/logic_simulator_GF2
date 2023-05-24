@@ -41,7 +41,7 @@ def test_symbol_initialization():
     assert symbol.type is None
     assert symbol.id is None
     assert symbol.line_number is None
-    assert symbol.end_position is None
+    assert symbol.start_position is None
 
 
 # Test Scanner class
@@ -79,7 +79,7 @@ def test_scanner_load_scanner_data(scanner_fixture):
     scanner.position = 20
     scanner.load_scanner_data(symbol)
     assert symbol.line_number == 10
-    assert symbol.end_position == 20
+    assert symbol.start_position == 20
 
 def test_scanner_advance(scanner_fixture):
     scanner = scanner_fixture
@@ -119,7 +119,7 @@ def test_scanner_display_line_and_marker(scanner_fixture, capfd):
     scanner = scanner_fixture
     symbol = Symbol()
     symbol.line_number = 10
-    symbol.end_position = 10
+    symbol.start_position = 10
     scanner.display_line_and_marker(symbol)
 
     # Capture the printed output
