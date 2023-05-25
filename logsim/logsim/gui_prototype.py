@@ -275,6 +275,7 @@ class RunSimulationPanel(wx.Panel):
         print(text)
         run_button_pressed.SetLabel("CONTINUE")
         run_button_pressed.SetBackgroundColour(wx.Colour(181, 150, 27))
+        run_button_pressed.SetToolTip("Continue running the simulation")
         self.GetSizer().Layout()
 
     def on_quit_button(self, event):
@@ -467,21 +468,6 @@ class SwitchesPanel(wx.Panel):
         switch_buttons_scrolled_panel.SetSizer(fgs)
         switch_buttons_scrolled_panel.SetAutoLayout(1)
         switch_buttons_scrolled_panel.SetupScrolling(scroll_x=True, scroll_y=True, rate_x=20, rate_y=20, scrollToTop=True, scrollIntoView=True)
-
-        '''### Sizer Tutorial
-        switches_panel = wx.Panel(self)
-        switches_panel.SetBackgroundColour(wx.Colour(255, 0, 0))
-        vbox.Add(switches_panel, 1, wx.EXPAND)
-        switches_panel.SetSizer(hbox)
-
-        left_panel = wx.Panel(switches_panel)
-        left_panel.SetBackgroundColour(wx.Colour(0, 255, 0))
-        hbox.Add(left_panel, 1, wx.ALL | wx.EXPAND, 0)
-
-        right_panel = wx.Panel(switches_panel)
-        right_panel.SetBackgroundColour(wx.Colour(0, 0, 255))
-        hbox.Add(right_panel, 2, wx.ALL | wx.EXPAND, 0)
-        ###'''
 
         # Create and add left panel in switches panel layout
         left_panel = wx.Panel(switches_panel)
