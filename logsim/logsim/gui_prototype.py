@@ -1,9 +1,18 @@
+import os
+
 import wx
 import wx.glcanvas as wxcanvas
 import wx.lib.scrolledpanel as wxscrolledpanel
 import wx.lib.buttons as wxbuttons
 import wx.lib.agw.aquabutton as wxaquabutton
 from OpenGL import GL, GLUT
+
+wildcard = "Python source (*.py)|*.py|"     \
+           "Compiled Python (*.pyc)|*.pyc|" \
+           "SPAM files (*.spam)|*.spam|"    \
+           "Egg file (*.egg)|*.egg|"        \
+           "All files (*.*)|*.*"
+
 
 class MyGLCanvas(wxcanvas.GLCanvas):
     def __init__(self, parent, id, pos, size):
@@ -184,11 +193,6 @@ class RunSimulationPanel(wx.Panel):
         font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         text.SetFont(font)
         cycles_hbox.Add(text, 0, flag=wx.TOP|wx.LEFT)
-        '''str = "TEST LEFT SIDE"
-        text = wx.StaticText(cycles_panel, wx.ID_ANY, str, style=wx.ALIGN_LEFT)
-        font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
-        text.SetFont(font)
-        cycles_hbox.Add(text, 0, flag=wx.LEFT, border=10)'''
         self.text = wx.TextCtrl(cycles_panel, wx.ID_ANY, "1", pos=wx.DefaultPosition, size=(60, -1))
         spin = wx.SpinButton(cycles_panel, wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.SP_VERTICAL)
         spin.SetRange(1, 100)
@@ -220,13 +224,46 @@ class RunSimulationPanel(wx.Panel):
         left_buttons_panel_hbox.Add(quit_button, 1, flag=wx.ALIGN_LEFT, border=5)
 
         # Create and add cycles + left buttons panel to RunSimulationPanel
-        hbox.Add(cycles_and_left_buttons_panel, 1, flag=wx.ALIGN_LEFT, border=5)
+        hbox.Add(cycles_and_left_buttons_panel, 1, flag=wx.ALIGN_LEFT)
 
-        str = "TEST RIGHT SIDE"
-        text = wx.StaticText(self, wx.ID_ANY, str, style=wx.ALIGN_RIGHT)
-        font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
-        text.SetFont(font)
-        hbox.Add(text, 1, flag=wx.TOP)
+        
+        centre_panel = wx.Panel(self)
+        #centre_panel.SetBackgroundColour("GREEN") # layout identifier colour for visualisation purposes
+        centre_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
+        hbox.Add(centre_panel, 2, flag=wx.EXPAND)
+
+        
+        upload_and_help_buttons_panel = wx.Panel(self, name="upload and help buttons panel")
+        #upload_and_help_buttons_panel.SetBackgroundColour("CYAN") # layout identifier colour for visualisation purposes
+        upload_and_help_buttons_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
+        upload_and_help_buttons_panel.SetSizer(upload_and_help_buttons_panel_hbox)
+
+        upload_button_panel = wx.Panel(upload_and_help_buttons_panel, name="upload button panel")
+        #upload_button_panel.SetBackgroundColour("RED") # layout identifier colour for visualisation purposes
+        upload_button_panel_vbox = wx.BoxSizer(wx.VERTICAL)
+        upload_button_panel.SetSizer(upload_button_panel_vbox)
+
+        upload_button = wx.Button(upload_button_panel, wx.ID_ANY, "UPLOAD")
+        self.Bind(wx.EVT_BUTTON, self.on_upload_button, upload_button)
+        upload_button.SetToolTip("Upload logic description file")
+        upload_button_panel_vbox.Add(upload_button, 1, flag=wx.ALIGN_CENTER)
+
+
+        help_button_panel = wx.Panel(upload_and_help_buttons_panel, name="help button panel")
+        #help_button_panel.SetBackgroundColour("BLUE") # layout identifier colour for visualisation purposes
+        help_button_panel_vbox = wx.BoxSizer(wx.VERTICAL)
+        help_button_panel.SetSizer(help_button_panel_vbox)
+
+        help_button = wx.Button(help_button_panel, wx.ID_ANY, "HELP")
+        help_button.SetToolTip("Help on running logic simulation")
+        help_button_panel_vbox.Add(help_button, 1, flag=wx.ALIGN_CENTER)
+
+
+        upload_and_help_buttons_panel_hbox.Add(upload_button_panel, 1, flag=wx.EXPAND)
+        upload_and_help_buttons_panel_hbox.Add(help_button_panel, 1, flag=wx.EXPAND)
+
+
+        hbox.Add(upload_and_help_buttons_panel, 1, flag=wx.EXPAND)
         
         # Set sizer of RunSimulationPanel
         self.SetSizer(hbox)
@@ -250,6 +287,35 @@ class RunSimulationPanel(wx.Panel):
     def on_spin(self, event):
         self.text.SetValue(str(event.GetPosition()))
 
+    def on_upload_button(self, event):
+        """Handle the event when the user clicks the upload button."""
+        dlg = wx.FileDialog(
+            self, message="Choose a file",
+            defaultDir=os.getcwd(),
+            defaultFile="",
+            wildcard=wildcard,
+            style=wx.FD_OPEN | wx.FD_MULTIPLE |
+                  wx.FD_CHANGE_DIR | wx.FD_FILE_MUST_EXIST |
+                  wx.FD_PREVIEW
+            )
+
+        # Show the dialog and retrieve the user response. If it is the OK response,
+        # process the data.
+        if dlg.ShowModal() == wx.ID_OK:
+            # This returns a Python list of files that were selected.
+            paths = dlg.GetPaths()
+
+            print('You selected %d files:' % len(paths))
+
+            for path in paths:
+                print('           %s\n' % path)
+
+        # Compare this with the debug above; did we change working dirs?
+        print("CWD: %s\n" % os.getcwd())
+
+        # Destroy the dialog. Don't do this until you are done with it!
+        # BAD things can happen otherwise!
+        dlg.Destroy()
 
 class SignalTrace(wx.ScrolledWindow):
     def __init__(self, parent, id=wx.ID_ANY, size=wx.DefaultSize):
