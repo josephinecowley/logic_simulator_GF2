@@ -114,7 +114,7 @@ class Parser:
         elif error_type == self.NO_Q_OR_QBAR:
             print("Syntax Error: Expected a Q or QBAR after the full stop")
         elif error_type == self.NO_INPUT_SUFFIX:
-            print("Syntax Error: Expected an input suffix")
+            print("Syntax Error: Expected a valid input suffix")
         elif error_type == self.SYMBOL_AFTER_END:
             print("Syntax Error: There should not be any text after the keyword END")
         elif error_type == self.EMPTY_FILE:
@@ -324,7 +324,7 @@ class Parser:
         # Check first symbol is "CONNECTIONS". If not, assuming missing and proceed to next {
         if not (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == CONNECTIONS_ID):
             self.display_error(self.symbol, self.NO_CONNECTIONS_KEYWORD,
-                               proceed=True, stopping_symbol_type=self.scanner.BRACE_OPEN)
+                               proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
         else:
             self.symbol = self.scanner.get_symbol()
         # Check next symbol is an open brace "{". If not, proceed to next semicolon ;
@@ -413,7 +413,7 @@ class Parser:
         # Check first symbol is "MONITORS". If not, assume missing and proceed to the next {
         if not ((self.symbol.type == self.scanner.KEYWORD) and (self.symbol.id == MONITORS_ID)):
             self.display_error(self.symbol, self.NO_MONITORS_KEYWORD,
-                               proceed=True, stopping_symbol_type=self.scanner.KEYWORD)
+                               proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
         else:
             self.symbol = self.scanner.get_symbol()
         # Check for the open brace '{'. If not, assume missing and proceed to next ;
@@ -423,12 +423,17 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         # Check that the first is a valid output name
         self.output()
+        print(self.symbol.type, self.scanner.SEMICOLON)
         # Repeat checking monitors in list until the close brace "}"
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
+            print(self.symbol.type)
             self.symbol = self.scanner.get_symbol()
             self.output()
         if self.symbol.type == self.scanner.BRACE_CLOSE:
             self.symbol = self.scanner.get_symbol()
+        else:
+            self.display_error(self.symbol, self.NO_BRACE_CLOSE,
+                               proceed=True, stopping_symbol_type=self.scanner.KEYWORD)
 
     def end(self):
         """Parse an END symbol"""
@@ -440,7 +445,7 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         if self.symbol.type == self.scanner.EOF:
             # Will need to return error count, etc
-            return True
+            return
         else:
             self.display_error(self.symbol, self.SYMBOL_AFTER_END)
 
@@ -459,16 +464,17 @@ class Parser:
             self.device_list()
 
             # Parse connection list
-            # self.connection_list()
+            self.connection_list()
 
             # Parse monnitor list
-            # self.monitor_list()
+            self.monitor_list()
 
             # Check for END keyword
-            # self.end()
+            self.end()
 
             # Check if there are errors
             if self.error_count == 0:
+                print("No errors detected")
                 return True
             else:
                 # Display total number of errors
