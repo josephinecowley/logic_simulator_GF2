@@ -53,11 +53,12 @@ class Parser:
             self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_BRACKET_OPEN, self.NO_BRACKET_CLOSE, self.NO_NUMBER, self.OUT_OF_RANGE,
             self.UNDEFINED_NAME, self.NO_FULLSTOP, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE] = self.names.unique_error_codes(19)
 
-    def display_error(self,  symbol, error_type,  proceed=False, stopping_symbol=""):
+# JC! need to change the 100 once all stopping symbol types are defined
+    def display_error(self,  symbol, error_type,  proceed=False, stopping_symbol_type=100):
         """Display the error message and where it occured
 
         Calls the error handling method to resume from the next available point."""
-        print(stopping_symbol)
+
         # Exception handling
         if not isinstance(error_type, (int)):
             raise TypeError(
@@ -69,9 +70,9 @@ class Parser:
             raise ValueError("Cannot have a negative error code")
         elif not isinstance(symbol, Symbol):
             raise TypeError("Expected an instance of the Symbol class")
-        elif not isinstance(stopping_symbol,  str):
+        elif not isinstance(stopping_symbol_type,  int):
             raise TypeError(
-                "Expected stopping symbol to be a string type argument")
+                "Expected stopping symbol to be a int type argument")
         elif not isinstance(proceed, bool):
             raise TypeError("Expected bool type argument for proceed")
 
@@ -80,14 +81,13 @@ class Parser:
 
         # Display location of error
         print(f"Line {self.symbol.line_number}:", end=" ")
-
         if error_type == self.NO_DEVICES_KEYWORD:
             print("Syntax Error: Expected the keyword DEVICES")
-        if error_type == self.NO_CONNECTIONS_KEYWORD:
+        elif error_type == self.NO_CONNECTIONS_KEYWORD:
             print("Syntax Error: Expected the keyword CONNECTIONS")
-        if error_type == self.NO_MONITORS_KEYWORD:
+        elif error_type == self.NO_MONITORS_KEYWORD:
             print("Syntax Error: Expected the keyword MONITORS")
-        if error_type == self.NO_END_KEYWORD:
+        elif error_type == self.NO_END_KEYWORD:
             print("Syntax Error: Expected the keyword END")
         elif error_type == self.NO_BRACE_OPEN:
             print("Syntax Error: Expected a '{' sign")
@@ -121,17 +121,14 @@ class Parser:
             print("Syntax Error: Cannot parse an empty file")
         else:
             raise ValueError("Expected a valid error code")
-
-        print("type!", self.symbol.type, self.scanner.BRACE_CLOSE,
-              self.names.get_name_string(self.symbol.id))
         self.scanner.display_line_and_marker(self.symbol)
-        self.error_recovery(error_type, proceed, stopping_symbol)
+        self.error_recovery(error_type, proceed, stopping_symbol_type)
 
-    def error_recovery(self, error_type, proceed, stopping_symbol):
+    def error_recovery(self, error_type, proceed, stopping_symbol_type):
         """Recovers from an error by resuming parsing at an appropriate point."""
-        if not isinstance(stopping_symbol, str):
+        if not isinstance(stopping_symbol_type, int):
             raise TypeError(
-                "Expected stopping symbol to be a string type argument")
+                "Expected stopping symbol to be a int type argument")
         if not isinstance(error_type, int):
             raise TypeError("Expected error_type to be an integer")
         # JC! need to fix this to not rely on a '19'
@@ -144,31 +141,36 @@ class Parser:
             raise TypeError("Expected bool type argument for proceed")
 
         if proceed == True:
-            pass
+            while ((self.symbol.type != stopping_symbol_type) and (self.symbol.type != self.scanner.EOF)):
+                self.symbol = self.scanner.get_symbol()
+            if self.symbol.type == stopping_symbol_type:
+                print("Woooo")
+                pass
         else:
             pass
 
     def device_list(self):
         """Parse device list"""
         DEVICES_ID = self.names.lookup(["DEVICES"])[0]
-        # Check first entry in file is DEVICES
-        if self.symbol.type == self.scanner.KEYWORD and self.symbol.id == DEVICES_ID:
+        # Check first entry in file is DEVICES. If not, assume just missing and proceed
+        if not (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == DEVICES_ID):
+            self.display_error(self.symbol, self.NO_DEVICES_KEYWORD,
+                               proceed=True, stopping_symbol_type=self.scanner.BRACE_OPEN)
+        self.symbol = self.scanner.get_symbol()
+        # Check the next symbol is a "{". If not, assume missing and proceed to next semicolon
+        if not (self.symbol.type == self.scanner.BRACE_OPEN):
+            self.display_error(self.symbol, self.NO_BRACE_OPEN,
+                               proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+        self.device()
+        # Check all devices in list, which are all separated by semicolons
+        while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
+            self.device()
+        # Check for the end of file symbol "}"
+        if self.symbol.type == self.scanner.BRACE_CLOSE:
             self.symbol = self.scanner.get_symbol()
-            # Check the next symbol is a "{"
-            if self.symbol.type == self.scanner.BRACE_OPEN:
-                self.device()
-                # Check all devices in list, which are all separated by semicolons
-                while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
-                    self.device()
-                # Check for the end of file symbol "}"
-                if self.symbol.type == self.scanner.BRACE_CLOSE:
-                    self.symbol = self.scanner.get_symbol()
-                else:
-                    self.display_error(self.symbol, self.NO_BRACE_CLOSE)
-            else:
-                self.display_error(self.symbol, self.NO_BRACE_OPEN)
         else:
-            self.display_error(self.symbol, self.NO_DEVICES_KEYWORD)
+            self.display_error(self.symbol, self.NO_BRACE_CLOSE,
+                               proceed=True, stopping_symbol_type=self.scanner.KEYWORD)
 
     def device(self):
         """Parse user defined devices"""
@@ -177,7 +179,9 @@ class Parser:
         if self.symbol.type == self.scanner.BRACE_CLOSE:
             pass
         elif self.symbol.type == self.scanner.NAME:
+
             self.symbol = self.scanner.get_symbol()
+
             # Check that the name is followed by an equals sign
             if self.symbol.type == self.scanner.EQUALS:
                 self.symbol = self.scanner.get_symbol()
@@ -185,9 +189,11 @@ class Parser:
                 symbol_ID, device_input = self.check_device_is_valid()
                 self.symbol = self.scanner.get_symbol()
             else:
-                self.display_error(self.symbol, self.NO_EQUALS)
+                self.display_error(self.symbol, self.NO_EQUALS, proceed=True,
+                                   stopping_symbol_type=self.scanner.SEMICOLON)
         else:
-            self.display_error(self.symbol, self.INVALID_NAME)
+            self.display_error(self.symbol, self.INVALID_NAME, proceed=True,
+                               stopping_symbol_type=self.scanner.SEMICOLON)
 
     def check_device_is_valid(self):
         """Returns both device type ID and the input ID"""
@@ -196,6 +202,7 @@ class Parser:
         one_to_sixteen = self.names.lookup([
             "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"])
         binary_digit = self.names.lookup(["0", "1"])
+
         # Check that name is either a AND, NAND, OR, NOR gate
         if self.symbol.id in [AND_ID, NAND_ID, OR_ID, NOR_ID]:
             symbol_ID = self.symbol
@@ -228,8 +235,7 @@ class Parser:
                 return None, None
         # Check if symbol is an XOR or DTYPE (with no inputs)
         elif self.symbol.id == XOR_ID or self.symbol.id == DTYPE_ID:
-            symbol_ID = self.symbol.id
-            return symbol_ID, None
+            return self.symbol.id, self.symbol.type
         # Check if symbol is a SWITCH type
         elif self.symbol.id == SWITCH_ID:
             symbol_ID = self.symbol.id
