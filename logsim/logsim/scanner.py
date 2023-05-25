@@ -221,7 +221,7 @@ class Scanner:
                 line_text = line
                 break
         
-        line_length = len(line_text)
+        line_length = len(line_text) - 1
 
         if symbol.type in [self.KEYWORD, self.NAME, self.NUMBER]:
             name = self.names.get_name_string(symbol.id)
