@@ -72,13 +72,13 @@ class Scanner:
             self.END_ID] = self.names.lookup(self.keywords_list)
 
         # hold the last character read from the definition file
-        self.current_character = ""
+        self.current_character = " "
 
     def get_symbol(self):
         """Translate the next sequence of characters into a symbol."""
         symbol = Symbol()
         self.skip_spaces()  # current character now not whitespace 
-
+        #breakpoint()
         if self.current_character.isalpha():  # name
             self.load_scanner_data(symbol)
             name_string = self.get_name()
@@ -169,16 +169,18 @@ class Scanner:
            Increments position in line for every call.
         """
         self.current_character = self.file.read(1)
-        if self.current_character == "\n":
-            self.line_number += 1
-            self.position = 0
-        else:
-            self.position += 1
+        self.position += 1
+        
 
     def skip_spaces(self):
-        """Calls advance() method until current character is not space"""
-        self.advance()
+        """Calls advance() method until current character is not space. 
+        If current_character is a space, returns next non-whitespace character.
+        If current_character is not a space, returns current character."""
+        #breakpoint()
         while self.current_character.isspace():
+            if self.current_character == "\n":
+                self.line_number += 1
+                self.position = 0
             self.advance()
     
     def skip_comment(self):
@@ -252,9 +254,4 @@ class Scanner:
 
                 print(line_text)
                 print("".join(caret_list))            
-
-
-
-
-
 
