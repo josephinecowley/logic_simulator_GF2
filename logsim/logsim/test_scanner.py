@@ -19,17 +19,29 @@ def scanner_fixture(path_fixture, names_fixture):
 
 @pytest.fixture
 def set_scanner_location(scanner_fixture):
-    def _set_scanner_location(location):
-        line_number, position = location
-        scanner = scanner_fixture
-        # Move the pointer to the correct line and then seek to the position
-        for i, line in enumerate(scanner.file, start=1):
-            if i == line_number:
-                scanner.file.seek(position, 1)
+    def _set_scanner_location(target_location):
+        target_line_number, target_position = target_location
+        scanner = scanner_fixture # call scanner instance
 
-        scanner.line_number = line_number
-        scanner.position = position
-        scanner.current_character = scanner.file.read(1)
+        # Reset the file pointer to the beginning of the file
+        scanner.file.seek(0, 0)
+
+        current_line_number = 1
+
+        while not current_line_number == target_line_number: # reads file until target line reached
+            scanner.current_character = scanner.file.read(1)
+            #breakpoint()
+            if scanner.current_character == "\n":
+                current_line_number += 1
+
+        current_position = 0
+
+        while not current_position == target_position: # reads file until target line reached
+            scanner.current_character = scanner.file.read(1)
+            current_position += 1
+                    
+        scanner.line_number = target_line_number
+        scanner.position = target_position
 
     return _set_scanner_location
 
@@ -88,16 +100,16 @@ def test_scanner_advance(scanner_fixture):
     assert scanner.current_character != ""
     assert scanner.position == position1 + 1
 
-@pytest.mark.parametrize("location, expected_character", [
-    ((1, 9), "\n"),
-    ((2, 0), "d"),
+@pytest.mark.parametrize("location, expected_character, expected_line", [
+    ((1, 9), "d", 2),
+    ((2, 0), "d", 2),
 ])
-def test_scanner_skip_spaces(scanner_fixture, set_scanner_location, location, expected_character):
+def test_scanner_skip_spaces(scanner_fixture, set_scanner_location, location, expected_character, expected_line):
     scanner = scanner_fixture
     set_scanner_location(location)
     scanner.skip_spaces()
     assert scanner.current_character == expected_character
-
+    assert scanner.line_number == expected_line
 
 def test_scanner_get_name(scanner_fixture, set_scanner_location):
     location = (1,0)
@@ -108,7 +120,7 @@ def test_scanner_get_name(scanner_fixture, set_scanner_location):
 
 
 def test_scanner_get_number(scanner_fixture, set_scanner_location):
-    location = (6, 16) # to '25'
+    location = (6, 17) # to '25'
     scanner = scanner_fixture
     set_scanner_location(location) 
     number = scanner.get_number()
@@ -127,7 +139,7 @@ def test_scanner_display_line_and_marker(scanner_fixture, capfd):
     output_lines = captured.out.splitlines()
 
     assert output_lines[0] == "CONNECTIONS {" 
-    assert output_lines[1] == "          ^  "  
+    assert output_lines[2] == "          ^  "  
 
 
 """Still need to write lots of tests for get_symbol """
