@@ -144,10 +144,8 @@ class Parser:
             raise TypeError("Expected bool type argument for proceed")
 
         if proceed == True:
-            print("yo", self.symbol.id, stopping_symbol_type)
             # Proof the scanner is broken
             while ((self.symbol.type != stopping_symbol_type) and (self.symbol.type != self.scanner.EOF)):
-                # print(self.symbol.type)
                 self.symbol = self.scanner.get_symbol()
                 # print(self.symbol.type)
             if self.symbol.type == stopping_symbol_type:
@@ -155,27 +153,23 @@ class Parser:
         else:
             pass
 
-            # Call error recovery function to resume parsing at appropriate point
-
     def device_list(self):
         """Parse device list"""
         DEVICES_ID = self.names.lookup(["DEVICES"])[0]
         # Check first entry in file is DEVICES. If not, assume just missing and proceed
         if not (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == DEVICES_ID):
             self.display_error(self.symbol, self.NO_DEVICES_KEYWORD,
-                               proceed=True, stopping_symbol_type=self.scanner.BRACE_OPEN)
+                               proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
         else:
             self.symbol = self.scanner.get_symbol()
         # Check the next symbol is a "{". If not, assume missing and proceed to next semicolon
         if not (self.symbol.type == self.scanner.BRACE_OPEN):
             self.display_error(self.symbol, self.NO_BRACE_OPEN,
                                proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
-
         self.device()
         # Check all devices in list, which are all separated by semicolons
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
             self.device()
-
         # Check for the end of file symbol "}"
         if self.symbol.type == self.scanner.BRACE_CLOSE:
             self.symbol = self.scanner.get_symbol()
@@ -208,9 +202,7 @@ class Parser:
         [AND_ID, NAND_ID, OR_ID, NOR_ID, XOR_ID, DTYPE_ID, SWITCH_ID, CLK_ID] = self.names.lookup(
             ["AND", "NAND", "OR", "NOR", "XOR", "DTYPE",  "SWITCH", "CLK"])
         one_to_sixteen = range(1, 16)
-        # self.names.lookup(["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"])
         binary_digit = [0, 1]
-
         # Check that name is either a AND, NAND, OR, NOR gate
         if self.symbol.id in [AND_ID, NAND_ID, OR_ID, NOR_ID]:
             symbol_ID = self.symbol
@@ -349,7 +341,7 @@ class Parser:
         else:
             self.display_error(
                 self.symbol, self.NO_BRACE_CLOSE,
-                proceed=True, stopping_symbol_type=self.scanner.KEYWORD)
+                proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
 
     def connection(self):
         """Parse a single connection line"""
@@ -421,7 +413,7 @@ class Parser:
         # Check first symbol is "MONITORS". If not, assume missing and proceed to the next {
         if not ((self.symbol.type == self.scanner.KEYWORD) and (self.symbol.id == MONITORS_ID)):
             self.display_error(self.symbol, self.NO_MONITORS_KEYWORD,
-                               proceed=True, stopping_symbol_type=self.scanner.BRACE_OPEN)
+                               proceed=True, stopping_symbol_type=self.scanner.KEYWORD)
         else:
             self.symbol = self.scanner.get_symbol()
         # Check for the open brace '{'. If not, assume missing and proceed to next ;
