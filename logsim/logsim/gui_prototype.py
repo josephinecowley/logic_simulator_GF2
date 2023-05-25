@@ -153,9 +153,9 @@ class Gui(wx.Frame):
 
 class RunSimulationPanel(wx.Panel):
     def __init__(self, parent, id=wx.ID_ANY, size=wx.DefaultSize):
-        super(RunSimulationPanel, self).__init__(parent, id, size=size)
+        super(RunSimulationPanel, self).__init__(parent, id, size=size, style=wx.SIMPLE_BORDER)
 
-        self.SetBackgroundColour("RED")
+        #self.SetBackgroundColour("RED") # layout identifier colour for visualisation purposes
         #print(self.GetLabel())
 
         # Configure sizers for layout of RunSimulationPanel
@@ -261,7 +261,7 @@ class SignalTrace(wx.ScrolledWindow):
         self.curLine = []
         self.drawing = False
 
-        self.SetBackgroundColour("PURPLE") # layout identifier colour for visualisation purposes
+        #self.SetBackgroundColour("PURPLE") # layout identifier colour for visualisation purposes
 
         # Set settings for ScrolledWindow
         self.SetVirtualSize((self.maxWidth, self.maxHeight))
@@ -281,7 +281,7 @@ class SignalTracesPanel(wx.Panel):
         signal_traces_panel.SetSizer(signal_traces_panel_vbox)
 
         add_new_monitor_panel = wx.Panel(self, name="add new monitor panel")
-        add_new_monitor_panel.SetBackgroundColour(wx.Colour(0, 238, 238))
+        #add_new_monitor_panel.SetBackgroundColour(wx.Colour(0, 238, 238)) # layout identifier colour for visualisation purposes
         add_new_monitor_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
         add_new_monitor_panel.SetSizer(add_new_monitor_panel_hbox)
 
@@ -415,7 +415,7 @@ class SwitchesPanel(wx.Panel):
 
         # Create and add left panel in switches panel layout
         left_panel = wx.Panel(switches_panel)
-        left_panel.SetBackgroundColour("GREEN") # layout identifier colour for visualisation purposes
+        #left_panel.SetBackgroundColour("GREEN") # layout identifier colour for visualisation purposes
         hbox.Add(left_panel, 1, wx.EXPAND)
 
         # Add the ScrolledPanel widget to SwitchesPanel panel
@@ -423,7 +423,7 @@ class SwitchesPanel(wx.Panel):
 
         # Create and add right panel in switches panel layout
         right_panel = wx.Panel(switches_panel)
-        right_panel.SetBackgroundColour("BLUE") # layout identifier colour for visualisation purposes
+        #right_panel.SetBackgroundColour("BLUE") # layout identifier colour for visualisation purposes
         hbox.Add(right_panel, 1, wx.EXPAND)
 
         # Set sizer of SwitchesPanel
