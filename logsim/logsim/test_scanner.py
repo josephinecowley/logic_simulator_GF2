@@ -157,13 +157,13 @@ def test_get_symbol_names(names_fixture, scanner_fixture, set_scanner_location, 
     assert symbol.line_number == expected_line_number
     assert symbol.start_position == expected_start_position
 
-@pytest.mark.parametrize("location, expected_name, expected_type, expected_line_number, expected_start_position", [
-    ((1, 8), None, 2, 1, 9),
-    ((18, 18), None, 5, 18, 19),
-    ((2, 11), None, 7, 2, 12),
+@pytest.mark.parametrize("location, expected_type, expected_line_number, expected_start_position", [
+    ((1, 8), 2, 1, 9),
+    ((18, 18), 5, 18, 19),
+    ((2, 11), 7, 2, 12),
 ])
 
-def test_get_symbol_punctuation(scanner_fixture, set_scanner_location, location, expected_name, 
+def test_get_symbol_punctuation(scanner_fixture, set_scanner_location, location, 
                     expected_type, expected_line_number, expected_start_position):
     scanner = scanner_fixture 
     set_scanner_location(location)
