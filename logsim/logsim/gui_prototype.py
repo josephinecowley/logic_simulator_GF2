@@ -266,6 +266,7 @@ class SignalTrace(wx.ScrolledWindow):
         self.SetVirtualSize((self.maxWidth, self.maxHeight))
         self.SetScrollRate(20,20)
 
+
 class SignalTracesPanel(wx.Panel):
     def __init__(self, parent):
         super(SignalTracesPanel, self).__init__(parent, size=wx.DefaultSize, style=wx.SUNKEN_BORDER)
@@ -274,17 +275,33 @@ class SignalTracesPanel(wx.Panel):
         vbox = wx.BoxSizer(wx.VERTICAL)
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
+        #test_panel = wx.Panel(self, name="test panel")
+        #test_panel.SetSizer(hbox)
+        #test_panel.SetBackgroundColour("CYAN2")
+
+        signal_traces_panel = wx.Panel(self, name="signal traces panel")
+        signal_traces_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
+        signal_traces_panel.SetSizer(signal_traces_panel_hbox)
+
+        test_panel = wx.Panel(self, name="test panel")
+        test_panel.SetBackgroundColour(wx.Colour(0, 238, 238))
+
         # Instantiate ScrolledPanel
-        signal_traces_scrolled_panel = wxscrolledpanel.ScrolledPanel(self, name="signal traces scrolled panel")
+        signal_traces_scrolled_panel = wxscrolledpanel.ScrolledPanel(signal_traces_panel, name="signal traces scrolled panel")
 
         # Configure sizer of ScrolledPanel
         signal_trace_size = (500, 200)
         num_of_signal_traces = 7
-        fgs = wx.FlexGridSizer(cols=1, rows=num_of_signal_traces, vgap=4, hgap=4)
+        fgs = wx.FlexGridSizer(cols=2, rows=num_of_signal_traces, vgap=4, hgap=50)
         
         for signal_trace_num in range(1, num_of_signal_traces + 1):
             signal_trace = SignalTrace(signal_traces_scrolled_panel, wx.ID_ANY, size=signal_trace_size) # create signal trace scrolled window
             signal_trace_canvas = MyGLCanvas(signal_trace, wx.ID_ANY, wx.DefaultPosition,  wx.Size(*signal_trace_size)) # draw canvas onto signal trace scrolled window
+            str = f"device {signal_trace_num}"
+            text = wx.StaticText(signal_traces_scrolled_panel, wx.ID_ANY, str)
+            font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+            text.SetFont(font)
+            fgs.Add(text, 0, flag=wx.ALIGN_CENTER|wx.LEFT, border=10)
             fgs.Add(signal_trace, 0, flag=wx.EXPAND, border=10) # add signal trace plot to ScrolledPanel
 
         # Set sizer of ScrolledPanel
@@ -292,10 +309,13 @@ class SignalTracesPanel(wx.Panel):
         signal_traces_scrolled_panel.SetAutoLayout(1)
         signal_traces_scrolled_panel.SetupScrolling(scroll_x=True, scroll_y=True, rate_x=20, rate_y=20, scrollToTop=True, scrollIntoView=True)
 
-        vbox.Add(signal_traces_scrolled_panel, 4, wx.EXPAND)
+        signal_traces_panel_hbox.Add(signal_traces_scrolled_panel, 1, wx.EXPAND)
+
+        #hbox.Add(test_panel, 1, flag=wx.EXPAND)
+        hbox.Add(signal_traces_panel, 3, flag=wx.EXPAND)
 
         # Set sizer of SignalTracesPanel
-        self.SetSizer(vbox)
+        self.SetSizer(hbox)
 
 
 class SwitchesPanel(wx.Panel):
