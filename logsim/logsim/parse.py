@@ -221,6 +221,7 @@ class Parser:
         # If something other than '}', assume it is simply missing
         else:
             self.display_error(self.symbol, self.NO_BRACE_CLOSE)
+            self.symbol = self.scanner.get_symbol()
 
     def device(self):
         """Parse user defined device."""
@@ -365,14 +366,14 @@ class Parser:
         # Check first symbol is "CONNECTIONS". If not, assuming missing and proceed to next {
         if not (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == CONNECTIONS_ID):
             self.display_error(self.symbol, self.NO_CONNECTIONS_KEYWORD,
-                               proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+                               proceed=False)
         else:
             self.symbol = self.scanner.get_symbol()
         # Check next symbol is an open brace "{". If not, proceed to next semicolon ;
         if not (self.symbol.type == self.scanner.BRACE_OPEN):
             self.display_error(
                 self.symbol, self.NO_BRACE_OPEN,
-                proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+                proceed=False)
         self.connection()
         # Repeat checking connections in list until the close brace "}"
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
@@ -382,7 +383,7 @@ class Parser:
         else:
             self.display_error(
                 self.symbol, self.NO_BRACE_CLOSE,
-                proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+                proceed=False)
 
     def connection(self):
         """Parse a connection."""
@@ -397,7 +398,7 @@ class Parser:
                 self.input()
             else:
                 self.display_error(self.symbol, self.NO_EQUALS,
-                                   proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+                                   proceed=False)
 
     def output(self):
         """Parse a single device output."""
@@ -417,7 +418,7 @@ class Parser:
                     self.symbol = self.scanner.get_symbol()
                 else:
                     self.display_error(self.symbol, self.NO_Q_OR_QBAR,
-                                       proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+                                       proceed=False)
 
         else:
             self.display_error(self.symbol, self.UNDEFINED_NAME,
@@ -440,10 +441,10 @@ class Parser:
                     self.symbol = self.scanner.get_symbol()
                 else:
                     self.display_error(self.symbol, self.NO_INPUT_SUFFIX,
-                                       proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+                                       proceed=False)
             else:
                 self.display_error(self.symbol, self.NO_FULLSTOP,
-                                   proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+                                   proceed=False)
         else:
             self.display_error(self.symbol, self.UNDEFINED_NAME,
                                proceed=False, stopping_symbol_type=self.scanner.SEMICOLON)
@@ -454,13 +455,13 @@ class Parser:
         # Check first symbol is "MONITORS". If not, assume missing and proceed to the next {
         if not ((self.symbol.type == self.scanner.KEYWORD) and (self.symbol.id == MONITORS_ID)):
             self.display_error(self.symbol, self.NO_MONITORS_KEYWORD,
-                               proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+                               proceed=False)
         else:
             self.symbol = self.scanner.get_symbol()
         # Check for the open brace '{'. If not, assume missing and proceed to next ;
         if not (self.symbol.type == self.scanner.BRACE_OPEN):
             self.display_error(self.symbol, self.NO_BRACE_OPEN,
-                               proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+                               proceed=False)
         self.symbol = self.scanner.get_symbol()
         # Check that the first is a valid output name
         self.output()
@@ -503,13 +504,13 @@ class Parser:
             self.device_list()
 
             # Parse connection list
-            self.connection_list()
+            # self.connection_list()
 
             # Parse monitor list
-            self.monitor_list()
+            # self.monitor_list()
 
             # Check for END keyword
-            self.end()
+            # self.end()
 
             # Check if there are errors, and return True if error count is zero, otherwise return falsex
             if self.error_count == 0:
