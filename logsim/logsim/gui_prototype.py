@@ -189,11 +189,12 @@ class RunSimulationPanel(wx.Panel):
         font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         text.SetFont(font)
         cycles_hbox.Add(text, 0, flag=wx.LEFT, border=10)'''
-        text = wx.TextCtrl(cycles_panel, wx.ID_ANY, "1", pos=wx.DefaultPosition, size=(60, -1))
+        self.text = wx.TextCtrl(cycles_panel, wx.ID_ANY, "1", pos=wx.DefaultPosition, size=(60, -1))
         spin = wx.SpinButton(cycles_panel, wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.SP_VERTICAL)
         spin.SetRange(1, 100)
         spin.SetValue(1)
-        cycles_hbox.Add(text, 0, flag=wx.LEFT, border=10)
+        self.Bind(wx.EVT_SPIN, self.on_spin, spin)
+        cycles_hbox.Add(self.text, 0, flag=wx.LEFT, border=10)
         cycles_hbox.Add(spin, 0, flag=wx.LEFT, border=10)
 
         # Create, bind running simulation event to and add the "Run simulation" button
@@ -245,6 +246,9 @@ class RunSimulationPanel(wx.Panel):
         text = "QUIT button pressed"
         print(text)
         quit_button_pressed.SetBackgroundColour(wx.Colour(148, 148, 148))
+
+    def on_spin(self, event):
+        self.text.SetValue(str(event.GetPosition()))
 
 
 class SignalTrace(wx.ScrolledWindow):
