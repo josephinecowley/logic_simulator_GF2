@@ -2,6 +2,7 @@ import wx
 import wx.glcanvas as wxcanvas
 import wx.lib.scrolledpanel as wxscrolledpanel
 import wx.lib.buttons as wxbuttons
+import wx.lib.agw.aquabutton as wxaquabutton
 from OpenGL import GL, GLUT
 
 class MyGLCanvas(wxcanvas.GLCanvas):
@@ -292,17 +293,24 @@ class SignalTracesPanel(wx.Panel):
         # Configure sizer of ScrolledPanel
         signal_trace_size = (500, 200)
         num_of_signal_traces = 7
-        fgs = wx.FlexGridSizer(cols=2, rows=num_of_signal_traces, vgap=4, hgap=50)
+        fgs = wx.FlexGridSizer(cols=3, rows=num_of_signal_traces, vgap=4, hgap=50)
         
         for signal_trace_num in range(1, num_of_signal_traces + 1):
-            signal_trace = SignalTrace(signal_traces_scrolled_panel, wx.ID_ANY, size=signal_trace_size) # create signal trace scrolled window
-            signal_trace_canvas = MyGLCanvas(signal_trace, wx.ID_ANY, wx.DefaultPosition,  wx.Size(*signal_trace_size)) # draw canvas onto signal trace scrolled window
             str = f"device {signal_trace_num}"
             text = wx.StaticText(signal_traces_scrolled_panel, wx.ID_ANY, str)
             font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
             text.SetFont(font)
+
+            signal_trace = SignalTrace(signal_traces_scrolled_panel, wx.ID_ANY, size=signal_trace_size) # create signal trace scrolled window
+            signal_trace_canvas = MyGLCanvas(signal_trace, wx.ID_ANY, wx.DefaultPosition,  wx.Size(*signal_trace_size)) # draw canvas onto signal trace scrolled window
+
+            delete_button = wxaquabutton.AquaButton(signal_traces_scrolled_panel, wx.ID_ANY, bitmap=None, label="DELETE")
+            delete_button.SetBackgroundColor(wx.Colour("BLUE"))
+            delete_button.SetHoverColor(wx.Colour("RED"))
+
             fgs.Add(text, 0, flag=wx.ALIGN_CENTER|wx.LEFT, border=10)
             fgs.Add(signal_trace, 0, flag=wx.EXPAND, border=10) # add signal trace plot to ScrolledPanel
+            fgs.Add(delete_button, 0, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         # Set sizer of ScrolledPanel
         signal_traces_scrolled_panel.SetSizer(fgs)
