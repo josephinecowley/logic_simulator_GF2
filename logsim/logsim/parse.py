@@ -180,7 +180,7 @@ class Parser:
         # Check if we have already built in error handling (have done so for obvious semantic errors, e.g. missing KEYWORD). If so, just pass
         if proceed == True:
             return
-        # Check if we have given a stopping symbol and therefore skip symbols until next stopping symbol
+        # Check if we need to skip symbols to recover parsing
         else:
             while ((self.symbol.type != stopping_symbol_type) and (self.symbol.type != self.scanner.EOF)):
                 self.symbol = self.scanner.get_symbol()
@@ -235,6 +235,7 @@ class Parser:
             if self.symbol.type == self.scanner.EQUALS:
                 self.symbol = self.scanner.get_symbol()
                 # Check that we then get a valid component name
+                # JC! May need to change this assignment, but atm I believe this will be useful for creating the network
                 symbol_ID, device_input = self.check_device_is_valid()
             else:
                 self.display_error(self.symbol, self.NO_EQUALS, proceed=False)
@@ -407,6 +408,10 @@ class Parser:
             return
         else:
             self.output()
+            # Incase we have had to error handle and recover, such that the symbol is now a ';'
+            while self.symbol.type == self.scanner.SEMICOLON:
+                self.symbol = self.scanner.get_symbol()
+                self.output()
             # Check ouput connection is followed by an equals sign "="
             if self.symbol.type == self.scanner.EQUALS:
                 self.symbol = self.scanner.get_symbol()
@@ -433,8 +438,7 @@ class Parser:
                     self.display_error(self.symbol, self.NO_Q_OR_QBAR,
                                        proceed=False)
         else:
-            self.display_error(self.symbol, self.UNDEFINED_NAME)
-            self.symbol = self.scanner.get_symbol()
+            self.display_error(self.symbol, self.UNDEFINED_NAME, proceed=False)
 
     def input(self):
         """Parse a single device input."""
