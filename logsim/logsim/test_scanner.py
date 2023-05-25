@@ -141,5 +141,33 @@ def test_scanner_display_line_and_marker(scanner_fixture, capfd):
     assert output_lines[0] == "CONNECTIONS {" 
     assert output_lines[2] == "          ^  "  
 
+@pytest.mark.parametrize("location, expected_name, expected_type, expected_line_number, expected_start_position", [
+    ((1, 9), "dtype1", 10, 2, 5),
+    ((11, 2), "data", 10, 11, 5),
+    ((20, 0), "MONITORS", 8, 21, 1),
+])
+def test_get_symbol_names(names_fixture, scanner_fixture, set_scanner_location, location, expected_name, 
+                    expected_type, expected_line_number, expected_start_position):
+    names = names_fixture # names class instance
+    scanner = scanner_fixture 
+    set_scanner_location(location)
+    symbol = scanner.get_symbol()
+    assert names.get_name_string(symbol.id) == expected_name # check that symbol_id maps to expected name
+    assert symbol.type == expected_type
+    assert symbol.line_number == expected_line_number
+    assert symbol.start_position == expected_start_position
 
-"""Still need to write lots of tests for get_symbol """
+@pytest.mark.parametrize("location, expected_name, expected_type, expected_line_number, expected_start_position", [
+    ((18, 18), None, 5, 18, 19),
+
+])
+
+def test_get_symbol_punctuation(scanner_fixture, set_scanner_location, location, expected_name, 
+                    expected_type, expected_line_number, expected_start_position):
+    scanner = scanner_fixture 
+    set_scanner_location(location)
+    symbol = scanner.get_symbol()
+    assert symbol.id == None # check that symbol_id maps to expected name
+    assert symbol.type == expected_type
+    assert symbol.line_number == expected_line_number
+    assert symbol.start_position == expected_start_position
