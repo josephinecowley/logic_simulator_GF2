@@ -179,15 +179,12 @@ class Parser:
         if self.symbol.type == self.scanner.BRACE_CLOSE:
             pass
         elif self.symbol.type == self.scanner.NAME:
-
             self.symbol = self.scanner.get_symbol()
-
             # Check that the name is followed by an equals sign
             if self.symbol.type == self.scanner.EQUALS:
                 self.symbol = self.scanner.get_symbol()
                 # Check that we then get a valid component name
                 symbol_ID, device_input = self.check_device_is_valid()
-                self.symbol = self.scanner.get_symbol()
             else:
                 self.display_error(self.symbol, self.NO_EQUALS, proceed=True,
                                    stopping_symbol_type=self.scanner.SEMICOLON)
@@ -221,20 +218,27 @@ class Parser:
                             return symbol_ID, number_of_inputs_ID
                         else:
                             self.display_error(
-                                self.symbol, self.NO_BRACKET_CLOSE)
+                                self.symbol, self.NO_BRACKET_CLOSE,
+                                proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+
+                            self.symbol = self.scanner.get_symbol()
                             return None, None
                     else:
-                        # JC! Might want to make this out of range more specific
-                        self.display_error(self.symbol, self.OUT_OF_RANGE)
+                        # JC! Might want to make this out of range more specific.
+                        self.display_error(self.symbol, self.OUT_OF_RANGE,
+                                           proceed=False, stopping_symbol_type=self.scanner.SEMICOLON)
                         return None, None
                 else:
-                    self.display_error(self.symbol, self.NO_NUMBER)
+                    self.display_error(self.symbol, self.NO_NUMBER,
+                                       proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
                     return None, None
             else:
-                self.display_error(self.symbol, self.NO_BRACKET_OPEN)
+                self.display_error(self.symbol, self.NO_BRACKET_OPEN,
+                                   proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
                 return None, None
         # Check if symbol is an XOR or DTYPE (with no inputs)
         elif self.symbol.id == XOR_ID or self.symbol.id == DTYPE_ID:
+            self.symbol = self.scanner.get_symbol()
             return self.symbol.id, self.symbol.type
         # Check if symbol is a SWITCH type
         elif self.symbol.id == SWITCH_ID:
@@ -251,20 +255,26 @@ class Parser:
                         # Check that the next symbol is a closed bracket
                         self.symbol = self.scanner.get_symbol()
                         if self.symbol.type == self.scanner.BRACKET_CLOSE:
+
+                            self.symbol = self.scanner.get_symbol()
                             return symbol_ID, switch_initial_state_ID
                         else:
                             self.display_error(
-                                self.symbol, self.NO_BRACKET_CLOSE)
+                                self.symbol, self.NO_BRACKET_CLOSE,
+                                proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
                             return None, None
                     else:
                         # JC! Might want to make this out of range more specific
-                        self.display_error(self.symbol, self.OUT_OF_RANGE)
+                        self.display_error(self.symbol, self.OUT_OF_RANGE,
+                                           proceed=False, stopping_symbol_type=self.scanner.SEMICOLON)
                         return None, None
                 else:
-                    self.display_error(self.symbol, self.NO_NUMBER)
+                    self.display_error(self.symbol, self.NO_NUMBER,
+                                       proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
                     return None, None
             else:
-                self.display_error(self.symbol, self.NO_BRACKET_OPEN)
+                self.display_error(self.symbol, self.NO_BRACKET_OPEN,
+                                   proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
                 return None, None
         # Check if symbol is a CLK
         elif self.symbol.id == CLK_ID:
@@ -283,23 +293,30 @@ class Parser:
                         # Check that the next symbol is a close bracket
                         self.symbol = self.scanner.get_symbol()
                         if self.symbol.type == self.scanner.BRACKET_CLOSE:
+
+                            self.symbol = self.scanner.get_symbol()
                             return symbol_ID, number_of_cycles_ID
                         else:
                             self.display_error(
-                                self.symbol, self.NO_BRACKET_CLOSE)
+                                self.symbol, self.NO_BRACKET_CLOSE,
+                                proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
                             return None, None
                     else:
                         # JC! Might want to make this out of range more specific
-                        self.display_error(self.symbol, self.OUT_OF_RANGE)
+                        self.display_error(self.symbol, self.OUT_OF_RANGE,
+                                           proceed=False, stopping_symbol_type=self.scanner.SEMICOLON)
                         return None, None
                 else:
-                    self.display_error(self.symbol, self.NO_NUMBER)
+                    self.display_error(self.symbol, self.NO_NUMBER,
+                                       proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
                     return None, None
             else:
-                self.display_error(self.symbol, self.NO_BRACKET_OPEN)
+                self.display_error(self.symbol, self.NO_BRACKET_OPEN,
+                                   proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
                 return None, None
         else:
-            self.display_error(self.symbol, self.INVALID_COMPONENT)
+            self.display_error(self.symbol, self.INVALID_COMPONENT,
+                               proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
             return None, None
 
     def connection_list(self):
