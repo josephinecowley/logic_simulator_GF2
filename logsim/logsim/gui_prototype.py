@@ -276,13 +276,9 @@ class SignalTracesPanel(wx.Panel):
         vbox = wx.BoxSizer(wx.VERTICAL)
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
-        #test_panel = wx.Panel(self, name="test panel")
-        #test_panel.SetSizer(hbox)
-        #test_panel.SetBackgroundColour("CYAN2")
-
         signal_traces_panel = wx.Panel(self, name="signal traces panel")
-        signal_traces_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
-        signal_traces_panel.SetSizer(signal_traces_panel_hbox)
+        signal_traces_panel_vbox = wx.BoxSizer(wx.VERTICAL)
+        signal_traces_panel.SetSizer(signal_traces_panel_vbox)
 
         test_panel = wx.Panel(self, name="test panel")
         test_panel.SetBackgroundColour(wx.Colour(0, 238, 238))
@@ -317,13 +313,13 @@ class SignalTracesPanel(wx.Panel):
         signal_traces_scrolled_panel.SetAutoLayout(1)
         signal_traces_scrolled_panel.SetupScrolling(scroll_x=True, scroll_y=True, rate_x=20, rate_y=20, scrollToTop=True, scrollIntoView=True)
 
-        signal_traces_panel_hbox.Add(signal_traces_scrolled_panel, 1, wx.EXPAND)
+        signal_traces_panel_vbox.Add(signal_traces_scrolled_panel, 1, wx.EXPAND)
 
-        #hbox.Add(test_panel, 1, flag=wx.EXPAND)
-        hbox.Add(signal_traces_panel, 3, flag=wx.EXPAND)
+        vbox.Add(signal_traces_panel, 4, flag=wx.EXPAND)
+        vbox.Add(test_panel, 1, flag=wx.EXPAND)
 
         # Set sizer of SignalTracesPanel
-        self.SetSizer(hbox)
+        self.SetSizer(vbox)
 
 
 class SwitchesPanel(wx.Panel):
