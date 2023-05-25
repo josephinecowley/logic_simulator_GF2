@@ -36,8 +36,6 @@ class Parser:
     Public methods
     --------------
 
-
-
     display_error(self, symbol, error_type, proceed=False, stopping_symbol_type=6): Display the error message and where it occured. 
     Calls the error handling method to resume from the next available point.
 
@@ -81,13 +79,13 @@ class Parser:
             self.UNDEFINED_NAME, self.NO_FULLSTOP, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE] = self.names.unique_error_codes(19)
 
     # Stopping symbol is automatically assigned to a semi-colon
-    def display_error(self,  symbol, error_type,  proceed=False, stopping_symbol_type=6):
+    def display_error(self,  symbol, error_type,  proceed=True, stopping_symbol_type=6):
         """Display the error message and where it occured
 
         Calls the error handling method to resume from the next available point."""
 
         # Exception handling
-        if not isinstance(error_type, (int)):
+        if not isinstance(error_type, int):
             raise TypeError(
                 "Expected error_type to be an integer type argument")
         elif error_type >= 19:
@@ -99,7 +97,10 @@ class Parser:
             raise TypeError("Expected an instance of the Symbol class")
         elif not isinstance(stopping_symbol_type,  int):
             raise TypeError(
-                "Expected stopping symbol to be a int type argument")
+                "Expected stopping symbol to be an integer type argument")
+        elif ((stopping_symbol_type >= 12) or (stopping_symbol_type <= 0)):
+            raise ValueError(
+                "Expected stopping symbol to be within range of given symbols")
         elif not isinstance(proceed, bool):
             raise TypeError("Expected bool type argument for proceed")
 
@@ -156,11 +157,11 @@ class Parser:
 
     def error_recovery(self, error_type, proceed=True, stopping_symbol_type=6):
         """Recover from an error by resuming parsing at an appropriate point."""
-        if not isinstance(stopping_symbol_type, int):
-            raise TypeError(
-                "Expected stopping symbol to be a int type argument")
+
+        # Exception handling
         if not isinstance(error_type, int):
-            raise TypeError("Expected error_type to be an integer")
+            raise TypeError(
+                "Expected error_type to be an integer type argument")
         # JC! need to fix this to not rely on a '19'
         elif error_type >= 19:
             raise ValueError(
@@ -169,45 +170,61 @@ class Parser:
             raise ValueError("Cannot have a negative error code")
         elif not isinstance(proceed, bool):
             raise TypeError("Expected bool type argument for proceed")
+        elif not isinstance(stopping_symbol_type, int):
+            raise TypeError(
+                "Expected stopping symbol to be an integer type argument")
+        elif ((stopping_symbol_type >= 12) or (stopping_symbol_type <= 0)):
+            raise ValueError(
+                "Expected stopping symbol to be within range of given symbols")
 
+        # Check if we have already built in error handling (have done so for obvious semantic errors, e.g. missing KEYWORD). If so, just pass
         if proceed == True:
-            # Proof the scanner is broken
+            return
+        # Check if we have given a stopping symbol and therefore skip symbols until next stopping symbol
+        else:
             while ((self.symbol.type != stopping_symbol_type) and (self.symbol.type != self.scanner.EOF)):
                 self.symbol = self.scanner.get_symbol()
-                # print(self.symbol.type)
             if self.symbol.type == stopping_symbol_type:
                 return
-        else:
-            pass
 
     def device_list(self):
         """Parse device list."""
         DEVICES_ID = self.names.lookup(["DEVICES"])[0]
-        # Check first entry in file is DEVICES. If not, assume just missing and proceed
+        # If DEVICES is missing, assume just missing and proceed to check if { is present
         if not (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == DEVICES_ID):
-            self.display_error(self.symbol, self.NO_DEVICES_KEYWORD,
-                               proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+            self.display_error(self.symbol, self.NO_DEVICES_KEYWORD)
+            self.symbol = self.scanner.get_symbol()
+            # Check if there's also a missing { after missing DEVICES. If so just pass to next symbol
+            if not (self.symbol.type == self.scanner.BRACE_OPEN):
+                self.display_error(self.symbol, self.NO_BRACE_OPEN)
+            # If only missing DEVICES keyword, advance symbol to NAME
+            else:
+                self.symbol = self.scanner.get_symbol()
+        # If DEVICES keyword is present
         else:
             self.symbol = self.scanner.get_symbol()
-        # Check the next symbol is a "{". If not, assume missing and proceed to next semicolon
-        if not (self.symbol.type == self.scanner.BRACE_OPEN):
-            self.display_error(self.symbol, self.NO_BRACE_OPEN,
-                               proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+            # Check the next symbol is a "{". If not, assume missing and proceed to next symbol
+            if not (self.symbol.type == self.scanner.BRACE_OPEN):
+                self.display_error(self.symbol, self.NO_BRACE_OPEN)
+            # If not missing either, advance symbol to NAME
+            else:
+                self.symbol = self.scanner.get_symbol()
+        # Parse device
         self.device()
         # Check all devices in list, which are all separated by semicolons
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
+            self.symbol = self.scanner.get_symbol()
             self.device()
         # Check for the end of file symbol "}"
         if self.symbol.type == self.scanner.BRACE_CLOSE:
             self.symbol = self.scanner.get_symbol()
+        # If something other than '}', assume it is simply missing
         else:
-            self.display_error(self.symbol, self.NO_BRACE_CLOSE,
-                               proceed=True, stopping_symbol_type=self.scanner.KEYWORD)
+            self.display_error(self.symbol, self.NO_BRACE_CLOSE)
 
     def device(self):
         """Parse user defined device."""
         # Check that we have a valid user defined name
-        self.symbol = self.scanner.get_symbol()
         if self.symbol.type == self.scanner.BRACE_CLOSE:
             return
         elif self.symbol.type == self.scanner.NAME:
@@ -218,11 +235,9 @@ class Parser:
                 # Check that we then get a valid component name
                 symbol_ID, device_input = self.check_device_is_valid()
             else:
-                self.display_error(self.symbol, self.NO_EQUALS, proceed=True,
-                                   stopping_symbol_type=self.scanner.SEMICOLON)
+                self.display_error(self.symbol, self.NO_EQUALS, proceed=False)
         else:
-            self.display_error(self.symbol, self.INVALID_NAME, proceed=True,
-                               stopping_symbol_type=self.scanner.SEMICOLON)
+            self.display_error(self.symbol, self.INVALID_NAME, proceed=False)
 
     def check_device_is_valid(self):
         """Check if device is valid and return both device type ID and the input ID."""
@@ -250,20 +265,20 @@ class Parser:
                         else:
                             self.display_error(
                                 self.symbol, self.NO_BRACKET_CLOSE,
-                                proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+                                proceed=False)
                             return None, None
                     else:
                         # JC! Might want to make this out of range more specific.
                         self.display_error(self.symbol, self.OUT_OF_RANGE,
-                                           proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+                                           proceed=False)
                         return None, None
                 else:
                     self.display_error(self.symbol, self.NO_NUMBER,
-                                       proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+                                       proceed=False)
                     return None, None
             else:
                 self.display_error(self.symbol, self.NO_BRACKET_OPEN,
-                                   proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+                                   proceed=False)
                 return None, None
         # Check if symbol is an XOR or DTYPE (with no inputs)
         elif self.symbol.id == XOR_ID or self.symbol.id == DTYPE_ID:
@@ -284,13 +299,12 @@ class Parser:
                         # Check that the next symbol is a closed bracket
                         self.symbol = self.scanner.get_symbol()
                         if self.symbol.type == self.scanner.BRACKET_CLOSE:
-
                             self.symbol = self.scanner.get_symbol()
                             return symbol_ID, switch_initial_state_ID
                         else:
                             self.display_error(
                                 self.symbol, self.NO_BRACKET_CLOSE,
-                                proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+                                proceed=False)
                             return None, None
                     else:
                         # JC! Might want to make this out of range more specific
@@ -299,11 +313,11 @@ class Parser:
                         return None, None
                 else:
                     self.display_error(self.symbol, self.NO_NUMBER,
-                                       proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+                                       proceed=False)
                     return None, None
             else:
                 self.display_error(self.symbol, self.NO_BRACKET_OPEN,
-                                   proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+                                   proceed=False)
                 return None, None
         # Check if symbol is a CLK
         elif self.symbol.id == CLK_ID:
@@ -325,7 +339,7 @@ class Parser:
                         else:
                             self.display_error(
                                 self.symbol, self.NO_BRACKET_CLOSE,
-                                proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+                                proceed=False)
                             return None, None
                     else:
                         # JC! Might want to make this out of range more specific
@@ -334,15 +348,15 @@ class Parser:
                         return None, None
                 else:
                     self.display_error(self.symbol, self.NO_NUMBER,
-                                       proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+                                       proceed=False)
                     return None, None
             else:
                 self.display_error(self.symbol, self.NO_BRACKET_OPEN,
-                                   proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+                                   proceed=False)
                 return None, None
         else:
             self.display_error(self.symbol, self.INVALID_COMPONENT,
-                               proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
+                               proceed=False)
             return None, None
 
     def connection_list(self):
