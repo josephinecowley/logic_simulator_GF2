@@ -280,8 +280,28 @@ class SignalTracesPanel(wx.Panel):
         signal_traces_panel_vbox = wx.BoxSizer(wx.VERTICAL)
         signal_traces_panel.SetSizer(signal_traces_panel_vbox)
 
-        test_panel = wx.Panel(self, name="test panel")
-        test_panel.SetBackgroundColour(wx.Colour(0, 238, 238))
+        add_new_monitor_panel = wx.Panel(self, name="add new monitor panel")
+        add_new_monitor_panel.SetBackgroundColour(wx.Colour(0, 238, 238))
+        add_new_monitor_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
+        add_new_monitor_panel.SetSizer(add_new_monitor_panel_hbox)
+
+
+        add_new_monitor_panel_LEFT = wx.Panel(add_new_monitor_panel, name="add new monitor LEFT panel")
+        add_new_monitor_panel_hbox.Add(add_new_monitor_panel_LEFT, 1, flag=wx.EXPAND)
+
+        add_new_monitor_panel_CENTRE = wx.Panel(add_new_monitor_panel, name="add new monitor CENTRE panel")
+        add_new_monitor_panel_CENTRE_vbox = wx.BoxSizer(wx.VERTICAL)
+        add_new_monitor_panel_CENTRE.SetSizer(add_new_monitor_panel_CENTRE_vbox)
+        str = "Add new monitor"
+        text = wx.StaticText(add_new_monitor_panel_CENTRE, wx.ID_ANY, str)
+        font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        text.SetFont(font)
+        add_new_monitor_panel_CENTRE_vbox.Add(text, 1, flag=wx.TOP|wx.ALIGN_CENTER, border=40)
+        add_new_monitor_panel_hbox.Add(add_new_monitor_panel_CENTRE, 3, flag=wx.EXPAND)
+
+        add_new_monitor_panel_RIGHT = wx.Panel(add_new_monitor_panel, name="add new monitor RIGHT panel")
+        add_new_monitor_panel_hbox.Add(add_new_monitor_panel_RIGHT, 1, flag=wx.EXPAND)
+
 
         # Instantiate ScrolledPanel
         signal_traces_scrolled_panel = wxscrolledpanel.ScrolledPanel(signal_traces_panel, name="signal traces scrolled panel")
@@ -316,7 +336,7 @@ class SignalTracesPanel(wx.Panel):
         signal_traces_panel_vbox.Add(signal_traces_scrolled_panel, 1, wx.EXPAND)
 
         vbox.Add(signal_traces_panel, 4, flag=wx.EXPAND)
-        vbox.Add(test_panel, 1, flag=wx.EXPAND)
+        vbox.Add(add_new_monitor_panel, 1, flag=wx.EXPAND)
 
         # Set sizer of SignalTracesPanel
         self.SetSizer(vbox)
