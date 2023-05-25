@@ -209,7 +209,7 @@ class RunSimulationPanel(wx.Panel):
         run_button.SetMinSize(wx.DefaultSize)
         run_button.SetBackgroundColour(wx.Colour(4, 84, 14))
         run_button.SetForegroundColour(wx.WHITE)
-        run_button.SetToolTip("Run the simulation")
+        run_button.SetToolTip("Begin running the simulation")
         left_buttons_panel_hbox.Add(run_button, 1, flag=wx.ALIGN_LEFT, border=5)
 
         # Create, bind quitting event to and add the "Quit simulation" button
