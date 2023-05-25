@@ -35,7 +35,34 @@ class Parser:
 
     Public methods
     --------------
-    parse_network(self): Parses the circuit definition file.
+
+
+
+    display_error(self, symbol, error_type, proceed=False, stopping_symbol_type=6): Display the error message and where it occured. 
+    Calls the error handling method to resume from the next available point.
+
+    error_recovery(self, error_type, proceed, stopping_symbol): Recover from an error by resuming parsing at an appropriate point specified by the stopping_symbol.
+
+    device_list(self): Parse device list.
+
+    device(self): Parse user defined device.
+
+    check_device_is_valid(self): Check if device is valid and return both device type ID and the input ID.
+
+    connection_list(self): Parse connection list.
+
+    connection(self): Parse a connection.
+
+    output(self): Parse a single device output.
+
+    input(self): Parse a single device input.
+
+    monitor_list(self): Parse monitor list.
+
+    end(self): Parse an END keyword and check there are no symbols afterwards. 
+
+    parse_network(self): Parse the circuit definition file and return true if there are no files.
+
     """
 
 #    def __init__(self, names, devices, network, monitors, scanner):
@@ -53,8 +80,8 @@ class Parser:
             self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_BRACKET_OPEN, self.NO_BRACKET_CLOSE, self.NO_NUMBER, self.OUT_OF_RANGE,
             self.UNDEFINED_NAME, self.NO_FULLSTOP, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE] = self.names.unique_error_codes(19)
 
-# JC! need to change the 100 once all stopping symbol types are defined
-    def display_error(self,  symbol, error_type,  proceed=False, stopping_symbol_type=100):
+    # Stopping symbol is automatically assigned to a semi-colon
+    def display_error(self,  symbol, error_type,  proceed=False, stopping_symbol_type=6):
         """Display the error message and where it occured
 
         Calls the error handling method to resume from the next available point."""
@@ -127,8 +154,8 @@ class Parser:
         # Call error recovery function to resume parsing at appropriate point
         self.error_recovery(error_type, proceed, stopping_symbol_type)
 
-    def error_recovery(self, error_type, proceed, stopping_symbol_type):
-        """Recovers from an error by resuming parsing at an appropriate point."""
+    def error_recovery(self, error_type, proceed=True, stopping_symbol_type=6):
+        """Recover from an error by resuming parsing at an appropriate point."""
         if not isinstance(stopping_symbol_type, int):
             raise TypeError(
                 "Expected stopping symbol to be a int type argument")
@@ -154,7 +181,7 @@ class Parser:
             pass
 
     def device_list(self):
-        """Parse device list"""
+        """Parse device list."""
         DEVICES_ID = self.names.lookup(["DEVICES"])[0]
         # Check first entry in file is DEVICES. If not, assume just missing and proceed
         if not (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == DEVICES_ID):
@@ -178,7 +205,7 @@ class Parser:
                                proceed=True, stopping_symbol_type=self.scanner.KEYWORD)
 
     def device(self):
-        """Parse user defined devices"""
+        """Parse user defined device."""
         # Check that we have a valid user defined name
         self.symbol = self.scanner.get_symbol()
         if self.symbol.type == self.scanner.BRACE_CLOSE:
@@ -198,7 +225,7 @@ class Parser:
                                stopping_symbol_type=self.scanner.SEMICOLON)
 
     def check_device_is_valid(self):
-        """Returns both device type ID and the input ID"""
+        """Check if device is valid and return both device type ID and the input ID."""
         [AND_ID, NAND_ID, OR_ID, NOR_ID, XOR_ID, DTYPE_ID, SWITCH_ID, CLK_ID] = self.names.lookup(
             ["AND", "NAND", "OR", "NOR", "XOR", "DTYPE",  "SWITCH", "CLK"])
         one_to_sixteen = range(1, 16)
@@ -319,7 +346,7 @@ class Parser:
             return None, None
 
     def connection_list(self):
-        """Parse connection list"""
+        """Parse connection list."""
         CONNECTIONS_ID = self.names.lookup(["CONNECTIONS"])[0]
         # Check first symbol is "CONNECTIONS". If not, assuming missing and proceed to next {
         if not (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == CONNECTIONS_ID):
@@ -344,7 +371,7 @@ class Parser:
                 proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
 
     def connection(self):
-        """Parse a single connection line"""
+        """Parse a connection."""
         self.symbol = self.scanner.get_symbol()
         # If after the semicolon we have a } , assume we can move onto the monitor_list
         if self.symbol.type == self.scanner.BRACE_CLOSE:
@@ -359,7 +386,7 @@ class Parser:
                                    proceed=True, stopping_symbol_type=self.scanner.SEMICOLON)
 
     def output(self):
-        """Parse a single device output"""
+        """Parse a single device output."""
         # DTYPE_ID = self.names.lookup(["DTYPE"])[0]
         valid_output_id_list = self.names.lookup(["Q", "QBAR"])
         # Check that the output to be connected is an already user-defined name
@@ -383,7 +410,7 @@ class Parser:
                                proceed=False, stopping_symbol_type=self.scanner.SEMICOLON)
 
     def input(self):
-        """Parse a single device input"""
+        """Parse a single device input."""
         valid_input_suffix_id_list = self.names.lookup(["I1", "I2", "I3", "I4", "I5", "I6", "I7", "I8", "I9",
                                                         "I10", "I11", "I12", "I13", "I14", "I15", "I16", "DATA", "CLK", "SET", "CLEAR"])
         # Check that the input is valid syntax
@@ -408,7 +435,7 @@ class Parser:
                                proceed=False, stopping_symbol_type=self.scanner.SEMICOLON)
 
     def monitor_list(self):
-        """Parse monitor list"""
+        """Parse monitor list."""
         MONITORS_ID = self.names.lookup(["MONITORS"])[0]
         # Check first symbol is "MONITORS". If not, assume missing and proceed to the next {
         if not ((self.symbol.type == self.scanner.KEYWORD) and (self.symbol.id == MONITORS_ID)):
@@ -423,10 +450,8 @@ class Parser:
         self.symbol = self.scanner.get_symbol()
         # Check that the first is a valid output name
         self.output()
-        print(self.symbol.type, self.scanner.SEMICOLON)
         # Repeat checking monitors in list until the close brace "}"
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
-            print(self.symbol.type)
             self.symbol = self.scanner.get_symbol()
             self.output()
         if self.symbol.type == self.scanner.BRACE_CLOSE:
@@ -436,7 +461,7 @@ class Parser:
                                proceed=True, stopping_symbol_type=self.scanner.KEYWORD)
 
     def end(self):
-        """Parse an END symbol"""
+        """Parse an END keyword and check there are no symbols afterwards."""
         # Check that the final symbol after the } is an END symbol
         END_ID = self.names.lookup(["END"])[0]
         if not (self.symbol.id == END_ID):
@@ -450,7 +475,7 @@ class Parser:
             self.display_error(self.symbol, self.SYMBOL_AFTER_END)
 
     def parse_network(self):
-        """Parse the circuit definition file."""
+        """Parse the circuit definition file and return true if there are no files."""
         # For now just return True, so that userint and gui can run in the
         # skeleton code. When complete, should return False when there are
         # errors in the circuit definition file.
@@ -466,13 +491,13 @@ class Parser:
             # Parse connection list
             self.connection_list()
 
-            # Parse monnitor list
+            # Parse monitor list
             self.monitor_list()
 
             # Check for END keyword
             self.end()
 
-            # Check if there are errors
+            # Check if there are errors, and return True if error count is zero, otherwise return falsex
             if self.error_count == 0:
                 print("No errors detected")
                 return True
@@ -483,9 +508,7 @@ class Parser:
                 return False
 
 
-# Return True if error count is zero, otherwise return false
-
-# This will be deleted once develoment is complete
+# JC! This will be deleted once develoment is complete
 def main():
     # Check command line arguments
     file_path = "logsim/example1_logic_description.txt"
