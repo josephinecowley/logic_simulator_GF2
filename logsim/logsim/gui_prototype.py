@@ -289,15 +289,28 @@ class SignalTracesPanel(wx.Panel):
         add_new_monitor_panel_LEFT = wx.Panel(add_new_monitor_panel, name="add new monitor LEFT panel")
         add_new_monitor_panel_hbox.Add(add_new_monitor_panel_LEFT, 1, flag=wx.EXPAND)
 
+
         add_new_monitor_panel_CENTRE = wx.Panel(add_new_monitor_panel, name="add new monitor CENTRE panel")
-        add_new_monitor_panel_CENTRE_vbox = wx.BoxSizer(wx.VERTICAL)
-        add_new_monitor_panel_CENTRE.SetSizer(add_new_monitor_panel_CENTRE_vbox)
+        add_new_monitor_panel_CENTRE_hbox = wx.BoxSizer(wx.HORIZONTAL)
+        add_new_monitor_panel_CENTRE.SetSizer(add_new_monitor_panel_CENTRE_hbox)
+
         str = "Add new monitor"
         text = wx.StaticText(add_new_monitor_panel_CENTRE, wx.ID_ANY, str)
         font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         text.SetFont(font)
-        add_new_monitor_panel_CENTRE_vbox.Add(text, 1, flag=wx.TOP|wx.ALIGN_CENTER, border=40)
+        add_new_monitor_panel_CENTRE_hbox.Add(text, 0, flag=wx.ALIGN_CENTER)
+
+        monitor_output_list = ["deviceA", "deviceB", "switchC", "dtypeD", "deviceE"]
+        cb = wx.ComboBox(add_new_monitor_panel_CENTRE, 500, "Select output", (90, 50),
+                         (160, -1), monitor_output_list,
+                         wx.CB_DROPDOWN
+                         #| wx.TE_PROCESS_ENTER
+                         #| wx.CB_SORT
+                         )
+        add_new_monitor_panel_CENTRE_hbox.Add(cb, 0, flag=wx.ALIGN_CENTER|wx.LEFT, border=30)
+
         add_new_monitor_panel_hbox.Add(add_new_monitor_panel_CENTRE, 3, flag=wx.EXPAND)
+
 
         add_new_monitor_panel_RIGHT = wx.Panel(add_new_monitor_panel, name="add new monitor RIGHT panel")
         add_new_monitor_panel_hbox.Add(add_new_monitor_panel_RIGHT, 1, flag=wx.EXPAND)
