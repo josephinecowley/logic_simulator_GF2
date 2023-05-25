@@ -336,6 +336,7 @@ class SignalTracesPanel(wx.Panel):
             delete_button = wxaquabutton.AquaButton(signal_traces_scrolled_panel, wx.ID_ANY, bitmap=None, label="DELETE")
             delete_button.SetBackgroundColor(wx.Colour("BLUE"))
             delete_button.SetHoverColor(wx.Colour("RED"))
+            delete_button.SetFocusColour(wx.Colour("BLUE"))
 
             fgs.Add(text, 0, flag=wx.ALIGN_CENTER|wx.LEFT, border=10)
             fgs.Add(signal_trace, 0, flag=wx.EXPAND, border=10) # add signal trace plot to ScrolledPanel
