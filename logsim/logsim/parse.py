@@ -218,6 +218,7 @@ class Parser:
         # Check for the end of file symbol "}"
         if self.symbol.type == self.scanner.BRACE_CLOSE:
             self.symbol = self.scanner.get_symbol()
+            return
         # If something other than '}', assume it is simply missing
         else:
             self.display_error(self.symbol, self.NO_BRACE_CLOSE)
@@ -363,31 +364,44 @@ class Parser:
     def connection_list(self):
         """Parse connection list."""
         CONNECTIONS_ID = self.names.lookup(["CONNECTIONS"])[0]
-        # Check first symbol is "CONNECTIONS". If not, assuming missing and proceed to next {
-        if not (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == CONNECTIONS_ID):
-            self.display_error(self.symbol, self.NO_CONNECTIONS_KEYWORD,
-                               proceed=False)
+        # If CONNECTIONS keyword is missing, proceed to next symbol
+        if not ((self.symbol.type == self.scanner.KEYWORD) and (self.symbol.id == CONNECTIONS_ID)):
+            self.display_error(self.symbol, self.NO_CONNECTIONS_KEYWORD)
+            self.symbol = self.scanner.get_symbol()
+            # If { is also missing, proceed to next symbol
+            if not self.symbol.type == self.scanner.BRACE_OPEN:
+                self.display_error(self.symbol, self.NO_BRACE_OPEN)
+            # If '{' is present
+            else:
+                self.symbol = self.scanner.get_symbol()
+        # If CONNECTIONS keyword is present
         else:
             self.symbol = self.scanner.get_symbol()
-        # Check next symbol is an open brace "{". If not, proceed to next semicolon ;
-        if not (self.symbol.type == self.scanner.BRACE_OPEN):
-            self.display_error(
-                self.symbol, self.NO_BRACE_OPEN,
-                proceed=False)
+            # If { is missing, proceed to next symbol
+            if not self.symbol.type == self.scanner.BRACE_OPEN:
+                self.display_error(self.symbol, self.NO_BRACE_OPEN)
+            # Both CONNECTIONS keyword and { are present
+            else:
+                self.symbol = self.scanner.get_symbol()
+        # Parse a connection
         self.connection()
         # Repeat checking connections in list until the close brace "}"
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
+            self.symbol = self.scanner.get_symbol()
             self.connection()
+        # Check for the end of file symbol "}"
         if self.symbol.type == self.scanner.BRACE_CLOSE:
             self.symbol = self.scanner.get_symbol()
+            return
+        # If something other than '}', assume it is simply missing
         else:
             self.display_error(
-                self.symbol, self.NO_BRACE_CLOSE,
-                proceed=False)
+                self.symbol, self.NO_BRACE_CLOSE)
+            self.symbol = self.scanner.get_symbol()
 
     def connection(self):
         """Parse a connection."""
-        self.symbol = self.scanner.get_symbol()
+        # self.symbol = self.scanner.get_symbol()
         # If after the semicolon we have a } , assume we can move onto the monitor_list
         if self.symbol.type == self.scanner.BRACE_CLOSE:
             return
@@ -395,6 +409,7 @@ class Parser:
             self.output()
             # Check ouput connection is followed by an equals sign "="
             if self.symbol.type == self.scanner.EQUALS:
+                self.symbol = self.scanner.get_symbol()
                 self.input()
             else:
                 self.display_error(self.symbol, self.NO_EQUALS,
@@ -402,12 +417,9 @@ class Parser:
 
     def output(self):
         """Parse a single device output."""
-        # DTYPE_ID = self.names.lookup(["DTYPE"])[0]
         valid_output_id_list = self.names.lookup(["Q", "QBAR"])
         # Check that the output to be connected is an already user-defined name
-        if self.symbol.type == self.scanner.BRACE_CLOSE:
-            return
-        elif self.symbol.type == self.scanner.NAME:
+        if self.symbol.type == self.scanner.NAME:
             self.symbol = self.scanner.get_symbol()
             # Check if gate is followed by a full stop
             if self.symbol.type == self.scanner.FULLSTOP:
@@ -416,20 +428,19 @@ class Parser:
                 # JC! this may need to be redone to ensure semantic checking of non dtypes don't have fullstops after them
                 if self.symbol.id in valid_output_id_list:
                     self.symbol = self.scanner.get_symbol()
+                    return
                 else:
                     self.display_error(self.symbol, self.NO_Q_OR_QBAR,
                                        proceed=False)
-
         else:
-            self.display_error(self.symbol, self.UNDEFINED_NAME,
-                               proceed=False, stopping_symbol_type=self.scanner.SEMICOLON)
+            self.display_error(self.symbol, self.UNDEFINED_NAME)
+            self.symbol = self.scanner.get_symbol()
 
     def input(self):
         """Parse a single device input."""
         valid_input_suffix_id_list = self.names.lookup(["I1", "I2", "I3", "I4", "I5", "I6", "I7", "I8", "I9",
                                                         "I10", "I11", "I12", "I13", "I14", "I15", "I16", "DATA", "CLK", "SET", "CLEAR"])
         # Check that the input is valid syntax
-        self.symbol = self.scanner.get_symbol()
         if self.symbol.type == self.scanner.NAME:
             self.symbol = self.scanner.get_symbol()
             # Check that the input is followed by a fullstop
@@ -501,10 +512,10 @@ class Parser:
             self.display_error(self.symbol, self.EMPTY_FILE)
         else:
             # Parse device list
-            self.device_list()
+            # self.device_list()
 
             # Parse connection list
-            # self.connection_list()
+            self.connection_list()
 
             # Parse monitor list
             # self.monitor_list()
