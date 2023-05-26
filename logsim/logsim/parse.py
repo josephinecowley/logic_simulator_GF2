@@ -249,9 +249,16 @@ class Parser:
             if self.symbol.type == self.scanner.NAME:
                 self.display_error(self.symbol, self.NO_SEMICOLON,
                                    proceed=False)
+                # If stopping symbol reached is a semicolon, need to pass, else if brace, need to return
+                if self.symbol.type == self.scanner.BRACE_CLOSE:
+                    self.symbol = self.scanner.get_symbol()
+                    return
+                elif self.symbol.type == self.scanner.SEMICOLON:
+                    pass
             # If semicolon is missing, and symbol is now a brace
             elif self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.display_error(self.symbol, self.NO_SEMICOLON)
+                self.symbol = self.scanner.get_symbol()
                 return
             # If semicolon missing and unknown symbol (including EOF)
             elif self.symbol.type != self.scanner.SEMICOLON:
@@ -441,9 +448,16 @@ class Parser:
             if self.symbol.type == self.scanner.NAME:
                 self.display_error(self.symbol, self.NO_SEMICOLON,
                                    proceed=False)
+                # If stopping symbol reached is a semicolon, need to pass, else if brace, need to return
+                if self.symbol.type == self.scanner.BRACE_CLOSE:
+                    self.symbol = self.scanner.get_symbol()
+                    return
+                elif self.symbol.type == self.scanner.SEMICOLON:
+                    pass
             # If semicolon is missing, and symbol is now a brace
             elif self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.display_error(self.symbol, self.NO_SEMICOLON)
+                self.symbol = self.scanner.get_symbol()
                 return
             # If semicolon missing and unknown symbol (including EOF)
             elif self.symbol.type != self.scanner.SEMICOLON:
@@ -604,7 +618,7 @@ class Parser:
             self.display_error(self.symbol, self.EMPTY_FILE)
         else:
             # Parse device list
-            # self.device_list()
+            self.device_list()
 
             # Parse connection list
             self.connection_list()
