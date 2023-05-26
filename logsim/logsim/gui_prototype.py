@@ -172,98 +172,98 @@ class RunSimulationPanel(wx.Panel):
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
         # Create and set sizer of overall cycles + left buttons panel
-        cycles_and_left_buttons_panel = wx.Panel(self)
-        cycles_and_left_buttons_panel.SetSizer(vbox)
+        self.cycles_and_left_buttons_panel = wx.Panel(self)
+        self.cycles_and_left_buttons_panel.SetSizer(vbox)
 
         # Create, configure, set and add cycles panel to overall cycles + left buttons panel
-        cycles_panel = wx.Panel(cycles_and_left_buttons_panel)
+        self.cycles_panel = wx.Panel(self.cycles_and_left_buttons_panel)
         cycles_hbox = wx.BoxSizer(wx.HORIZONTAL)
-        cycles_panel.SetSizer(cycles_hbox)
-        vbox.Add(cycles_panel)
+        self.cycles_panel.SetSizer(cycles_hbox)
+        vbox.Add(self.cycles_panel)
 
         # Create, configure, set and add left buttons panel to overall cycles + left buttons panel
-        left_buttons_panel = wx.Panel(cycles_and_left_buttons_panel)
+        self.left_buttons_panel = wx.Panel(self.cycles_and_left_buttons_panel)
         left_buttons_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
-        left_buttons_panel.SetSizer(left_buttons_panel_hbox)
-        vbox.Add(left_buttons_panel)
+        self.left_buttons_panel.SetSizer(left_buttons_panel_hbox)
+        vbox.Add(self.left_buttons_panel)
         
         # Create number of cycles text to cycles panel
         str = "No. Cycles"
-        text = wx.StaticText(cycles_panel, wx.ID_ANY, str, style=wx.ALIGN_LEFT)
+        text = wx.StaticText(self.cycles_panel, wx.ID_ANY, str, style=wx.ALIGN_LEFT)
         font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         text.SetFont(font)
         cycles_hbox.Add(text, 0, flag=wx.TOP|wx.LEFT)
-        self.text = wx.TextCtrl(cycles_panel, wx.ID_ANY, "1", pos=wx.DefaultPosition, size=(60, -1))
-        spin = wx.SpinButton(cycles_panel, wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.SP_VERTICAL)
+        self.spin_text = wx.TextCtrl(self.cycles_panel, wx.ID_ANY, "1", pos=wx.DefaultPosition, size=(60, -1))
+        spin = wx.SpinButton(self.cycles_panel, wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.SP_VERTICAL)
         spin.SetRange(1, 100)
         spin.SetValue(1)
         self.Bind(wx.EVT_SPIN, self.on_spin, spin)
-        cycles_hbox.Add(self.text, 0, flag=wx.LEFT, border=10)
+        cycles_hbox.Add(self.spin_text, 0, flag=wx.LEFT, border=10)
         cycles_hbox.Add(spin, 0, flag=wx.LEFT, border=10)
 
         # Create, bind running simulation event to and add the "Run simulation" button
-        run_button = wxbuttons.GenButton(left_buttons_panel, wx.ID_ANY, "RUN", name="run button")
-        self.Bind(wx.EVT_BUTTON, self.on_run_button, run_button)
-        run_button.SetFont(wx.Font(20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
-        run_button.SetBezelWidth(5)
-        run_button.SetMinSize(wx.DefaultSize)
-        run_button.SetBackgroundColour(wx.Colour(4, 84, 14))
-        run_button.SetForegroundColour(wx.WHITE)
-        run_button.SetToolTip("Begin running the simulation")
-        left_buttons_panel_hbox.Add(run_button, 1, flag=wx.ALIGN_LEFT, border=5)
+        self.run_button = wxbuttons.GenButton(self.left_buttons_panel, wx.ID_ANY, "RUN", name="run button")
+        self.Bind(wx.EVT_BUTTON, self.on_run_button, self.run_button)
+        self.run_button.SetFont(wx.Font(20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
+        self.run_button.SetBezelWidth(5)
+        self.run_button.SetMinSize(wx.DefaultSize)
+        self.run_button.SetBackgroundColour(wx.Colour(4, 84, 14))
+        self.run_button.SetForegroundColour(wx.WHITE)
+        self.run_button.SetToolTip("Begin running the simulation")
+        left_buttons_panel_hbox.Add(self.run_button, 1, flag=wx.ALIGN_LEFT, border=5)
 
         # Create, bind quitting event to and add the "Quit simulation" button
-        quit_button = wxbuttons.GenButton(left_buttons_panel, wx.ID_ANY, "QUIT", name="quit button")
-        self.Bind(wx.EVT_BUTTON, self.on_quit_button, quit_button)
-        quit_button.SetFont(wx.Font(20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
-        quit_button.SetBezelWidth(5)
-        quit_button.SetMinSize(wx.DefaultSize)
-        quit_button.SetBackgroundColour(wx.Colour(139, 26, 26))
-        quit_button.SetForegroundColour(wx.WHITE)
-        quit_button.SetToolTip("Quit the simulation")
-        left_buttons_panel_hbox.Add(quit_button, 1, flag=wx.ALIGN_LEFT, border=5)
+        self.quit_button = wxbuttons.GenButton(self.left_buttons_panel, wx.ID_ANY, "QUIT", name="quit button")
+        self.Bind(wx.EVT_BUTTON, self.on_quit_button, self.quit_button)
+        self.quit_button.SetFont(wx.Font(20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
+        self.quit_button.SetBezelWidth(5)
+        self.quit_button.SetMinSize(wx.DefaultSize)
+        self.quit_button.SetBackgroundColour(wx.Colour(139, 26, 26))
+        self.quit_button.SetForegroundColour(wx.WHITE)
+        self.quit_button.SetToolTip("Quit the simulation")
+        left_buttons_panel_hbox.Add(self.quit_button, 1, flag=wx.ALIGN_LEFT, border=5)
 
         # Create and add cycles + left buttons panel to RunSimulationPanel
-        hbox.Add(cycles_and_left_buttons_panel, 1, flag=wx.ALIGN_LEFT)
+        hbox.Add(self.cycles_and_left_buttons_panel, 1, flag=wx.ALIGN_LEFT)
 
         
-        centre_panel = wx.Panel(self)
+        self.centre_panel = wx.Panel(self)
         #centre_panel.SetBackgroundColour("GREEN") # layout identifier colour for visualisation purposes
         centre_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
-        hbox.Add(centre_panel, 2, flag=wx.EXPAND)
+        hbox.Add(self.centre_panel, 2, flag=wx.EXPAND)
 
         
-        upload_and_help_buttons_panel = wx.Panel(self, name="upload and help buttons panel")
+        self.upload_and_help_buttons_panel = wx.Panel(self, name="upload and help buttons panel")
         #upload_and_help_buttons_panel.SetBackgroundColour("CYAN") # layout identifier colour for visualisation purposes
         upload_and_help_buttons_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
-        upload_and_help_buttons_panel.SetSizer(upload_and_help_buttons_panel_hbox)
+        self.upload_and_help_buttons_panel.SetSizer(upload_and_help_buttons_panel_hbox)
 
-        upload_button_panel = wx.Panel(upload_and_help_buttons_panel, name="upload button panel")
+        self.upload_button_panel = wx.Panel(self.upload_and_help_buttons_panel, name="upload button panel")
         #upload_button_panel.SetBackgroundColour("RED") # layout identifier colour for visualisation purposes
         upload_button_panel_vbox = wx.BoxSizer(wx.VERTICAL)
-        upload_button_panel.SetSizer(upload_button_panel_vbox)
+        self.upload_button_panel.SetSizer(upload_button_panel_vbox)
 
-        upload_button = wx.Button(upload_button_panel, wx.ID_ANY, "UPLOAD")
-        self.Bind(wx.EVT_BUTTON, self.on_upload_button, upload_button)
-        upload_button.SetToolTip("Upload logic description file")
-        upload_button_panel_vbox.Add(upload_button, 1, flag=wx.ALIGN_CENTER)
+        self.upload_button = wx.Button(self.upload_button_panel, wx.ID_ANY, "UPLOAD")
+        self.Bind(wx.EVT_BUTTON, self.on_upload_button, self.upload_button)
+        self.upload_button.SetToolTip("Upload logic description file")
+        upload_button_panel_vbox.Add(self.upload_button, 1, flag=wx.ALIGN_CENTER)
 
 
-        help_button_panel = wx.Panel(upload_and_help_buttons_panel, name="help button panel")
+        self.help_button_panel = wx.Panel(self.upload_and_help_buttons_panel, name="help button panel")
         #help_button_panel.SetBackgroundColour("BLUE") # layout identifier colour for visualisation purposes
         help_button_panel_vbox = wx.BoxSizer(wx.VERTICAL)
-        help_button_panel.SetSizer(help_button_panel_vbox)
+        self.help_button_panel.SetSizer(help_button_panel_vbox)
 
-        help_button = wx.Button(help_button_panel, wx.ID_ANY, "HELP")
-        help_button.SetToolTip("Help on running logic simulation")
-        help_button_panel_vbox.Add(help_button, 1, flag=wx.ALIGN_CENTER)
-
-
-        upload_and_help_buttons_panel_hbox.Add(upload_button_panel, 1, flag=wx.EXPAND)
-        upload_and_help_buttons_panel_hbox.Add(help_button_panel, 1, flag=wx.EXPAND)
+        self.help_button = wx.Button(self.help_button_panel, wx.ID_ANY, "HELP")
+        self.help_button.SetToolTip("Help on running logic simulation")
+        help_button_panel_vbox.Add(self.help_button, 1, flag=wx.ALIGN_CENTER)
 
 
-        hbox.Add(upload_and_help_buttons_panel, 1, flag=wx.EXPAND)
+        upload_and_help_buttons_panel_hbox.Add(self.upload_button_panel, 1, flag=wx.EXPAND)
+        upload_and_help_buttons_panel_hbox.Add(self.help_button_panel, 1, flag=wx.EXPAND)
+
+
+        hbox.Add(self.upload_and_help_buttons_panel, 1, flag=wx.EXPAND)
         
         # Set sizer of RunSimulationPanel
         self.SetSizer(hbox)
@@ -286,7 +286,7 @@ class RunSimulationPanel(wx.Panel):
         quit_button_pressed.SetBackgroundColour(wx.Colour(148, 148, 148))
 
     def on_spin(self, event):
-        self.text.SetValue(str(event.GetPosition()))
+        self.spin_text.SetValue(str(event.GetPosition()))
 
     def on_upload_button(self, event):
         """Handle the event when the user clicks the upload button."""
