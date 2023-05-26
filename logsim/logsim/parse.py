@@ -36,7 +36,7 @@ class Parser:
     Public methods
     --------------
 
-    display_error(self, symbol, error_type, proceed=False, stopping_symbol_type=6): Display the error message and where it occured. 
+    display_error(self, symbol, error_type, proceed=False, stopping_symbol_type=6): Display the error message and where it occured.
     Calls the error handling method to resume from the next available point.
 
     error_recovery(self, error_type, proceed, stopping_symbol): Recover from an error by resuming parsing at an appropriate point specified by the stopping_symbol.
@@ -57,7 +57,7 @@ class Parser:
 
     monitor_list(self): Parse monitor list.
 
-    end(self): Parse an END keyword and check there are no symbols afterwards. 
+    end(self): Parse an END keyword and check there are no symbols afterwards.
 
     parse_network(self): Parse the circuit definition file and return true if there are no files.
 
@@ -214,6 +214,10 @@ class Parser:
         # Check all devices in list, which are all separated by semicolons
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
             self.symbol = self.scanner.get_symbol()
+            # Incase a KEYWORD is enterred straight after a ';', assume '{' was missed
+            if (self.symbol.type == self.scanner.KEYWORD):
+                self.display_error(self.symbol, self.NO_BRACE_CLOSE)
+                return
             self.device()
         # Check for the end of file symbol "}"
         if self.symbol.type == self.scanner.BRACE_CLOSE:
@@ -222,7 +226,6 @@ class Parser:
         # If something other than '}', assume it is simply missing
         else:
             self.display_error(self.symbol, self.NO_BRACE_CLOSE)
-            self.symbol = self.scanner.get_symbol()
 
     def device(self):
         """Parse user defined device."""
@@ -389,16 +392,19 @@ class Parser:
         # Repeat checking connections in list until the close brace "}"
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
             self.symbol = self.scanner.get_symbol()
+            # Incase a KEYWORD is enterred straight after a ';', assume '{' was missed
+            if (self.symbol.type == self.scanner.KEYWORD):
+                self.display_error(self.symbol, self.NO_BRACE_CLOSE)
+                return
             self.connection()
         # Check for the end of file symbol "}"
         if self.symbol.type == self.scanner.BRACE_CLOSE:
             self.symbol = self.scanner.get_symbol()
             return
-        # If something other than '}', assume it is simply missing
+        # If something other than '}', assume it is missing
         else:
             self.display_error(
                 self.symbol, self.NO_BRACE_CLOSE)
-            self.symbol = self.scanner.get_symbol()
 
     def connection(self):
         """Parse a connection."""
@@ -423,6 +429,9 @@ class Parser:
     def output(self):
         """Parse a single device output."""
         valid_output_id_list = self.names.lookup(["Q", "QBAR"])
+        # If after the semicolon we have a } , assume we can move onto the monitor_list
+        if self.symbol.type == self.scanner.BRACE_CLOSE:
+            return
         # Check that the output to be connected is an already user-defined name
         if self.symbol.type == self.scanner.NAME:
             self.symbol = self.scanner.get_symbol()
@@ -462,33 +471,43 @@ class Parser:
                                    proceed=False)
         else:
             self.display_error(self.symbol, self.UNDEFINED_NAME,
-                               proceed=False, stopping_symbol_type=self.scanner.SEMICOLON)
+                               proceed=False)
 
     def monitor_list(self):
         """Parse monitor list."""
         MONITORS_ID = self.names.lookup(["MONITORS"])[0]
         # Check first symbol is "MONITORS". If not, assume missing and proceed to the next {
         if not ((self.symbol.type == self.scanner.KEYWORD) and (self.symbol.id == MONITORS_ID)):
-            self.display_error(self.symbol, self.NO_MONITORS_KEYWORD,
-                               proceed=False)
+            self.display_error(self.symbol, self.NO_MONITORS_KEYWORD)
+            self.symbol = self.scanner.get_symbol()
+            # If '{' is also missing, throw error and proceed to next symbol
+            if not (self.symbol.type == self.scanner.BRACE_OPEN):
+                self.display_error(self.symbol, self.NO_BRACE_OPEN)
+            # If '{' is present, proceed to next symbol
+            else:
+                self.symbol = self.scanner.get_symbol()
+        # If MONITORS keyword is present
         else:
             self.symbol = self.scanner.get_symbol()
-        # Check for the open brace '{'. If not, assume missing and proceed to next ;
-        if not (self.symbol.type == self.scanner.BRACE_OPEN):
-            self.display_error(self.symbol, self.NO_BRACE_OPEN,
-                               proceed=False)
-        self.symbol = self.scanner.get_symbol()
-        # Check that the first is a valid output name
+            # If '{' is missing, throw error and proceed to next symbol
+            if not (self.symbol.type == self.scanner.BRACE_OPEN):
+                self.display_error(self.symbol, self.NO_BRACE_OPEN)
+            # If neither MONITORS keyword nor { is missing, proceed to next symbol
+            else:
+                self.symbol = self.scanner.get_symbol()
+        # Check a monitor is a valid output name
         self.output()
         # Repeat checking monitors in list until the close brace "}"
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
             self.symbol = self.scanner.get_symbol()
             self.output()
+        # Check for the end of file symbol "}"
         if self.symbol.type == self.scanner.BRACE_CLOSE:
             self.symbol = self.scanner.get_symbol()
+            return
+        # If something other than '}', assume it is missing
         else:
-            self.display_error(self.symbol, self.NO_BRACE_CLOSE,
-                               proceed=True, stopping_symbol_type=self.scanner.KEYWORD)
+            self.display_error(self.symbol, self.NO_BRACE_CLOSE)
 
     def end(self):
         """Parse an END keyword and check there are no symbols afterwards."""
@@ -519,10 +538,10 @@ class Parser:
             # self.device_list()
 
             # Parse connection list
-            self.connection_list()
+            # self.connection_list()
 
             # Parse monitor list
-            # self.monitor_list()
+            self.monitor_list()
 
             # Check for END keyword
             # self.end()
