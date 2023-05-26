@@ -76,7 +76,7 @@ class Parser:
         # JC! come back and change this to a dictionary such that manual changes to number of errors is unecessary
         [self.NO_DEVICES_KEYWORD, self.NO_CONNECTIONS_KEYWORD, self.NO_MONITORS_KEYWORD, self.NO_END_KEYWORD, self.NO_BRACE_OPEN, self.NO_BRACE_CLOSE,
             self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_BRACKET_OPEN, self.NO_BRACKET_CLOSE, self.NO_NUMBER, self.OUT_OF_RANGE,
-            self.UNDEFINED_NAME, self.NO_FULLSTOP, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE] = self.names.unique_error_codes(19)
+            self.UNDEFINED_NAME, self.NO_FULLSTOP, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE, self.TERMINATE] = self.names.unique_error_codes(20)
 
     # Stopping symbol is automatically assigned to a semi-colon
     def display_error(self,  symbol, error_type,  proceed=True, stopping_symbol_type=6):
@@ -88,7 +88,7 @@ class Parser:
         if not isinstance(error_type, int):
             raise TypeError(
                 "Expected error_type to be an integer type argument")
-        elif error_type >= 19:
+        elif error_type >= 20:
             raise ValueError(
                 "Expected an error code within range of error types")
         elif error_type < 0:
@@ -116,7 +116,7 @@ class Parser:
         elif error_type == self.NO_MONITORS_KEYWORD:
             print("Syntax Error: Expected the keyword MONITORS")
         elif error_type == self.NO_END_KEYWORD:
-            print("Syntax Error: Expected the keyword END")
+            print("Syntax Error: Expected the keyword END straight after monitors list")
         elif error_type == self.NO_BRACE_OPEN:
             print("Syntax Error: Expected a '{' sign")
         elif error_type == self.NO_BRACE_CLOSE:
@@ -147,6 +147,9 @@ class Parser:
             print("Syntax Error: There should not be any text after the keyword END")
         elif error_type == self.EMPTY_FILE:
             print("Syntax Error: Cannot parse an empty file")
+        elif error_type == self.TERMINATE:
+            print(
+                "Syntax Error: Could not find parsing point to restart, program terminated early")
         else:
             raise ValueError("Expected a valid error code")
 
@@ -163,7 +166,7 @@ class Parser:
             raise TypeError(
                 "Expected error_type to be an integer type argument")
         # JC! need to fix this to not rely on a '19'
-        elif error_type >= 19:
+        elif error_type >= 20:
             raise ValueError(
                 "Expected an error code within range of error types")
         elif error_type < 0:
@@ -186,11 +189,14 @@ class Parser:
                 self.symbol = self.scanner.get_symbol()
             if self.symbol.type == stopping_symbol_type:
                 return
+            elif self.symbol.type == self.scanner.EOF:
+                self.display_error(self.symbol, self.TERMINATE)
+                return
 
     def device_list(self):
         """Parse device list."""
         DEVICES_ID = self.names.lookup(["DEVICES"])[0]
-        # If DEVICES is missing, assume just missing and proceed to check if { is present
+        # If DEVICES keyword is wrong, assume just missing and proceed to check if { is present
         if not (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == DEVICES_ID):
             self.display_error(self.symbol, self.NO_DEVICES_KEYWORD)
             self.symbol = self.scanner.get_symbol()
@@ -511,23 +517,31 @@ class Parser:
 
     def end(self):
         """Parse an END keyword and check there are no symbols afterwards."""
-        # Check that the final symbol after the } is an END symbol
+        # Check that the final symbol is the keyword END
         END_ID = self.names.lookup(["END"])[0]
-        if not (self.symbol.id == END_ID):
-            self.display_error(self.symbol, self.NO_END_KEYWORD,
-                               proceed=True, stopping_symbol_type=self.scanner.BRACE_OPEN)
-        self.symbol = self.scanner.get_symbol()
+        # If nothing after monitors class, assume missing, display error and end program
         if self.symbol.type == self.scanner.EOF:
-            # Will need to return error count, etc
+            self.display_error(self.symbol, self.NO_END_KEYWORD)
             return
+        # If symbol is anything other than END, display error and pass until END keyword
+        elif not (self.symbol.id == END_ID):
+            self.display_error(self.symbol, self.NO_END_KEYWORD)
+            self.symbol = self.scanner.get_symbol()
+            # If after incorrect keyword END there is nothing, pass
+            if self.symbol.type == self.scanner.EOF:
+                return
+            while ((self.symbol.id != END_ID) and (self.symbol.type != self.scanner.EOF)):
+                self.symbol = self.scanner.get_symbol()
+            # If EOF is reached and no keyword END is encountered
+            if self.symbol.type == self.scanner.EOF:
+                self.display_error(self.symbol, self.TERMINATE)
+                return
+        # If symbol is keyword END
         else:
-            self.display_error(self.symbol, self.SYMBOL_AFTER_END)
+            return
 
     def parse_network(self):
         """Parse the circuit definition file and return true if there are no files."""
-        # For now just return True, so that userint and gui can run in the
-        # skeleton code. When complete, should return False when there are
-        # errors in the circuit definition file.
 
         self.symbol = self.scanner.get_symbol()
         # Check to see if file is empty
@@ -535,16 +549,16 @@ class Parser:
             self.display_error(self.symbol, self.EMPTY_FILE)
         else:
             # Parse device list
-            # self.device_list()
+            self.device_list()
 
             # Parse connection list
-            # self.connection_list()
+            self.connection_list()
 
             # Parse monitor list
             self.monitor_list()
 
             # Check for END keyword
-            # self.end()
+            self.end()
 
             # Check if there are errors, and return True if error count is zero, otherwise return falsex
             if self.error_count == 0:
@@ -557,7 +571,7 @@ class Parser:
                 return False
 
 
-# JC! This will be deleted once develoment is complete
+# JC! This will be deleted once development is complete
 def main():
     # Check command line arguments
     file_path = "logsim/example1_logic_description.txt"
