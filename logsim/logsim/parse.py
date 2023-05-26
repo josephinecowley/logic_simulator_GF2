@@ -78,8 +78,8 @@ class Parser:
             self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_BRACKET_OPEN, self.NO_BRACKET_CLOSE, self.NO_NUMBER, self.CLK_OUT_OF_RANGE, self.SWITCH_OUT_OF_RANGE,
             self.UNDEFINED_NAME, self.NO_FULLSTOP, self.NO_SEMICOLON, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE, self.TERMINATE] = self.names.unique_error_codes(22)
 
-    # Stopping symbol is automatically assigned to a semi-colon
-    def display_error(self,  symbol, error_type,  proceed=True, stopping_symbol_types=[2, 6]):
+    # Stopping symbols automatically assigned to semi-colons, braces and keywords
+    def display_error(self,  symbol, error_type,  proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
         """Display the error message and where it occured
 
         Calls the error handling method to resume from the next available point."""
@@ -166,7 +166,7 @@ class Parser:
         self.error_recovery(error_type, proceed, stopping_symbol_types)
         return
 
-    def error_recovery(self, error_type, proceed=True, stopping_symbol_types=[2, 6]):
+    def error_recovery(self, error_type, proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
         """Recover from an error by resuming parsing at an appropriate point."""
 
         # Exception handling
@@ -197,9 +197,6 @@ class Parser:
                 self.symbol = self.scanner.get_symbol()
             # Stop when stopping symbol is encountered
             if self.symbol.type in stopping_symbol_types:
-                return
-            # Stop if '}' is encountered
-            elif self.symbol.type == self.scanner.BRACE_CLOSE:
                 return
             elif self.symbol.type == self.scanner.EOF:
                 self.display_error(self.symbol, self.TERMINATE)
@@ -566,23 +563,30 @@ class Parser:
             if (self.symbol.type == self.scanner.KEYWORD):
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
                 return
-            # Incase after semicolon we have a '}', we need to escape the loop before output method is called
-            elif (self.symbol.type == self.scanner.BRACE_CLOSE):
-                self.display_error(
-                    self.symbol, self.NO_SEMICOLON, proceed=False)
-                break
+            # Incase now a brace, leave while loop
+            elif self.symbol.type == self.scanner.BRACE_CLOSE:
+                self.symbol = self.scanner.get_symbol()
+                return
             self.output()
             # If semicolon is missing, but new NAME type symbol is entered, call error and parse to next stopping symbol
             if self.symbol.type == self.scanner.NAME:
                 self.display_error(self.symbol, self.NO_SEMICOLON,
                                    proceed=False)
-        # Check for the end of file symbol "}"
-        if self.symbol.type == self.scanner.BRACE_CLOSE:
-            self.symbol = self.scanner.get_symbol()
-            return
-        # If something other than '}', assume it is missing
-        else:
-            self.display_error(self.symbol, self.NO_BRACE_CLOSE)
+                # If stopping symbol reached is a semicolon, need to pass, else if brace, need to return
+                if self.symbol.type == self.scanner.BRACE_CLOSE:
+                    self.symbol = self.scanner.get_symbol()
+                    return
+                elif self.symbol.type == self.scanner.SEMICOLON:
+                    pass
+            # If semicolon is missing, and symbol is now a brace
+            elif self.symbol.type == self.scanner.BRACE_CLOSE:
+                self.display_error(self.symbol, self.NO_SEMICOLON)
+                self.symbol = self.scanner.get_symbol()
+                return
+            # If semicolon missing and unknown symbol (including EOF)
+            elif self.symbol.type != self.scanner.SEMICOLON:
+                self.display_error(self.symbol, self.NO_SEMICOLON)
+                return
 
     def end(self):
         """Parse an END keyword and check there are no symbols afterwards."""
@@ -624,10 +628,10 @@ class Parser:
             self.connection_list()
 
             # Parse monitor list
-            # self.monitor_list()
+            self.monitor_list()
 
             # Check for END keyword
-            # self.end()
+            self.end()
 
             # Check if there are errors, and return True if error count is zero, otherwise return falsex
             if self.error_count == 0:
