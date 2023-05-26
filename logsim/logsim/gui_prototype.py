@@ -347,71 +347,69 @@ class SignalTracesPanel(wx.Panel):
         vbox = wx.BoxSizer(wx.VERTICAL)
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
-        signal_traces_panel = wx.Panel(self, name="signal traces panel")
+        self.signal_traces_panel = wx.Panel(self, name="signal traces panel")
         signal_traces_panel_vbox = wx.BoxSizer(wx.VERTICAL)
-        signal_traces_panel.SetSizer(signal_traces_panel_vbox)
+        self.signal_traces_panel.SetSizer(signal_traces_panel_vbox)
 
-        add_new_monitor_panel = wx.Panel(self, name="add new monitor panel")
+        self.add_new_monitor_panel = wx.Panel(self, name="add new monitor panel")
         #add_new_monitor_panel.SetBackgroundColour(wx.Colour(0, 238, 238)) # layout identifier colour for visualisation purposes
         add_new_monitor_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
-        add_new_monitor_panel.SetSizer(add_new_monitor_panel_hbox)
+        self.add_new_monitor_panel.SetSizer(add_new_monitor_panel_hbox)
 
 
-        add_new_monitor_panel_LEFT = wx.Panel(add_new_monitor_panel, name="add new monitor LEFT panel")
-        add_new_monitor_panel_hbox.Add(add_new_monitor_panel_LEFT, 1, flag=wx.EXPAND)
+        self.add_new_monitor_panel_LEFT = wx.Panel(self.add_new_monitor_panel, name="add new monitor LEFT panel")
+        add_new_monitor_panel_hbox.Add(self.add_new_monitor_panel_LEFT, 1, flag=wx.EXPAND)
 
 
-        add_new_monitor_panel_CENTRE = wx.Panel(add_new_monitor_panel, name="add new monitor CENTRE panel")
+        self.add_new_monitor_panel_CENTRE = wx.Panel(self.add_new_monitor_panel, name="add new monitor CENTRE panel")
         add_new_monitor_panel_CENTRE_hbox = wx.BoxSizer(wx.HORIZONTAL)
-        add_new_monitor_panel_CENTRE.SetSizer(add_new_monitor_panel_CENTRE_hbox)
+        self.add_new_monitor_panel_CENTRE.SetSizer(add_new_monitor_panel_CENTRE_hbox)
 
         str = "Add new monitor"
-        text = wx.StaticText(add_new_monitor_panel_CENTRE, wx.ID_ANY, str)
+        text = wx.StaticText(self.add_new_monitor_panel_CENTRE, wx.ID_ANY, str)
         font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         text.SetFont(font)
         add_new_monitor_panel_CENTRE_hbox.Add(text, 0, flag=wx.ALIGN_CENTER)
 
-        monitor_output_list = ["deviceA", "deviceB", "switchC", "dtypeD", "deviceE"]
-        cb = wx.ComboBox(add_new_monitor_panel_CENTRE, 500, "Select output", (90, 50),
-                         (160, -1), monitor_output_list,
+        self.monitor_output_list = ["deviceA", "deviceB", "switchC", "dtypeD", "deviceE"]
+        self.combo_box = wx.ComboBox(self.add_new_monitor_panel_CENTRE, 500, "Select output", (90, 50),
+                         (160, -1), self.monitor_output_list,
                          wx.CB_DROPDOWN
                          #| wx.TE_PROCESS_ENTER
                          #| wx.CB_SORT
                          )
-        add_new_monitor_panel_CENTRE_hbox.Add(cb, 0, flag=wx.ALIGN_CENTER|wx.LEFT, border=30)
+        add_new_monitor_panel_CENTRE_hbox.Add(self.combo_box, 0, flag=wx.ALIGN_CENTER|wx.LEFT, border=30)
 
-        add_new_monitor_panel_hbox.Add(add_new_monitor_panel_CENTRE, 3, flag=wx.EXPAND)
+        add_new_monitor_panel_hbox.Add(self.add_new_monitor_panel_CENTRE, 3, flag=wx.EXPAND)
 
 
-        add_new_monitor_panel_RIGHT = wx.Panel(add_new_monitor_panel, name="add new monitor RIGHT panel")
+        self.add_new_monitor_panel_RIGHT = wx.Panel(self.add_new_monitor_panel, name="add new monitor RIGHT panel")
         add_new_monitor_panel_RIGHT_hbox = wx.BoxSizer(wx.HORIZONTAL)
-        add_new_monitor_panel_RIGHT.SetSizer(add_new_monitor_panel_RIGHT_hbox)
-        add_new_monitor_button = wx.Button(add_new_monitor_panel_RIGHT, wx.ID_ANY, label="+")
-        add_new_monitor_button.SetToolTip("Add a new monitor")
-        add_new_monitor_panel_RIGHT_hbox.Add(add_new_monitor_button, 1, flag=wx.EXPAND)
+        self.add_new_monitor_panel_RIGHT.SetSizer(add_new_monitor_panel_RIGHT_hbox)
+        self.add_new_monitor_button = wx.Button(self.add_new_monitor_panel_RIGHT, wx.ID_ANY, label="+")
+        self.add_new_monitor_button.SetToolTip("Add a new monitor")
+        add_new_monitor_panel_RIGHT_hbox.Add(self.add_new_monitor_button, 1, flag=wx.EXPAND)
 
-        add_new_monitor_panel_hbox.Add(add_new_monitor_panel_RIGHT, 1, flag=wx.EXPAND)
-
-
+        add_new_monitor_panel_hbox.Add(self.add_new_monitor_panel_RIGHT, 1, flag=wx.EXPAND)
 
         # Instantiate ScrolledPanel
-        signal_traces_scrolled_panel = wxscrolledpanel.ScrolledPanel(signal_traces_panel, name="signal traces scrolled panel")
+        self.signal_traces_scrolled_panel = wxscrolledpanel.ScrolledPanel(self.signal_traces_panel, name="signal traces scrolled panel")
 
         # Configure sizer of ScrolledPanel
         signal_trace_size = (500, 200)
-        num_of_signal_traces = 7
-        fgs = wx.FlexGridSizer(cols=3, rows=num_of_signal_traces, vgap=4, hgap=50)
+        self.num_of_signal_traces = 7
+        fgs = wx.FlexGridSizer(cols=3, rows=self.num_of_signal_traces, vgap=4, hgap=50)
         
-        for signal_trace_num in range(1, num_of_signal_traces + 1):
+        for signal_trace_num in range(1, self.num_of_signal_traces + 1):
             str = f"device {signal_trace_num}"
-            text = wx.StaticText(signal_traces_scrolled_panel, wx.ID_ANY, str)
+            text = wx.StaticText(self.signal_traces_scrolled_panel, wx.ID_ANY, str)
             font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
             text.SetFont(font)
 
-            signal_trace = SignalTrace(signal_traces_scrolled_panel, wx.ID_ANY, size=signal_trace_size) # create signal trace scrolled window
+            signal_trace = SignalTrace(self.signal_traces_scrolled_panel, wx.ID_ANY, size=signal_trace_size) # create signal trace scrolled window
             signal_trace_canvas = MyGLCanvas(signal_trace, wx.ID_ANY, wx.DefaultPosition,  wx.Size(*signal_trace_size)) # draw canvas onto signal trace scrolled window
 
-            delete_button = wxaquabutton.AquaButton(signal_traces_scrolled_panel, wx.ID_ANY, bitmap=None, label="DELETE")
+            delete_button = wxaquabutton.AquaButton(self.signal_traces_scrolled_panel, wx.ID_ANY, bitmap=None, label="DELETE")
             delete_button.SetBackgroundColor(wx.Colour("BLUE"))
             delete_button.SetHoverColor(wx.Colour("RED"))
             delete_button.SetFocusColour(wx.Colour("BLUE"))
@@ -421,14 +419,14 @@ class SignalTracesPanel(wx.Panel):
             fgs.Add(delete_button, 0, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         # Set sizer of ScrolledPanel
-        signal_traces_scrolled_panel.SetSizer(fgs)
-        signal_traces_scrolled_panel.SetAutoLayout(1)
-        signal_traces_scrolled_panel.SetupScrolling(scroll_x=True, scroll_y=True, rate_x=20, rate_y=20, scrollToTop=True, scrollIntoView=True)
+        self.signal_traces_scrolled_panel.SetSizer(fgs)
+        self.signal_traces_scrolled_panel.SetAutoLayout(1)
+        self.signal_traces_scrolled_panel.SetupScrolling(scroll_x=True, scroll_y=True, rate_x=20, rate_y=20, scrollToTop=True, scrollIntoView=True)
 
-        signal_traces_panel_vbox.Add(signal_traces_scrolled_panel, 1, wx.EXPAND)
+        signal_traces_panel_vbox.Add(self.signal_traces_scrolled_panel, 1, wx.EXPAND)
 
-        vbox.Add(signal_traces_panel, 4, flag=wx.EXPAND)
-        vbox.Add(add_new_monitor_panel, 1, flag=wx.EXPAND)
+        vbox.Add(self.signal_traces_panel, 4, flag=wx.EXPAND)
+        vbox.Add(self.add_new_monitor_panel, 1, flag=wx.EXPAND)
 
         # Set sizer of SignalTracesPanel
         self.SetSizer(vbox)
