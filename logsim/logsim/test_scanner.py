@@ -144,20 +144,23 @@ def test_scanner_get_number(scanner_fixture, set_scanner_location):
     number = scanner.get_number()
     assert number == "25"
 
-
-def test_scanner_display_line_and_marker(scanner_fixture, capfd):
+@pytest.mark.parametrize("location, expected_line1, expected_line2", [
+    ((2, 12), "    dtype1 = DTYPE;", "           ^       "),
+    ((10, 1), "CONNECTIONS {", "~~~~~~~~~~~  "),
+    ((7, 19), "    data = SWITCH(0);", "                  ^  "),
+])
+def test_scanner_display_line_and_marker(scanner_fixture, set_scanner_location, capfd, location, expected_line1, expected_line2):
     scanner = scanner_fixture
-    symbol = Symbol()
-    symbol.line_number = 10
-    symbol.start_position = 10
+    set_scanner_location(location)
+    symbol = scanner.get_symbol()
     scanner.display_line_and_marker(symbol)
 
     # Capture the printed output
     captured = capfd.readouterr()
     output_lines = captured.out.splitlines()
 
-    assert output_lines[0] == "CONNECTIONS {" 
-    assert output_lines[2] == "          ^  "  
+    assert output_lines[0] == expected_line1 
+    assert output_lines[2] == expected_line2  
 
 @pytest.mark.parametrize("location, expected_name, expected_type, expected_line_number, expected_start_position", [
     ((1, 1), "DEVICES", 8, 1, 1),

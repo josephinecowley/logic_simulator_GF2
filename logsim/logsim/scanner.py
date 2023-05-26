@@ -54,6 +54,7 @@ class Scanner:
         """Open specified file and initialise reserved words and IDs."""
         # open the definition file using path
         self.file = self.open_file(path)
+        self.path = path
 
         # keep track of current location in file
         self.line_number = 1 # one-based indexing for error reporting
@@ -214,44 +215,51 @@ class Scanner:
         return num #returns the number as a string 
 
     def display_line_and_marker(self, symbol):
-        """Takes a symbol instance and prints its line in the file. 
+        """Uses a temp_file instance to avoid interference with scanner's pointer. 
+        Takes a symbol instance and prints its line in the file. 
         If the 'name' is over length one, use tildes, otherwise use caret."""
 
+        temp_file = self.open_file(self.path)
         # find the whole line where that symbol appears
-        for i, line in enumerate(self.file, start=1):
+        for i, line in enumerate(temp_file, start=1):
             if i == symbol.line_number:
                 line_text = line
                 break
-        
-        line_length = len(line_text) - 1
+        temp_file.close()
+        #breakpoint()
+        line_length = len(line_text)
 
         if symbol.type in [self.KEYWORD, self.NAME, self.NUMBER]:
             name = self.names.get_name_string(symbol.id)
             name_length = len(name)
 
             if name_length == 1:
-                caret_position = symbol.start_position
+                caret_position = symbol.start_position - 1
                 caret_string = " " * line_length
                 caret_list = list(caret_string)
+                caret_list.pop()
                 caret_list[caret_position] = "^"
 
                 print(line_text)
                 print("".join(caret_list))
-            
+
             else:
                 start_position = symbol.start_position
                 tilde_string = " " * line_length
                 tilde_list = list(tilde_string)
-                tilde_list[start_position: start_position + name_length - 1] = list("~" * name_length)
+                tilde_list[start_position - 1: start_position + name_length] = list("~" * name_length)
+                #tilde_list.append(" ")
 
                 print(line_text)
                 print("".join(tilde_list))
         else:
-                caret_position = symbol.start_position
+                caret_position = symbol.start_position - 1
                 caret_string = " " * line_length
                 caret_list = list(caret_string)
+                caret_list.pop()
                 caret_list[caret_position] = "^"
 
                 print(line_text)
-                print("".join(caret_list))            
+                print("".join(caret_list))      
+                  
 
