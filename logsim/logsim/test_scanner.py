@@ -192,7 +192,3 @@ def test_get_symbol_punctuation(scanner_fixture, set_scanner_location, location,
     assert symbol.line_number == expected_line_number
     assert symbol.start_position == expected_start_position
 
-def test_full(scanner_fixture, set_scanner_location):
-    scanner = scanner_fixture
-    set_scanner_location((26,1))
-    breakpoint()
