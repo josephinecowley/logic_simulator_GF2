@@ -384,7 +384,14 @@ class SignalTracesPanel(wx.Panel):
 
 
         add_new_monitor_panel_RIGHT = wx.Panel(add_new_monitor_panel, name="add new monitor RIGHT panel")
+        add_new_monitor_panel_RIGHT_hbox = wx.BoxSizer(wx.HORIZONTAL)
+        add_new_monitor_panel_RIGHT.SetSizer(add_new_monitor_panel_RIGHT_hbox)
+        add_new_monitor_button = wx.Button(add_new_monitor_panel_RIGHT, wx.ID_ANY, label="+")
+        add_new_monitor_button.SetToolTip("Add a new monitor")
+        add_new_monitor_panel_RIGHT_hbox.Add(add_new_monitor_button, 1, flag=wx.EXPAND)
+
         add_new_monitor_panel_hbox.Add(add_new_monitor_panel_RIGHT, 1, flag=wx.EXPAND)
+
 
 
         # Instantiate ScrolledPanel
