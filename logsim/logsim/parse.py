@@ -154,7 +154,8 @@ class Parser:
             raise ValueError("Expected a valid error code")
 
         # Display error line and visual marker
-        self.scanner.display_line_and_marker(self.symbol)
+        # Have commented out function because it seems to fail.
+        # self.scanner.display_line_and_marker(self.symbol)
         # Call error recovery function to resume parsing at appropriate point
         self.error_recovery(error_type, proceed, stopping_symbol_type)
 
@@ -306,13 +307,14 @@ class Parser:
                 # Check that number of inputs is an integer
                 if self.symbol.type == self.scanner.NUMBER:
                     # Check that number is within range
-                    if self.symbol.id in binary_digit:
-                        switch_initial_state_ID = self.symbol.id
+                    switch_initial_state = int(
+                        self.names.get_name_string(self.symbol.id))
+                    if switch_initial_state in binary_digit:
                         # Check that the next symbol is a closed bracket
                         self.symbol = self.scanner.get_symbol()
                         if self.symbol.type == self.scanner.BRACKET_CLOSE:
                             self.symbol = self.scanner.get_symbol()
-                            return symbol_ID, switch_initial_state_ID
+                            return symbol_ID, switch_initial_state
                         else:
                             self.display_error(
                                 self.symbol, self.NO_BRACKET_CLOSE,
@@ -321,7 +323,7 @@ class Parser:
                     else:
                         # JC! Might want to make this out of range more specific
                         self.display_error(self.symbol, self.OUT_OF_RANGE,
-                                           proceed=False, stopping_symbol_type=self.scanner.SEMICOLON)
+                                           proceed=False)
                         return None, None
                 else:
                     self.display_error(self.symbol, self.NO_NUMBER,
@@ -340,7 +342,8 @@ class Parser:
                 self.symbol = self.scanner.get_symbol()
                 # Check that number of inputs is an integer
                 if self.symbol.type == self.scanner.NUMBER:
-                    number_of_cycles = self.symbol.id
+                    number_of_cycles = int(self.names.get_name_string(
+                        self.symbol.id))
                     # Check that input number is negative (this is a semantic check!)
                     if number_of_cycles > 0:
                         # Check that the next symbol is a close bracket
