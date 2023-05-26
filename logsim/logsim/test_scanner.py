@@ -160,9 +160,15 @@ def test_scanner_display_line_and_marker(scanner_fixture, capfd):
     assert output_lines[2] == "          ^  "  
 
 @pytest.mark.parametrize("location, expected_name, expected_type, expected_line_number, expected_start_position", [
+    ((1, 1), "DEVICES", 8, 1, 1),
+    ((10, 1), "CONNECTIONS", 8, 10, 1),
+    ((20, 1), "MONITORS", 8, 21, 1),
+    ((28, 1), "END", 8, 28, 1),
+    ((6, 17), "25", 9, 6, 17),
+    ((7, 19), "0", 9, 7, 19),
     ((2, 1), "dtype1", 10, 2, 5),
     ((11, 2), "data", 10, 11, 5),
-    ((20, 1), "MONITORS", 8, 21, 1),
+    ((22, 12), "Q", 10, 22, 12),
 ])
 def test_get_symbol_names(names_fixture, scanner_fixture, set_scanner_location, location, expected_name, 
                     expected_type, expected_line_number, expected_start_position):
@@ -177,18 +183,31 @@ def test_get_symbol_names(names_fixture, scanner_fixture, set_scanner_location, 
     assert symbol.start_position == expected_start_position
 
 @pytest.mark.parametrize("location, expected_type, expected_line_number, expected_start_position", [
-    ((1, 8), 2, 1, 9),
+    ((6, 16), 0, 6, 16),
+    ((6, 19), 1, 6, 19),
+    ((10, 13), 2, 10, 13),
+    ((26, 1), 3, 26, 1),
     ((18, 19), 5, 18, 19),
+    ((2, 19), 6, 2, 19),
     ((2, 11), 7, 2, 12),
 ])
 
 def test_get_symbol_punctuation(scanner_fixture, set_scanner_location, location, 
                     expected_type, expected_line_number, expected_start_position):
+    """self.BRACKET_OPEN, self.BRACKET_CLOSE, self.BRACE_OPEN, self.BRACE_CLOSE, self.COMMA, self.FULLSTOP, 
+            self.SEMICOLON, self.EQUALS, self.KEYWORD, self.NUMBER, self.NAME, self.EOF"""
     scanner = scanner_fixture 
     set_scanner_location(location)
     symbol = scanner.get_symbol()
-    assert symbol.id == None # check that symbol_id maps to expected name
+    assert symbol.id == None # check that symbol_ids are all None
     assert symbol.type == expected_type
     assert symbol.line_number == expected_line_number
     assert symbol.start_position == expected_start_position
 
+def test_EOF(scanner_fixture, set_scanner_location):
+    location = (28, 1)
+    scanner = scanner_fixture 
+    set_scanner_location(location)
+    symbol = scanner.get_symbol() # call once to get END
+    symbol = scanner.get_symbol() # call again to get to EOF
+    assert symbol.type == scanner.EOF
