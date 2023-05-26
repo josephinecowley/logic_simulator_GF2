@@ -462,20 +462,26 @@ class SwitchesPanel(wx.Panel):
 
         # Configure sizer of ScrolledPanel
         self.num_of_switches = 30
-        fgs = wx.FlexGridSizer(cols=1, rows=self.num_of_switches, vgap=4, hgap=4)
+        self.fgs = wx.FlexGridSizer(cols=1, rows=self.num_of_switches+10, vgap=4, hgap=4)
 
         for switch_num in range(1, self.num_of_switches + 1):
             switch = wx.ToggleButton(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"switch {switch_num}") # create switch toggle button object with appropriate label
             self.Bind(wx.EVT_TOGGLEBUTTON, self.on_switch_toggle_button, switch) # bind switch toggle button to its event
-            fgs.Add(switch, 1, flag=wx.ALL, border=10) # add switch toggle buttons to ScrolledPanel
+            self.fgs.Add(switch, 1, flag=wx.ALL, border=10) # add switch toggle buttons to ScrolledPanel
 
         # Set sizer of ScrolledPanel
-        self.switch_buttons_scrolled_panel.SetSizer(fgs)
+        self.switch_buttons_scrolled_panel.SetSizer(self.fgs)
         self.switch_buttons_scrolled_panel.SetAutoLayout(1)
         self.switch_buttons_scrolled_panel.SetupScrolling(scroll_x=True, scroll_y=True, rate_x=20, rate_y=20, scrollToTop=True, scrollIntoView=True)
 
         # Create and add left panel in switches panel layout
         self.left_panel = wx.Panel(self.switches_panel)
+        left_panel_vbox = wx.BoxSizer(wx.VERTICAL)
+        self.left_panel.SetSizer(left_panel_vbox)
+        self.add_new_switch_button = wx.Button(self.left_panel, wx.ID_ANY, "add new switch")
+        self.add_new_switch_button.SetToolTip("Add a new switch")
+        self.Bind(wx.EVT_BUTTON, self.on_add_new_switch_button, self.add_new_switch_button)
+        left_panel_vbox.Add(self.add_new_switch_button, 1, flag=wx.EXPAND)
         #left_panel.SetBackgroundColour("GREEN") # layout identifier colour for visualisation purposes
         hbox.Add(self.left_panel, 1, wx.EXPAND)
 
@@ -494,6 +500,23 @@ class SwitchesPanel(wx.Panel):
         """Handle the event when the user clicks the toggle button for a switch."""
         switch_selected = event.GetEventObject()
         print(f'{switch_selected.GetLabel()} has been pressed.')
+
+    def on_add_new_switch_button(self, event):
+        print("Add new switch button pressed")
+        self.num_of_switches += 1
+        new_switch = wx.ToggleButton(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"switch {self.num_of_switches}")
+        #self.fgs = wx.FlexGridSizer(cols=1, rows=self.num_of_switches+1, vgap=4, hgap=4)
+        self.Bind(wx.EVT_TOGGLEBUTTON, self.on_switch_toggle_button, new_switch)
+        self.fgs.Add(new_switch, 1, flag=wx.ALL, border=10)
+        #self.switch_buttons_scrolled_panel.Update()
+        self.switch_buttons_scrolled_panel.Refresh()
+        self.switches_panel.Layout()
+
+    def on_change_right_panel_colour(self, event):
+        self.right_panel.SetBackgroundColour("GREEN")
+        self.right_panel.Layout()
+        self.right_panel.Refresh()
+        self.right_panel.Update()
 
 
 class LogicSimApp(wx.App):
