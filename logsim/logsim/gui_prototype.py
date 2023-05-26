@@ -452,40 +452,40 @@ class SwitchesPanel(wx.Panel):
         vbox.Add(static_line, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
 
         # Create panel for switch toggle buttons
-        switches_panel = wx.Panel(self)
+        self.switches_panel = wx.Panel(self)
         #switches_panel.SetBackgroundColour(wx.Colour(255, 0, 0))
-        vbox.Add(switches_panel, 7, wx.EXPAND)
-        switches_panel.SetSizer(hbox)
+        vbox.Add(self.switches_panel, 7, wx.EXPAND)
+        self.switches_panel.SetSizer(hbox)
 
         # Instantiate ScrolledPanel
-        switch_buttons_scrolled_panel = wxscrolledpanel.ScrolledPanel(switches_panel, name="switch buttons scrolled panel")
+        self.switch_buttons_scrolled_panel = wxscrolledpanel.ScrolledPanel(self.switches_panel, name="switch buttons scrolled panel")
 
         # Configure sizer of ScrolledPanel
-        num_of_switches = 30
-        fgs = wx.FlexGridSizer(cols=1, rows=num_of_switches, vgap=4, hgap=4)
+        self.num_of_switches = 30
+        fgs = wx.FlexGridSizer(cols=1, rows=self.num_of_switches, vgap=4, hgap=4)
 
-        for switch_num in range(1, num_of_switches + 1):
-            switch = wx.ToggleButton(parent=switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"switch {switch_num}") # create switch toggle button object with appropriate label
+        for switch_num in range(1, self.num_of_switches + 1):
+            switch = wx.ToggleButton(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"switch {switch_num}") # create switch toggle button object with appropriate label
             self.Bind(wx.EVT_TOGGLEBUTTON, self.on_switch_toggle_button, switch) # bind switch toggle button to its event
             fgs.Add(switch, 1, flag=wx.ALL, border=10) # add switch toggle buttons to ScrolledPanel
 
         # Set sizer of ScrolledPanel
-        switch_buttons_scrolled_panel.SetSizer(fgs)
-        switch_buttons_scrolled_panel.SetAutoLayout(1)
-        switch_buttons_scrolled_panel.SetupScrolling(scroll_x=True, scroll_y=True, rate_x=20, rate_y=20, scrollToTop=True, scrollIntoView=True)
+        self.switch_buttons_scrolled_panel.SetSizer(fgs)
+        self.switch_buttons_scrolled_panel.SetAutoLayout(1)
+        self.switch_buttons_scrolled_panel.SetupScrolling(scroll_x=True, scroll_y=True, rate_x=20, rate_y=20, scrollToTop=True, scrollIntoView=True)
 
         # Create and add left panel in switches panel layout
-        left_panel = wx.Panel(switches_panel)
+        self.left_panel = wx.Panel(self.switches_panel)
         #left_panel.SetBackgroundColour("GREEN") # layout identifier colour for visualisation purposes
-        hbox.Add(left_panel, 1, wx.EXPAND)
+        hbox.Add(self.left_panel, 1, wx.EXPAND)
 
         # Add the ScrolledPanel widget to SwitchesPanel panel
-        hbox.Add(switch_buttons_scrolled_panel, 2, wx.EXPAND)
+        hbox.Add(self.switch_buttons_scrolled_panel, 2, wx.EXPAND)
 
         # Create and add right panel in switches panel layout
-        right_panel = wx.Panel(switches_panel)
+        self.right_panel = wx.Panel(self.switches_panel)
         #right_panel.SetBackgroundColour("BLUE") # layout identifier colour for visualisation purposes
-        hbox.Add(right_panel, 1, wx.EXPAND)
+        hbox.Add(self.right_panel, 1, wx.EXPAND)
 
         # Set sizer of SwitchesPanel
         self.SetSizer(vbox)
