@@ -496,11 +496,6 @@ class SwitchesPanel(wx.Panel):
         print(f'{switch_selected.GetLabel()} has been pressed.')
 
 
-class SimulationPanel(wx.Panel):
-    def __init__(self, parent):
-        super(SimulationPanel, self).__init__(parent)
-
-
 class LogicSimApp(wx.App):
     def OnInit(self):
         self.frame = Gui("GF2 Team 7 Logic Simulator GUI")
