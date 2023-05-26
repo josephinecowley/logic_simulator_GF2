@@ -282,6 +282,7 @@ class Gui(wx.Frame):
         vbox = wx.BoxSizer(wx.VERTICAL)
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
+        # Create data panel and add to Frame
         data_panel = wx.Panel(self)
         vbox.Add(data_panel, 8, wx.EXPAND)
         data_panel.SetSizer(hbox)
@@ -637,7 +638,7 @@ class SwitchesPanel(wx.Panel):
         self.switch_buttons_scrolled_panel = wxscrolledpanel.ScrolledPanel(self.switches_panel, name="switch buttons scrolled panel")
 
         # Configure sizer of switch buttons scrolled panel
-        self.num_of_switches = 30
+        self.num_of_switches = len([switch for switch in ...])
         fgs = wx.FlexGridSizer(cols=1, rows=self.num_of_switches, vgap=4, hgap=4)
 
         for switch_num in range(1, self.num_of_switches + 1):
