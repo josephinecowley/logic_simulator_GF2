@@ -254,7 +254,7 @@ class Gui(wx.Frame):
         self.text_box = wx.TextCtrl(self, wx.ID_ANY, "",
                                     style=wx.TE_PROCESS_ENTER)
 
-        # Bind events to widgets
+        '''# Bind events to widgets
         self.Bind(wx.EVT_MENU, self.on_menu)
         self.spin.Bind(wx.EVT_SPINCTRL, self.on_spin)
         self.run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
@@ -273,7 +273,33 @@ class Gui(wx.Frame):
         side_sizer.Add(self.text_box, 1, wx.ALL, 5)
 
         self.SetSizeHints(600, 600)
-        self.SetSizer(main_sizer)
+        self.SetSizer(main_sizer)'''
+
+        # Bind events to widgets
+        self.Bind(wx.EVT_MENU, self.on_menu)
+
+        # Configure sizers for layout of Frame
+        vbox = wx.BoxSizer(wx.VERTICAL)
+        hbox = wx.BoxSizer(wx.HORIZONTAL)
+
+        data_panel = wx.Panel(self)
+        vbox.Add(data_panel, 8, wx.EXPAND)
+        data_panel.SetSizer(hbox)
+
+        # Instantiate SwitchesPanel widget and add to Frame
+        switches_panel = SwitchesPanel(data_panel)
+        hbox.Add(switches_panel, 1, wx.EXPAND, 0)
+
+        # Instantiate SignalTracesPanel widget and add to Frame
+        signal_traces_panel = SignalTracesPanel(data_panel)
+        hbox.Add(signal_traces_panel, 3, wx.EXPAND, 0)
+
+        simulation_panel = RunSimulationPanel(self)
+        vbox.Add(simulation_panel, 1, wx.EXPAND)
+
+        self.SetSizeHints(200, 200)
+        self.SetSizer(vbox)
+
 
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
