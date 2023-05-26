@@ -139,6 +139,7 @@ class Scanner:
         
         elif self.current_character in ['#', '"']: # comment openers
             self.skip_comment()
+            self.advance()
 
         elif self.current_character == "":  # end of file
             self.load_scanner_data(symbol)
@@ -190,11 +191,15 @@ class Scanner:
             self.advance() # get first character in comment
             while not self.current_character == "\n": # closed by new line
                 self.advance() 
+            self.line_number += 1
+            self.position = 0
         else:
             self.advance() # get first character in comment
             while not self.current_character == '"': # closed by " (have to break PEP8 for this)
+                if self.current_character == "\n":
+                    self.line_number += 1
+                    self.position = 0
                 self.advance()
-            self.advance() # advance once more to leave comment
 
     def get_name(self):
         """Assumes that current character is alphabetical and returns an alphanumeric name."""
