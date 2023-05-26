@@ -12,15 +12,17 @@ CONNECTIONS {
     dtype1.Q = dtype2.DATA;
     dtype2.Q = dtype3.DATA;
     dtype3.Q = dtype4.DATA;
-    clock = dtype1.CLOCK;
-    clock = dtype2.CLOCK;
-    clock = dtype3.CLOCK;
-    clock = dtype4.CLOCK;
+    clock = dtype1.CLK;
+    clock = dtype2.CLK;
+    clock = dtype3.CLK;
+    clock = dtype4.CLK;
 }
 
 MONITORS {
-    Q1 = dtype1.Q;
-    Q2 = dtype2.Q;
-    Q3 = dtype3.Q;
-    Q4 = dtype4.Q;
+    dtype1.Q;
+    dtype2.Q;
+    dtype3.Q;
+    dtype4.Q;
 }
+
+END
