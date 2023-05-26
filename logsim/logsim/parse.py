@@ -233,7 +233,7 @@ class Parser:
         if self.symbol.type != self.scanner.SEMICOLON:
             self.display_error(
                 self.symbol, self.NO_SEMICOLON, proceed=False)
-        # Check all devices in list, which are all separated by
+        # Check all devices in list, which are all separated by a ';'
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
             self.symbol = self.scanner.get_symbol()
             # Incase a KEYWORD is entered straight after a ';', assume '}' was missed and go on to monitor list
@@ -257,12 +257,6 @@ class Parser:
             elif self.symbol.type != self.scanner.SEMICOLON:
                 self.display_error(self.symbol, self.NO_SEMICOLON)
                 return
-
-        # # If a semicolon is missing
-        # else:
-        #     self.display_error(self.symbol, self.NO_SEMICOLON)
-        #     print("here")
-        #     return
 
     def device(self):
         """Parse user defined device."""
@@ -427,6 +421,10 @@ class Parser:
                 self.symbol = self.scanner.get_symbol()
         # Parse a connection
         self.connection()
+        # Check if semicolon is missing but next symbol is a NAME type
+        if self.symbol.type != self.scanner.SEMICOLON:
+            self.display_error(
+                self.symbol, self.NO_SEMICOLON, proceed=False)
         # Repeat checking connections in list until the close brace "}"
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
             self.symbol = self.scanner.get_symbol()
@@ -434,19 +432,23 @@ class Parser:
             if (self.symbol.type == self.scanner.KEYWORD):
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
                 return
+            # Incase now a brace, leave while loop
+            if self.symbol.type == self.scanner.BRACE_CLOSE:
+                self.symbol = self.scanner.get_symbol()
+                return
             self.connection()
             # If semicolon is missing, but new NAME type symbol is entered, call error and parse to next stopping symbol
             if self.symbol.type == self.scanner.NAME:
                 self.display_error(self.symbol, self.NO_SEMICOLON,
                                    proceed=False)
-        # Check for the end of file symbol "}"
-        if self.symbol.type == self.scanner.BRACE_CLOSE:
-            self.symbol = self.scanner.get_symbol()
-            return
-        # If something other than '}', assume it is missing
-        else:
-            self.display_error(
-                self.symbol, self.NO_BRACE_CLOSE)
+            # If semicolon is missing, and symbol is now a brace
+            elif self.symbol.type == self.scanner.BRACE_CLOSE:
+                self.display_error(self.symbol, self.NO_SEMICOLON)
+                return
+            # If semicolon missing and unknown symbol (including EOF)
+            elif self.symbol.type != self.scanner.SEMICOLON:
+                self.display_error(self.symbol, self.NO_SEMICOLON)
+                return
 
     def connection(self):
         """Parse a connection."""
@@ -602,10 +604,10 @@ class Parser:
             self.display_error(self.symbol, self.EMPTY_FILE)
         else:
             # Parse device list
-            self.device_list()
+            # self.device_list()
 
             # Parse connection list
-            # self.connection_list()
+            self.connection_list()
 
             # Parse monitor list
             # self.monitor_list()
