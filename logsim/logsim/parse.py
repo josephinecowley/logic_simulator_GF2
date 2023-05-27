@@ -119,13 +119,13 @@ class Parser:
             print(
                 "Syntax Error: Expected the keyword END straight after monitors list", end="\n \n")
         elif error_type == self.NO_BRACE_OPEN:
-            print("Syntax Error: Expected a '{' sign", end="\n \n")
+            print("Syntax Error: Expected a '{' symbol", end="\n \n")
         elif error_type == self.NO_BRACE_CLOSE:
-            print("Syntax Error: Expected a '}' sign", end="\n \n")
+            print("Syntax Error: Expected a '}' symbol", end="\n \n")
         elif error_type == self.INVALID_NAME:
             print("Syntax Error: Invalid user name entered", end="\n \n")
         elif error_type == self.NO_EQUALS:
-            print("Syntax Error: Expected an '=' sign", end="\n \n")
+            print("Syntax Error: Expected an '=' symbol", end="\n \n")
         elif error_type == self.INVALID_COMPONENT:
             print("Syntax Error: Invalid component name entered", end="\n \n")
         elif error_type == self.NO_BRACKET_OPEN:
@@ -208,24 +208,39 @@ class Parser:
     def device_list(self):
         """Parse device list."""
         DEVICES_ID = self.names.lookup(["DEVICES"])[0]
-        # If DEVICES keyword is wrong, assume just missing and proceed to check if { is present
+        # If DEVICES keyword is wrong
         if not (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == DEVICES_ID):
-            self.display_error(self.symbol, self.NO_DEVICES_KEYWORD)
-            self.symbol = self.scanner.get_symbol()
-            # Check if there's also a missing { after missing DEVICES. If so just pass to next symbol
-            if not (self.symbol.type == self.scanner.BRACE_OPEN):
-                self.display_error(self.symbol, self.NO_BRACE_OPEN)
-            # If only missing DEVICES keyword, advance symbol to NAME
+            # If first symbol is a NAME type
+            if not (self.symbol.type == self.scanner.NAME):
+                # If open brace '{'
+                if self.symbol.type == self.scanner.BRACE_OPEN:
+                    # Case 3: { ...
+                    self.display_error(self.symbol, self.NO_DEVICES_KEYWORD)
+                    self.symbol = self.scanner.get_symbol()
             else:
                 self.symbol = self.scanner.get_symbol()
+                # If open brace '{'
+                if not (self.symbol.type == self.scanner.BRACE_OPEN):
+                    # Case 4: ...
+                    # and Case 6: D ...
+                    self.display_error(self.symbol, self.NO_DEVICES_KEYWORD)
+                    self.display_error(
+                        self.symbol, self.NO_BRACE_OPEN, proceed=False)
+                    self.symbol = self.scanner.get_symbol()
+                else:
+                    # Case 2: D { ...
+                    self.display_error(
+                        self.symbol, self.NO_DEVICES_KEYWORD)
+                    self.symbol = self.scanner.get_symbol()
         # If DEVICES keyword is present
         else:
             self.symbol = self.scanner.get_symbol()
-            # Check the next symbol is a "{". If not, assume missing and proceed to next symbol
+            # If open brace '{'
             if not (self.symbol.type == self.scanner.BRACE_OPEN):
+                # Case 5. DEVICES ...
                 self.display_error(self.symbol, self.NO_BRACE_OPEN)
-            # If not missing either, advance symbol to NAME
             else:
+                # Case 1. DEVICES{ ...
                 self.symbol = self.scanner.get_symbol()
         # Parse device
         self.device()
@@ -280,7 +295,8 @@ class Parser:
                 symbol_ID, device_input = self.check_device_is_valid()
 
             else:
-                self.display_error(self.symbol, self.NO_EQUALS, proceed=False)
+                self.display_error(
+                    self.symbol, self.NO_EQUALS, proceed=False)
         else:
             self.display_error(self.symbol, self.INVALID_NAME, proceed=False)
 
@@ -628,13 +644,13 @@ class Parser:
             self.device_list()
 
             # Parse connection list
-            self.connection_list()
+            # self.connection_list()
 
             # Parse monitor list
-            self.monitor_list()
+            # self.monitor_list()
 
             # Check for END keyword
-            self.end()
+            # self.end()
 
             # Check if there are errors, and return True if error count is zero, otherwise return falsex
             if self.error_count == 0:
