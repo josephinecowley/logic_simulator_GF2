@@ -137,7 +137,7 @@ def test_parser_display_error_error_count_increment(parser_fixture, correct_erro
     ("parser.EMPTY_FILE", "  Line 2: Syntax Error: Cannot parse an empty file"),
     ("parser.TERMINATE", "  Line 2: Syntax Error: Could not find parsing point to restart, program terminated early"),
 ])
-def test_parser_display_error_show_error_messages(parser_fixture, correct_error_arguments, capfd, error_type, expected_message):
+def test_parser_display_error_show_appropriate_error_message(parser_fixture, correct_error_arguments, capfd, error_type, expected_message):
     parser = parser_fixture
     symbol, fake_error_type, proceed, stopping_symbol_types = correct_error_arguments
     error_type = eval(error_type)
