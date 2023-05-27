@@ -94,13 +94,13 @@ def test_parser_display_error(parser_fixture, symbol, error_type, proceed, stopp
         parser.display_error(symbol, error_type)'''
 
 @pytest.fixture
-def correct_parser_display_error_arguments(symbol_fixture):
+def correct_error_arguments(symbol_fixture):
     symbol = symbol_fixture
     return symbol, 4, True, [2, 3, 6, 8]
 
-def test_parser_display_error_instance_handling(parser_fixture, correct_parser_display_error_arguments):
+def test_parser_display_error_instance_handling(parser_fixture, correct_error_arguments):
     parser = parser_fixture
-    symbol, error_type, proceed, stopping_symbol_types = correct_parser_display_error_arguments
+    symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
 
     with pytest.raises(TypeError):
         parser.display_error(symbol, "non-integer error_type") # Expected error_type to be an integer type argument
@@ -124,27 +124,52 @@ def test_parser_display_error_instance_handling(parser_fixture, correct_parser_d
         parser.display_error(symbol, error_type, proceed, list(range(-8))) # Expected stopping symbol to be within range of given symbols
 
 
-def test_parser_display_error_error_count_increment(parser_fixture, correct_parser_display_error_arguments):
+def test_parser_display_error_error_count_increment(parser_fixture, correct_error_arguments):
     parser = parser_fixture
-    parser.display_error(*correct_parser_display_error_arguments)
+    parser.display_error(*correct_error_arguments)
 
     assert parser.error_count == 1
 
 '''@pytest.mark.parametrize("error_type, expected_error_message", [
     (4, "Syntax Error: Expected the keyword DEVICES"),
 ])
-def test_parser_display_error_type_of_error(parser_fixture, correct_parser_display_error_arguments):
+def test_parser_display_error_type_of_error(parser_fixture, correct_error_arguments):
     parser = parser_fixture
-    symbol, error_type, proceed, stopping_symbol_types = correct_parser_display_error_arguments
+    symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
     assert parser.display_error(symbol, error_type, proceed, stopping_symbol_types) == "Line 2: Syntax Error: Expected a '{' sign"'''
 
 
-def test_parser_display_error_valid_error_code(parser_fixture, correct_parser_display_error_arguments):
+def test_parser_display_error_valid_error_code(parser_fixture, correct_error_arguments):
     parser = parser_fixture
-    symbol, error_type, proceed, stopping_symbol_types = correct_parser_display_error_arguments
+    symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
     invalid_error_type = max(parser.syntax_errors) + 1
 
     with pytest.raises(ValueError):
         parser.display_error(symbol, invalid_error_type, proceed, stopping_symbol_types)
+
+
+def test_error_recovery_instance_handling(parser_fixture, correct_error_arguments):
+    parser = parser_fixture
+    symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
+
+    with pytest.raises(TypeError):
+        parser.error_recovery("not an integer") # Expected error_type to be an integer type argument
+
+    # KO! Return to this once JC has fixed not relying on 19
+
+    with pytest.raises(ValueError):
+        parser.error_recovery(-4) # Cannot have a negative error code
+    with pytest.raises(TypeError):
+        parser.error_recovery(error_type, "not a boolean") # Expected bool type argument for proceed
+    with pytest.raises(TypeError):
+        parser.error_recovery(error_type, proceed, "not a list") # Expected stopping symbol to be an integer type argument
+    with pytest.raises(ValueError):
+        parser.error_recovery(error_type, proceed, list(range(12))) # Expected stopping symbol to be within range of given symbols
+    with pytest.raises(ValueError):
+        parser.error_recovery(error_type, proceed, list(range(32))) # Expected stopping symbol to be within range of given symbols
+    with pytest.raises(ValueError):
+        parser.error_recovery(error_type, proceed, list(range(0))) # Expected stopping symbol to be within range of given symbols
+    with pytest.raises(ValueError):
+        parser.error_recovery(error_type, proceed, list(range(-8))) # Expected stopping symbol to be within range of given symbols
 
 
