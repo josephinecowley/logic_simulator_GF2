@@ -73,19 +73,19 @@ class Scanner:
             self.END_ID] = self.names.lookup(self.keywords_list)
 
         # hold the last character read from the definition file
-        self.current_character = " "
+        self.current_character = " " # initialised with a space so that advance() is called on the first call to get_symbol
 
     def get_symbol(self):
         """Translate the next sequence of characters into a symbol."""
         symbol = Symbol()
         self.skip_spaces()  # current character now not whitespace 
-        #breakpoint()
+
         if self.current_character.isalpha():  # name
-            self.load_scanner_data(symbol)
+            self.load_scanner_data(symbol) #load the scanner location attributes to symbol
             name_string = self.get_name()
             if name_string in self.keywords_list:
                 symbol.type = self.KEYWORD
-                
+                 
             else:
                 symbol.type = self.NAME
             symbol.id = self.names.lookup([name_string])[0] # lookup a symbol id
@@ -97,7 +97,7 @@ class Scanner:
             symbol.id = self.names.lookup([number])[0]
             
 
-        elif self.current_character == "=":  # punctuation
+        elif self.current_character == "=":  # punctuation...
             self.load_scanner_data(symbol)
             symbol.type = self.EQUALS
             self.advance()
@@ -177,7 +177,6 @@ class Scanner:
         """Calls advance() method until current character is not space. 
         If current_character is a space, returns next non-whitespace character.
         If current_character is not a space, returns current character."""
-        #breakpoint()
         while self.current_character.isspace():
             if self.current_character == "\n":
                 self.line_number += 1
@@ -220,7 +219,8 @@ class Scanner:
     def display_line_and_marker(self, symbol):
         """Uses a temp_file instance to avoid interference with scanner's pointer. 
         Takes a symbol instance and prints its line in the file. 
-        If the 'name' is over length one, use tildes, otherwise use caret."""
+        If the 'name' is over length one, use tildes, otherwise use caret.
+        Printed lines will have a standard indent of eight spaces."""
 
         temp_file = self.open_file(self.path)
         # find the whole line where that symbol appears
@@ -229,39 +229,54 @@ class Scanner:
                 line_text = line
                 break
         temp_file.close()
-        #breakpoint()
+
         line_length = len(line_text)
 
+        for i, char in enumerate(line_text):
+            if not char.isspace():
+                start_of_text_index = i
+                break
+            
         if symbol.type in [self.KEYWORD, self.NAME, self.NUMBER]:
             name = self.names.get_name_string(symbol.id)
             name_length = len(name)
 
             if name_length == 1:
                 caret_position = symbol.start_position - 1
-                caret_string = " " * line_length
-                caret_list = list(caret_string)
+                empty_caret_string = " " * line_length
+                caret_list = list(empty_caret_string)
                 caret_list.pop()
                 caret_list[caret_position] = "^"
+                filled_marker_string = "".join(caret_list)
 
-                print(line_text, end="")
-                print("".join(caret_list), end="\n\n")
 
             else:
                 start_position = symbol.start_position
-                tilde_string = " " * line_length
-                tilde_list = list(tilde_string)
+                empty_tilde_string = " " * line_length
+                tilde_list = list(empty_tilde_string)
                 tilde_list[start_position - 1: start_position + name_length] = list("~" * name_length)
-
-                print(line_text, end="")
-                print("".join(tilde_list), end="\n\n")
+                filled_marker_string = "".join(tilde_list)
+            
         else:
                 caret_position = symbol.start_position - 1
-                caret_string = " " * line_length
-                caret_list = list(caret_string)
+                empty_caret_string = " " * line_length
+                caret_list = list(empty_caret_string)
                 caret_list.pop()
                 caret_list[caret_position] = "^"
+                filled_marker_string = "".join(caret_list)
 
-                print(line_text, end="")
-                print("".join(caret_list), end="\n\n")    
-                  
+
+        # standardise line indent
+        line_text = " "*8 + line_text.lstrip()
+        filled_marker_string = " "*8 + filled_marker_string[start_of_text_index:]
+
+        if symbol.type == self.EOF: # handle case of error in END keyword
+            print(line_text)
+            print(filled_marker_string, end="\n\n")
+
+        else:
+            print(line_text, end="")
+            print(filled_marker_string, end="\n\n")
+        
+            
 
