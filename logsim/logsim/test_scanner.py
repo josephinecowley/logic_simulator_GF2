@@ -5,7 +5,7 @@ from names import Names
 
 @pytest.fixture
 def path_fixture():
-    return "logsim/logsim/example1_logic_description.txt"
+    return "example1_logic_description.txt"
 
 @pytest.fixture
 def names_fixture():
@@ -148,7 +148,7 @@ def test_scanner_get_number(scanner_fixture, set_scanner_location):
     ((2, 12), "        dtype1 = DTYPE;", "               ^       "),
     ((10, 1), "        CONNECTIONS {", "        ~~~~~~~~~~~  "),
     ((7, 19), "        data = SWITCH(0);", "                      ^  "),
-    
+
 ])
 def test_scanner_display_line_and_marker(scanner_fixture, set_scanner_location, capfd, location, expected_line1, expected_line2):
     scanner = scanner_fixture
