@@ -98,7 +98,7 @@ def correct_parser_display_error_arguments(symbol_fixture):
     symbol = symbol_fixture
     return symbol, 4, True, [2, 3, 6, 8]
 
-def test_parser_display_error(parser_fixture, correct_parser_display_error_arguments):
+def test_parser_display_error_instance_handling(parser_fixture, correct_parser_display_error_arguments):
     parser = parser_fixture
     symbol, error_type, proceed, stopping_symbol_types = correct_parser_display_error_arguments
 
@@ -122,3 +122,10 @@ def test_parser_display_error(parser_fixture, correct_parser_display_error_argum
         parser.display_error(symbol, error_type, proceed, list(range(0))) # Expected stopping symbol to be within range of given symbols
     with pytest.raises(ValueError):
         parser.display_error(symbol, error_type, proceed, list(range(-8))) # Expected stopping symbol to be within range of given symbols
+
+
+def test_parser_display_error_error_count_increment(parser_fixture, correct_parser_display_error_arguments):
+    parser = parser_fixture
+    parser.display_error(*correct_parser_display_error_arguments)
+
+    assert parser.error_count == 1
