@@ -129,3 +129,22 @@ def test_parser_display_error_error_count_increment(parser_fixture, correct_pars
     parser.display_error(*correct_parser_display_error_arguments)
 
     assert parser.error_count == 1
+
+'''@pytest.mark.parametrize("error_type, expected_error_message", [
+    (4, "Syntax Error: Expected the keyword DEVICES"),
+])
+def test_parser_display_error_type_of_error(parser_fixture, correct_parser_display_error_arguments):
+    parser = parser_fixture
+    symbol, error_type, proceed, stopping_symbol_types = correct_parser_display_error_arguments
+    assert parser.display_error(symbol, error_type, proceed, stopping_symbol_types) == "Line 2: Syntax Error: Expected a '{' sign"'''
+
+
+def test_parser_display_error_valid_error_code(parser_fixture, correct_parser_display_error_arguments):
+    parser = parser_fixture
+    symbol, error_type, proceed, stopping_symbol_types = correct_parser_display_error_arguments
+    invalid_error_type = max(parser.syntax_errors) + 1
+
+    with pytest.raises(ValueError):
+        parser.display_error(symbol, invalid_error_type, proceed, stopping_symbol_types)
+
+
