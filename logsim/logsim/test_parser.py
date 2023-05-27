@@ -173,3 +173,9 @@ def test_error_recovery_instance_handling(parser_fixture, correct_error_argument
         parser.error_recovery(error_type, proceed, list(range(-8))) # Expected stopping symbol to be within range of given symbols
 
 
+def test_error_recovery_check_built_in_error_handling(parser_fixture, correct_error_arguments):
+    parser = parser_fixture
+    symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
+
+    proceed = True
+    assert parser.error_recovery(error_type, proceed, stopping_symbol_types) == None # KO! May need to check this again once parse.py is complete
