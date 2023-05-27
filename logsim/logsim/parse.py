@@ -75,8 +75,8 @@ class Parser:
         # List of syntax errors
         # JC! come back and change this to a dictionary such that manual changes to number of errors is unecessary
         self.syntax_errors = [self.NO_DEVICES_KEYWORD, self.NO_CONNECTIONS_KEYWORD, self.NO_MONITORS_KEYWORD, self.NO_END_KEYWORD, self.NO_BRACE_OPEN, self.NO_BRACE_CLOSE,
-            self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_BRACKET_OPEN, self.NO_BRACKET_CLOSE, self.NO_NUMBER, self.CLK_OUT_OF_RANGE, self.SWITCH_OUT_OF_RANGE,
-            self.UNDEFINED_NAME, self.NO_FULLSTOP, self.NO_SEMICOLON, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE, self.TERMINATE] = self.names.unique_error_codes(22)
+                              self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_BRACKET_OPEN, self.NO_BRACKET_CLOSE, self.NO_NUMBER, self.CLK_OUT_OF_RANGE, self.SWITCH_OUT_OF_RANGE,
+                              self.UNDEFINED_NAME, self.NO_FULLSTOP, self.NO_SEMICOLON, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE, self.TERMINATE] = self.names.unique_error_codes(22)
 
     # Stopping symbols automatically assigned to semi-colons, braces and keywords
     def display_error(self,  symbol, error_type,  proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
@@ -88,7 +88,7 @@ class Parser:
         if not isinstance(error_type, int):
             raise TypeError(
                 "Expected error_type to be an integer type argument")
-        elif error_type >= 22:
+        elif error_type >= len(self.syntax_errors):
             raise ValueError(
                 "Expected an error code within range of error types")
         elif error_type < 0:
@@ -107,60 +107,63 @@ class Parser:
         self.error_count += 1
 
         # Display location and type of error
-        print(f"Line {symbol.line_number}:", end=" ")
+        print(f"\n  Line {symbol.line_number}:", end=" ")
         if error_type == self.NO_DEVICES_KEYWORD:
-            print("Syntax Error: Expected the keyword DEVICES")
+            print("Syntax Error: Expected the keyword DEVICES", end="\n \n")
         elif error_type == self.NO_CONNECTIONS_KEYWORD:
-            print("Syntax Error: Expected the keyword CONNECTIONS")
+            print("Syntax Error: Expected the keyword CONNECTIONS", end="\n \n")
         elif error_type == self.NO_MONITORS_KEYWORD:
-            print("Syntax Error: Expected the keyword MONITORS")
+            print("Syntax Error: Expected the keyword MONITORS", end="\n \n")
         elif error_type == self.NO_END_KEYWORD:
-            print("Syntax Error: Expected the keyword END straight after monitors list")
+            print(
+                "Syntax Error: Expected the keyword END straight after monitors list", end="\n \n")
         elif error_type == self.NO_BRACE_OPEN:
-            print("Syntax Error: Expected a '{' sign")
+            print("Syntax Error: Expected a '{' symbol", end="\n \n")
         elif error_type == self.NO_BRACE_CLOSE:
-            print("Syntax Error: Expected a '}' sign")
+            print("Syntax Error: Expected a '}' symbol", end="\n \n")
         elif error_type == self.INVALID_NAME:
-            print("Syntax Error: Invalid user name entered")
+            print("Syntax Error: Invalid user name entered", end="\n \n")
         elif error_type == self.NO_EQUALS:
-            print("Syntax Error: Expected an '=' sign")
+            print("Syntax Error: Expected an '=' symbol", end="\n \n")
         elif error_type == self.INVALID_COMPONENT:
-            print("Syntax Error: Invalid component name entered")
+            print("Syntax Error: Invalid component name entered", end="\n \n")
         elif error_type == self.NO_BRACKET_OPEN:
-            print("Syntax Error: Expected a '(' for an input")
+            print("Syntax Error: Expected a '(' for an input", end="\n \n")
         elif error_type == self.NO_BRACKET_CLOSE:
-            print("Syntax Error: Expected a ')' for an input")
+            print("Syntax Error: Expected a ')' for an input", end="\n \n")
         elif error_type == self.NO_NUMBER:
-            print("Syntax Error: Expected a positive integer")
+            print("Syntax Error: Expected a positive integer", end="\n \n")
         elif error_type == self.CLK_OUT_OF_RANGE:
             print(
-                "Semantic Error: Input clock half period is out of range. Must be a positive integer")
+                "Semantic Error: Input clock half period is out of range. Must be a positive integer", end="\n \n")
         elif error_type == self.SWITCH_OUT_OF_RANGE:
             print(
-                "Semantic Error: Input switch number is out of range. Must be either 1 or 0")
+                "Semantic Error: Input switch number is out of range. Must be either 1 or 0", end="\n \n")
         elif error_type == self.UNDEFINED_NAME:
-            print("Semantic Error: Undefined device name given")
+            print("Syntax Error: Undefined device name given", end="\n \n")
         elif error_type == self.NO_FULLSTOP:
-            print("Syntax Error: Expected a full stop")
+            print("Syntax Error: Expected a full stop", end="\n \n")
         elif error_type == self.NO_SEMICOLON:
-            print("Syntax Error: Expected a semicolon")
+            print("Syntax Error: Expected a semicolon", end="\n \n")
         elif error_type == self.NO_Q_OR_QBAR:
-            print("Syntax Error: Expected a Q or QBAR after the full stop")
+            print("Syntax Error: Expected a Q or QBAR after the full stop", end="\n \n")
         elif error_type == self.NO_INPUT_SUFFIX:
-            print("Syntax Error: Expected a valid input suffix")
+            print("Syntax Error: Expected a valid input suffix", end="\n \n")
         elif error_type == self.SYMBOL_AFTER_END:
-            print("Syntax Error: There should not be any text after the keyword END")
+            print(
+                "Syntax Error: There should not be any text after the keyword END", end="\n \n")
         elif error_type == self.EMPTY_FILE:
-            print("Syntax Error: Cannot parse an empty file")
+            print("Syntax Error: Cannot parse an empty file", end="\n \n")
         elif error_type == self.TERMINATE:
             print(
-                "Syntax Error: Could not find parsing point to restart, program terminated early")
+                "Syntax Error: Could not find parsing point to restart, program terminated early", end="\n \n")
         else:
-            raise ValueError("Expected a valid error code")
+            raise ValueError("Expected a valid error code", end="\n \n")
 
         # Display error line and visual marker
-        # Have commented out function because it seems to fail.
-        # self.scanner.display_line_and_marker(self.symbol)
+        if symbol.type == self.scanner.EOF:
+            return
+        self.scanner.display_line_and_marker(symbol)
         # Call error recovery function to resume parsing at appropriate point
         self.error_recovery(error_type, proceed, stopping_symbol_types)
         return
@@ -173,7 +176,7 @@ class Parser:
             raise TypeError(
                 "Expected error_type to be an integer type argument")
         # JC! need to fix this to not rely on a '19'
-        elif error_type >= 22:
+        elif error_type >= len(self.syntax_errors):
             raise ValueError(
                 "Expected an error code within range of error types")
         elif error_type < 0:
@@ -201,28 +204,59 @@ class Parser:
                 self.display_error(self.symbol, self.TERMINATE)
                 return
 
+    def initial_error_checks(self, KEYWORD_ID, missing_error_type):
+        """Check initial symbols for common errors. This function tests for 6 cases:
+
+        ... represents the first line of the list. For cases 4 and 6, because it is difficult 
+        to distinguish between them, we merely skip to the next stopping symbol.
+
+        1. Correct - when both keyword and open brace are present: KEYWORD { ...
+        2. First keyword is spelt wrong, but open brace follows: KYWORD { ...
+        3. Missing first keyword, but open brace follows: { ...
+        4. Missing both the first keyword and open brace: ... 
+        5. First keyword is correct, but missing open brace: { ...
+        6. First keyword is spelt wrong, and missing an open brace { ...
+        """
+        # If keyword is wrong
+        if not (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == KEYWORD_ID):
+            # If first symbol is a NAME type
+            if not (self.symbol.type == self.scanner.NAME):
+                # If open brace '{'
+                if self.symbol.type == self.scanner.BRACE_OPEN:
+                    # Case 3: { ...
+                    self.display_error(self.symbol, missing_error_type)
+                    self.symbol = self.scanner.get_symbol()
+            else:
+                self.symbol = self.scanner.get_symbol()
+                # If open brace '{'
+                if not (self.symbol.type == self.scanner.BRACE_OPEN):
+                    # Case 4: ...
+                    # and Case 6: D ...
+                    self.display_error(self.symbol, missing_error_type)
+                    self.display_error(
+                        self.symbol, self.NO_BRACE_OPEN, proceed=False)
+                    self.symbol = self.scanner.get_symbol()
+                else:
+                    # Case 2: D { ...
+                    self.display_error(
+                        self.symbol, missing_error_type)
+                    self.symbol = self.scanner.get_symbol()
+        # If keyword is present
+        else:
+            self.symbol = self.scanner.get_symbol()
+            # If open brace '{'
+            if not (self.symbol.type == self.scanner.BRACE_OPEN):
+                # Case 5. KEYWORD ...
+                self.display_error(self.symbol, self.NO_BRACE_OPEN)
+            else:
+                # Case 1. KEYWORD{ ...
+                self.symbol = self.scanner.get_symbol()
+
     def device_list(self):
         """Parse device list."""
         DEVICES_ID = self.names.lookup(["DEVICES"])[0]
-        # If DEVICES keyword is wrong, assume just missing and proceed to check if { is present
-        if not (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == DEVICES_ID):
-            self.display_error(self.symbol, self.NO_DEVICES_KEYWORD)
-            self.symbol = self.scanner.get_symbol()
-            # Check if there's also a missing { after missing DEVICES. If so just pass to next symbol
-            if not (self.symbol.type == self.scanner.BRACE_OPEN):
-                self.display_error(self.symbol, self.NO_BRACE_OPEN)
-            # If only missing DEVICES keyword, advance symbol to NAME
-            else:
-                self.symbol = self.scanner.get_symbol()
-        # If DEVICES keyword is present
-        else:
-            self.symbol = self.scanner.get_symbol()
-            # Check the next symbol is a "{". If not, assume missing and proceed to next symbol
-            if not (self.symbol.type == self.scanner.BRACE_OPEN):
-                self.display_error(self.symbol, self.NO_BRACE_OPEN)
-            # If not missing either, advance symbol to NAME
-            else:
-                self.symbol = self.scanner.get_symbol()
+        # Common initial error handling
+        self.initial_error_checks(DEVICES_ID, self.NO_DEVICES_KEYWORD)
         # Parse device
         self.device()
         # Check if semicolon is missing but next symbol is a NAME type
@@ -276,7 +310,8 @@ class Parser:
                 symbol_ID, device_input = self.check_device_is_valid()
 
             else:
-                self.display_error(self.symbol, self.NO_EQUALS, proceed=False)
+                self.display_error(
+                    self.symbol, self.NO_EQUALS, proceed=False)
         else:
             self.display_error(self.symbol, self.INVALID_NAME, proceed=False)
 
@@ -403,25 +438,8 @@ class Parser:
     def connection_list(self):
         """Parse connection list."""
         CONNECTIONS_ID = self.names.lookup(["CONNECTIONS"])[0]
-        # If CONNECTIONS keyword is missing, proceed to next symbol
-        if not ((self.symbol.type == self.scanner.KEYWORD) and (self.symbol.id == CONNECTIONS_ID)):
-            self.display_error(self.symbol, self.NO_CONNECTIONS_KEYWORD)
-            self.symbol = self.scanner.get_symbol()
-            # If { is also missing, proceed to next symbol
-            if not self.symbol.type == self.scanner.BRACE_OPEN:
-                self.display_error(self.symbol, self.NO_BRACE_OPEN)
-            # If '{' is present
-            else:
-                self.symbol = self.scanner.get_symbol()
-        # If CONNECTIONS keyword is present
-        else:
-            self.symbol = self.scanner.get_symbol()
-            # If { is missing, proceed to next symbol
-            if not self.symbol.type == self.scanner.BRACE_OPEN:
-                self.display_error(self.symbol, self.NO_BRACE_OPEN)
-            # Both CONNECTIONS keyword and { are present
-            else:
-                self.symbol = self.scanner.get_symbol()
+        # Common initial error handling
+        self.initial_error_checks(CONNECTIONS_ID, self.NO_CONNECTIONS_KEYWORD)
         # Parse a connection
         self.connection()
         # Check if semicolon is missing but next symbol is a NAME type
@@ -501,7 +519,7 @@ class Parser:
                     self.display_error(self.symbol, self.NO_Q_OR_QBAR,
                                        proceed=False)
         else:
-            self.display_error(self.symbol, self.UNDEFINED_NAME, proceed=False)
+            self.display_error(self.symbol, self.INVALID_NAME, proceed=False)
 
     def input(self):
         """Parse a single device input."""
@@ -530,26 +548,9 @@ class Parser:
     def monitor_list(self):
         """Parse monitor list."""
         MONITORS_ID = self.names.lookup(["MONITORS"])[0]
-        # Check first symbol is "MONITORS". If not, assume missing and proceed to the next {
-        if not ((self.symbol.type == self.scanner.KEYWORD) and (self.symbol.id == MONITORS_ID)):
-            self.display_error(self.symbol, self.NO_MONITORS_KEYWORD)
-            self.symbol = self.scanner.get_symbol()
-            # If '{' is also missing, throw error and proceed to next symbol
-            if not (self.symbol.type == self.scanner.BRACE_OPEN):
-                self.display_error(self.symbol, self.NO_BRACE_OPEN)
-            # If '{' is present, proceed to next symbol
-            else:
-                self.symbol = self.scanner.get_symbol()
-        # If MONITORS keyword is present
-        else:
-            self.symbol = self.scanner.get_symbol()
-            # If '{' is missing, throw error and proceed to next symbol
-            if not (self.symbol.type == self.scanner.BRACE_OPEN):
-                self.display_error(self.symbol, self.NO_BRACE_OPEN)
-            # If neither MONITORS keyword nor { is missing, proceed to next symbol
-            else:
-                self.symbol = self.scanner.get_symbol()
-        # Check a monitor is a valid output name
+        # Common initial error handling
+        self.initial_error_checks(MONITORS_ID, self.NO_MONITORS_KEYWORD)
+        # Parse a monitor
         self.output()
         # Check if semicolon is missing but next symbol is a NAME type
         if self.symbol.type != self.scanner.SEMICOLON:
@@ -639,7 +640,6 @@ class Parser:
             elif self.error_count == 1:
                 print("1 error detected")
                 return False
-
             else:
                 # Display total number of errors
                 print(
