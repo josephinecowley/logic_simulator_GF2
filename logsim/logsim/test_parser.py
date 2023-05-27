@@ -130,6 +130,18 @@ def test_parser_display_error_error_count_increment(parser_fixture, correct_erro
 
     assert parser.error_count == 1
 
+@pytest.mark.parametrize(", error_type, proceed, stopping_symbol_types", [
+    ("=", 4, True, [2, 3, 6, 8]),
+])
+def test_parser_display_error_show_error_messages(parser_fixture, correct_error_arguments, capfd):
+    parser = parser_fixture
+    symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
+
+
+
+    captured = capfd.outererr()
+
+
 '''@pytest.mark.parametrize("error_type, expected_error_message", [
     (4, "Syntax Error: Expected the keyword DEVICES"),
 ])
@@ -154,9 +166,10 @@ def test_error_recovery_instance_handling(parser_fixture, correct_error_argument
 
     with pytest.raises(TypeError):
         parser.error_recovery("not an integer") # Expected error_type to be an integer type argument
-
-    # KO! Return to this once JC has fixed not relying on 19
-
+    with pytest.raises(ValueError):
+        parser.error_recovery(len(parser.syntax_errors)) # Expected an error code within range of error types
+    with pytest.raises(ValueError):
+        parser.error_recovery(len(parser.syntax_errors) + 10) # Expected an error code within range of error types
     with pytest.raises(ValueError):
         parser.error_recovery(-4) # Cannot have a negative error code
     with pytest.raises(TypeError):
@@ -173,9 +186,9 @@ def test_error_recovery_instance_handling(parser_fixture, correct_error_argument
         parser.error_recovery(error_type, proceed, list(range(-8))) # Expected stopping symbol to be within range of given symbols
 
 
-def test_error_recovery_check_built_in_error_handling(parser_fixture, correct_error_arguments):
+def test_error_recovery_check_built_in_error_handling(parser_fixture, correct_error_arguments, capfd):
     parser = parser_fixture
     symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
 
     proceed = True
-    assert parser.error_recovery(error_type, proceed, stopping_symbol_types) == None # KO! May need to check this again once parse.py is complete
+    assert parser.error_recovery(error_type, proceed, stopping_symbol_types) is None # KO! May need to check this again once parse.py is complete
