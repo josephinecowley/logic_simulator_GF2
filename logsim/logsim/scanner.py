@@ -10,6 +10,7 @@ Symbol - encapsulates a symbol and stores its properties.
 """
 import sys
 
+
 class Symbol:
 
     """Encapsulate a symbol and store its properties.
@@ -29,6 +30,7 @@ class Symbol:
         self.id = None
         self.line_number = None
         self.start_position = None
+
 
 class Scanner:
 
@@ -57,15 +59,15 @@ class Scanner:
         self.path = path
 
         # keep track of current location in file
-        self.line_number = 1 # one-based indexing for error reporting
+        self.line_number = 1  # one-based indexing for error reporting
         self.position = 0
-        
+
         # assign the instance of the names class to self.names
         self.names = names
 
         # initialises a list of symbol types
-        self.symbol_type_list = [self.BRACKET_OPEN, self.BRACKET_CLOSE, self.BRACE_OPEN, self.BRACE_CLOSE, self.COMMA, self.FULLSTOP, 
-            self.SEMICOLON, self.EQUALS, self.KEYWORD, self.NUMBER, self.NAME, self.EOF] = range(12)
+        self.symbol_type_list = [self.BRACKET_OPEN, self.BRACKET_CLOSE, self.BRACE_OPEN, self.BRACE_CLOSE, self.COMMA, self.FULLSTOP,
+                                 self.SEMICOLON, self.EQUALS, self.KEYWORD, self.NUMBER, self.NAME, self.EOF] = range(12)
         self.keywords_list = ["DEVICES", "CONNECTIONS", "MONITORS", "END"]
 
         # populates name table with keywords and assigns keywork IDs
@@ -73,29 +75,31 @@ class Scanner:
             self.END_ID] = self.names.lookup(self.keywords_list)
 
         # hold the last character read from the definition file
-        self.current_character = " " # initialised with a space so that advance() is called on the first call to get_symbol
+        # initialised with a space so that advance() is called on the first call to get_symbol
+        self.current_character = " "
 
     def get_symbol(self):
         """Translate the next sequence of characters into a symbol."""
         symbol = Symbol()
-        self.skip_spaces()  # current character now not whitespace 
+        self.skip_spaces()  # current character now not whitespace
 
         if self.current_character.isalpha():  # name
-            self.load_scanner_data(symbol) #load the scanner location attributes to symbol
+            # load the scanner location attributes to symbol
+            self.load_scanner_data(symbol)
             name_string = self.get_name()
             if name_string in self.keywords_list:
                 symbol.type = self.KEYWORD
-                 
+
             else:
                 symbol.type = self.NAME
-            symbol.id = self.names.lookup([name_string])[0] # lookup a symbol id
+            symbol.id = self.names.lookup([name_string])[
+                0]  # lookup a symbol id
 
         elif self.current_character.isdigit():  # number
             self.load_scanner_data(symbol)
             number = self.get_number()
             symbol.type = self.NUMBER
             symbol.id = self.names.lookup([number])[0]
-            
 
         elif self.current_character == "=":  # punctuation...
             self.load_scanner_data(symbol)
@@ -111,9 +115,9 @@ class Scanner:
             self.load_scanner_data(symbol)
             symbol.type = self.FULLSTOP
             self.advance()
-        
+
         elif self.current_character == ";":
-            self.load_scanner_data(symbol)            
+            self.load_scanner_data(symbol)
             symbol.type = self.SEMICOLON
             self.advance()
 
@@ -126,7 +130,7 @@ class Scanner:
             self.load_scanner_data(symbol)
             symbol.type = self.BRACE_CLOSE
             self.advance()
-        
+
         elif self.current_character == "(":
             self.load_scanner_data(symbol)
             symbol.type = self.BRACKET_OPEN
@@ -136,8 +140,8 @@ class Scanner:
             self.load_scanner_data(symbol)
             symbol.type = self.BRACKET_CLOSE
             self.advance()
-        
-        elif self.current_character in ['#', '"']: # comment openers
+
+        elif self.current_character in ['#', '"']:  # comment openers
             self.skip_comment()
             self.get_symbol()
 
@@ -157,7 +161,8 @@ class Scanner:
             file = open(path, "r")
         except:
             # raise a value error
-            raise ValueError("Error: can\'t find specified file - check file name is correct")
+            raise ValueError(
+                "Error: can\'t find specified file - check file name is correct")
         else:
             return file
 
@@ -172,7 +177,6 @@ class Scanner:
         """
         self.current_character = self.file.read(1)
         self.position += 1
-        
 
     def skip_spaces(self):
         """Calls advance() method until current character is not space. 
@@ -183,18 +187,19 @@ class Scanner:
                 self.line_number += 1
                 self.position = 0
             self.advance()
-    
+
     def skip_comment(self):
         """Assumes current character is a # or " and advances until comments are closed. 
         Then skip spaces such than current_character is non_whitespace"""
         if self.current_character == "#":
-            self.advance() # get first character in comment
-            while not self.current_character == "\n": # closed by new line
-                self.advance() 
-            self.skip_spaces() # current_character now non-whitespace, line_number and position updated
+            self.advance()  # get first character in comment
+            while not self.current_character == "\n":  # closed by new line
+                self.advance()
+            self.skip_spaces()  # current_character now non-whitespace, line_number and position updated
         else:
-            self.advance() # get first character in comment
-            while not self.current_character == '"': # closed by " (have to break PEP8 for this)
+            self.advance()  # get first character in comment
+            # closed by " (have to break PEP8 for this)
+            while not self.current_character == '"':
                 if self.current_character == "\n":
                     self.line_number += 1
                     self.position = 0
@@ -204,21 +209,21 @@ class Scanner:
 
     def get_name(self):
         """Assumes that current character is alphabetical and returns an alphanumeric name."""
-        name = f"{self.current_character}" # put first character in string 
-        self.advance() # get next character
-        while self.current_character.isalnum(): # updating alnum chars to string
+        name = f"{self.current_character}"  # put first character in string
+        self.advance()  # get next character
+        while self.current_character.isalnum():  # updating alnum chars to string
             name += self.current_character
             self.advance()
         return name
 
     def get_number(self):
         """Assumes that current character is a number and returns a string of integer number."""
-        num = f"{self.current_character}" # put first digit in string
-        self.advance() # get next character
-        while self.current_character.isdigit(): # updating digits to string
+        num = f"{self.current_character}"  # put first digit in string
+        self.advance()  # get next character
+        while self.current_character.isdigit():  # updating digits to string
             num += self.current_character
             self.advance()
-        return num #returns the number as a string 
+        return num  # returns the number as a string
 
     def display_line_and_marker(self, symbol):
         """Uses a temp_file instance to avoid interference with scanner's pointer. 
@@ -240,7 +245,7 @@ class Scanner:
             if not char.isspace():
                 start_of_text_index = i
                 break
-            
+
         if symbol.type in [self.KEYWORD, self.NAME, self.NUMBER]:
             name = self.names.get_name_string(symbol.id)
             name_length = len(name)
@@ -253,34 +258,31 @@ class Scanner:
                 caret_list[caret_position] = "^"
                 filled_marker_string = "".join(caret_list)
 
-
             else:
                 start_position = symbol.start_position
                 empty_tilde_string = " " * line_length
                 tilde_list = list(empty_tilde_string)
-                tilde_list[start_position - 1: start_position + name_length] = list("~" * name_length)
+                tilde_list[start_position - 1: start_position +
+                           name_length] = list("~" * name_length)
                 filled_marker_string = "".join(tilde_list)
-            
-        else:
-                caret_position = symbol.start_position - 1
-                empty_caret_string = " " * line_length
-                caret_list = list(empty_caret_string)
-                caret_list.pop()
-                caret_list[caret_position] = "^"
-                filled_marker_string = "".join(caret_list)
 
+        else:
+            caret_position = symbol.start_position - 1
+            empty_caret_string = " " * line_length
+            caret_list = list(empty_caret_string)
+            caret_list.pop()
+            caret_list[caret_position] = "^"
+            filled_marker_string = "".join(caret_list)
 
         # standardise line indent
         line_text = " "*8 + line_text.lstrip()
-        filled_marker_string = " "*8 + filled_marker_string[start_of_text_index:]
+        filled_marker_string = " "*8 + \
+            filled_marker_string[start_of_text_index:]
 
-        if symbol.type == self.EOF: # handle case of error in END keyword
+        if symbol.type == self.EOF:  # handle case of error in END keyword
             print(line_text)
             print(filled_marker_string, end="\n\n")
 
         else:
             print(line_text, end="")
             print(filled_marker_string, end="\n\n")
-        
-            
-
