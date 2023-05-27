@@ -130,16 +130,41 @@ def test_parser_display_error_error_count_increment(parser_fixture, correct_erro
 
     assert parser.error_count == 1
 
-@pytest.mark.parametrize(", error_type, proceed, stopping_symbol_types", [
-    ("=", 4, True, [2, 3, 6, 8]),
+@pytest.mark.parametrize("error_type, expected_message", [
+    ("parser.NO_DEVICES_KEYWORD", "  Line 2: Syntax Error: Expected the keyword DEVICES"),
+    ("parser.NO_CONNECTIONS_KEYWORD", "  Line 2: Syntax Error: Expected the keyword CONNECTIONS"),
+    ("parser.NO_MONITORS_KEYWORD", "  Line 2: Syntax Error: Expected the keyword MONITORS"),
+    ("parser.NO_END_KEYWORD", "  Line 2: Syntax Error: Expected the keyword END straight after monitors list"),
+    ("parser.NO_BRACE_OPEN", "  Line 2: Syntax Error: Expected a '{' symbol"),
+    ("parser.NO_BRACE_CLOSE", "  Line 2: Syntax Error: Expected a '}' symbol"),
+    ("parser.INVALID_NAME", "  Line 2: Syntax Error: Invalid user name entered"),
+    ("parser.NO_EQUALS", "  Line 2: Syntax Error: Expected an '=' symbol"),
+    ("parser.INVALID_COMPONENT", "  Line 2: Syntax Error: Invalid component name entered"),
+    ("parser.NO_BRACKET_OPEN", "  Line 2: Syntax Error: Expected a '(' for an input"),
+    ("parser.NO_BRACKET_CLOSE", "  Line 2: Syntax Error: Expected a ')' for an input"),
+    ("parser.NO_NUMBER", "  Line 2: Syntax Error: Expected a positive integer"),
+    ("parser.CLK_OUT_OF_RANGE", "  Line 2: Semantic Error: Input clock half period is out of range. Must be a positive integer"),
+    ("parser.SWITCH_OUT_OF_RANGE", "  Line 2: Semantic Error: Input switch number is out of range. Must be either 1 or 0"),
+    ("parser.UNDEFINED_NAME", "  Line 2: Syntax Error: Undefined device name given"),
+    ("parser.NO_FULLSTOP", "  Line 2: Syntax Error: Expected a full stop"),
+    ("parser.NO_SEMICOLON", "  Line 2: Syntax Error: Expected a semicolon"),
+    ("parser.NO_Q_OR_QBAR", "  Line 2: Syntax Error: Expected a Q or QBAR after the full stop"),
+    ("parser.NO_INPUT_SUFFIX", "  Line 2: Syntax Error: Expected a valid input suffix"),
+    ("parser.SYMBOL_AFTER_END", "  Line 2: Syntax Error: There should not be any text after the keyword END"),
+    ("parser.EMPTY_FILE", "  Line 2: Syntax Error: Cannot parse an empty file"),
+    ("parser.TERMINATE", "  Line 2: Syntax Error: Could not find parsing point to restart, program terminated early"),
 ])
-def test_parser_display_error_show_error_messages(parser_fixture, correct_error_arguments, capfd):
+def test_parser_display_error_show_error_messages(parser_fixture, correct_error_arguments, capfd, error_type, expected_message):
     parser = parser_fixture
-    symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
+    symbol, fake_error_type, proceed, stopping_symbol_types = correct_error_arguments
+    error_type = eval(error_type)
 
+    parser.display_error(symbol, error_type, proceed, stopping_symbol_types)
 
+    captured = capfd.readouterr()
+    output_lines = captured.out.splitlines()
 
-    captured = capfd.outererr()
+    assert output_lines[1] == expected_message
 
 
 '''@pytest.mark.parametrize("error_type, expected_error_message", [
