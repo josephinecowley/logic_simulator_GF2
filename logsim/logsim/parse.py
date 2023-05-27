@@ -459,6 +459,7 @@ class Parser:
             else:
                 # Case 1. CONNECTIONS{ ...
                 self.symbol = self.scanner.get_symbol()
+        # Parse a connection
         self.connection()
         # Check if semicolon is missing but next symbol is a NAME type
         if self.symbol.type != self.scanner.SEMICOLON:
@@ -566,26 +567,41 @@ class Parser:
     def monitor_list(self):
         """Parse monitor list."""
         MONITORS_ID = self.names.lookup(["MONITORS"])[0]
-        # Check first symbol is "MONITORS". If not, assume missing and proceed to the next {
-        if not ((self.symbol.type == self.scanner.KEYWORD) and (self.symbol.id == MONITORS_ID)):
-            self.display_error(self.symbol, self.NO_MONITORS_KEYWORD)
-            self.symbol = self.scanner.get_symbol()
-            # If '{' is also missing, throw error and proceed to next symbol
-            if not (self.symbol.type == self.scanner.BRACE_OPEN):
-                self.display_error(self.symbol, self.NO_BRACE_OPEN)
-            # If '{' is present, proceed to next symbol
+        # If MONITORS keyword is wrong
+        if not (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == MONITORS_ID):
+            # If first symbol is a NAME type
+            if not (self.symbol.type == self.scanner.NAME):
+                # If open brace '{'
+                if self.symbol.type == self.scanner.BRACE_OPEN:
+                    # Case 3: { ...
+                    self.display_error(self.symbol, self.NO_MONITORS_KEYWORD)
+                    self.symbol = self.scanner.get_symbol()
             else:
                 self.symbol = self.scanner.get_symbol()
+                # If open brace '{'
+                if not (self.symbol.type == self.scanner.BRACE_OPEN):
+                    # Case 4: ...
+                    # and Case 6: D ...
+                    self.display_error(self.symbol, self.NO_MONITORS_KEYWORD)
+                    self.display_error(
+                        self.symbol, self.NO_BRACE_OPEN, proceed=False)
+                    self.symbol = self.scanner.get_symbol()
+                else:
+                    # Case 2: D { ...
+                    self.display_error(
+                        self.symbol, self.NO_MONITORS_KEYWORD)
+                    self.symbol = self.scanner.get_symbol()
         # If MONITORS keyword is present
         else:
             self.symbol = self.scanner.get_symbol()
-            # If '{' is missing, throw error and proceed to next symbol
+            # If open brace '{'
             if not (self.symbol.type == self.scanner.BRACE_OPEN):
+                # Case 5. MONITORS ...
                 self.display_error(self.symbol, self.NO_BRACE_OPEN)
-            # If neither MONITORS keyword nor { is missing, proceed to next symbol
             else:
+                # Case 1. MONITORS{ ...
                 self.symbol = self.scanner.get_symbol()
-        # Check a monitor is a valid output name
+        # Parse a monitor
         self.output()
         # Check if semicolon is missing but next symbol is a NAME type
         if self.symbol.type != self.scanner.SEMICOLON:
@@ -660,10 +676,10 @@ class Parser:
             # self.device_list()
 
             # Parse connection list
-            self.connection_list()
+            # self.connection_list()
 
             # Parse monitor list
-            # self.monitor_list()
+            self.monitor_list()
 
             # Check for END keyword
             # self.end()
