@@ -423,26 +423,42 @@ class Parser:
     def connection_list(self):
         """Parse connection list."""
         CONNECTIONS_ID = self.names.lookup(["CONNECTIONS"])[0]
-        # If CONNECTIONS keyword is missing, proceed to next symbol
-        if not ((self.symbol.type == self.scanner.KEYWORD) and (self.symbol.id == CONNECTIONS_ID)):
-            self.display_error(self.symbol, self.NO_CONNECTIONS_KEYWORD)
-            self.symbol = self.scanner.get_symbol()
-            # If { is also missing, proceed to next symbol
-            if not self.symbol.type == self.scanner.BRACE_OPEN:
-                self.display_error(self.symbol, self.NO_BRACE_OPEN)
-            # If '{' is present
+        # If CONNECTIONS keyword is wrong
+        if not (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == CONNECTIONS_ID):
+            # If first symbol is a NAME type
+            if not (self.symbol.type == self.scanner.NAME):
+                # If open brace '{'
+                if self.symbol.type == self.scanner.BRACE_OPEN:
+                    # Case 3: { ...
+                    self.display_error(
+                        self.symbol, self.NO_CONNECTIONS_KEYWORD)
+                    self.symbol = self.scanner.get_symbol()
             else:
                 self.symbol = self.scanner.get_symbol()
+                # If open brace '{'
+                if not (self.symbol.type == self.scanner.BRACE_OPEN):
+                    # Case 4: ...
+                    # and Case 6: D ...
+                    self.display_error(
+                        self.symbol, self.NO_CONNECTIONS_KEYWORD)
+                    self.display_error(
+                        self.symbol, self.NO_BRACE_OPEN, proceed=False)
+                    self.symbol = self.scanner.get_symbol()
+                else:
+                    # Case 2: D { ...
+                    self.display_error(
+                        self.symbol, self.NO_CONNECTIONS_KEYWORD)
+                    self.symbol = self.scanner.get_symbol()
         # If CONNECTIONS keyword is present
         else:
             self.symbol = self.scanner.get_symbol()
-            # If { is missing, proceed to next symbol
-            if not self.symbol.type == self.scanner.BRACE_OPEN:
+            # If open brace '{'
+            if not (self.symbol.type == self.scanner.BRACE_OPEN):
+                # Case 5. CONNECTIONS ...
                 self.display_error(self.symbol, self.NO_BRACE_OPEN)
-            # Both CONNECTIONS keyword and { are present
             else:
+                # Case 1. CONNECTIONS{ ...
                 self.symbol = self.scanner.get_symbol()
-        # Parse a connection
         self.connection()
         # Check if semicolon is missing but next symbol is a NAME type
         if self.symbol.type != self.scanner.SEMICOLON:
@@ -641,10 +657,10 @@ class Parser:
             self.display_error(self.symbol, self.EMPTY_FILE)
         else:
             # Parse device list
-            self.device_list()
+            # self.device_list()
 
             # Parse connection list
-            # self.connection_list()
+            self.connection_list()
 
             # Parse monitor list
             # self.monitor_list()
