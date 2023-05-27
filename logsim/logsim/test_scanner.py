@@ -30,7 +30,7 @@ def set_scanner_location(scanner_fixture):
 
         while not current_line_number == target_line_number: # reads file until target line reached
             scanner.current_character = scanner.file.read(1)
-            #breakpoint()
+
             if scanner.current_character == "\n":
                 current_line_number += 1
 
@@ -117,7 +117,6 @@ def test_scanner_advance(scanner_fixture, set_scanner_location, location, expect
 def test_scanner_skip_spaces(scanner_fixture, set_scanner_location, location, expected_character, expected_line, expected_position):
     scanner = scanner_fixture
     set_scanner_location(location)
-    #breakpoint()
     scanner.skip_spaces()
     print(scanner.current_character, scanner.line_number, scanner.position)
     assert scanner.current_character == expected_character
@@ -208,6 +207,19 @@ def test_get_symbol_punctuation(scanner_fixture, set_scanner_location, location,
     assert symbol.type == expected_type
     assert symbol.line_number == expected_line_number
     assert symbol.start_position == expected_start_position
+
+@pytest.mark.parametrize("location, expected_character, expected_line_number, expected_position", [
+    ((2, 21), "d", 3, 5),
+    ((9, 1), "C", 10, 1),
+])
+
+def test_skip_comment(scanner_fixture, set_scanner_location, location, expected_character, expected_line_number, expected_position):
+    scanner = scanner_fixture 
+    set_scanner_location(location)
+    scanner.skip_comment()
+    assert scanner.position== expected_position
+    assert scanner.line_number == expected_line_number
+    assert scanner.current_character == expected_character
 
 def test_EOF(scanner_fixture, set_scanner_location):
     location = (28, 1)
