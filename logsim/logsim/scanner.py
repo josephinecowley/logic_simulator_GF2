@@ -243,18 +243,17 @@ class Scanner:
                 caret_list.pop()
                 caret_list[caret_position] = "^"
 
-                print(line_text)
-                print("".join(caret_list))
+                print(line_text, end="")
+                print("".join(caret_list), end="\n\n")
 
             else:
                 start_position = symbol.start_position
                 tilde_string = " " * line_length
                 tilde_list = list(tilde_string)
                 tilde_list[start_position - 1: start_position + name_length] = list("~" * name_length)
-                #tilde_list.append(" ")
 
-                print(line_text)
-                print("".join(tilde_list))
+                print(line_text, end="")
+                print("".join(tilde_list), end="\n\n")
         else:
                 caret_position = symbol.start_position - 1
                 caret_string = " " * line_length
@@ -262,7 +261,7 @@ class Scanner:
                 caret_list.pop()
                 caret_list[caret_position] = "^"
 
-                print(line_text)
-                print("".join(caret_list))      
+                print(line_text, end="")
+                print("".join(caret_list), end="\n\n")    
                   
 
