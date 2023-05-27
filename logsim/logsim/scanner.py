@@ -139,6 +139,7 @@ class Scanner:
         
         elif self.current_character in ['#', '"']: # comment openers
             self.skip_comment()
+            self.get_symbol()
 
         elif self.current_character == "":  # end of file
             self.load_scanner_data(symbol)
@@ -184,7 +185,8 @@ class Scanner:
             self.advance()
     
     def skip_comment(self):
-        """Assumes current character is a # or " and advances until comments are closed """
+        """Assumes current character is a # or " and advances until comments are closed. 
+        Then skip spaces such than current_character is non_whitespace"""
         if self.current_character == "#":
             self.advance() # get first character in comment
             while not self.current_character == "\n": # closed by new line
@@ -198,6 +200,8 @@ class Scanner:
                     self.position = 0
                 self.advance()
             self.advance()
+            self.skip_spaces()
+
     def get_name(self):
         """Assumes that current character is alphabetical and returns an alphanumeric name."""
         name = f"{self.current_character}" # put first character in string 
