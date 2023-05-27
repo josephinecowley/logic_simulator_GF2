@@ -43,8 +43,7 @@ def set_scanner_location(scanner_fixture):
     def _set_scanner_location(target_location):
         target_line_number, target_position = target_location
         scanner = scanner_fixture # call scanner instance
-
-        breakpoint()
+        
 
         # Reset the file pointer to the beginning of the file
         scanner.file.seek(0, 0)
@@ -117,3 +116,4 @@ def test_parser_display_error(parser_fixture, correct_parser_display_error_argum
         parser.display_error(symbol, error_type, proceed, ())
     with  pytest.raises(ValueError):
         parser.display_error(symbol, error_type, proceed, range(12))
+    
