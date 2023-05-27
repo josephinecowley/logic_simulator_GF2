@@ -205,17 +205,27 @@ class Parser:
                 self.display_error(self.symbol, self.TERMINATE)
                 return
 
-    def device_list(self):
-        """Parse device list."""
-        DEVICES_ID = self.names.lookup(["DEVICES"])[0]
-        # If DEVICES keyword is wrong
-        if not (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == DEVICES_ID):
+    def initial_error_checks(self, KEYWORD_ID, missing_error_type):
+        """Check initial symbols for common errors. This function tests for 6 cases:
+
+        ... represents the first line of the list. For cases 4 and 6, because it is difficult 
+        to distinguish between them, we merely skip to the next stopping symbol.
+
+        1. Correct - when both keyword and open brace are present: KEYWORD { ...
+        2. First keyword is spelt wrong, but open brace follows: KYWORD { ...
+        3. Missing first keyword, but open brace follows: { ...
+        4. Missing both the first keyword and open brace: ... 
+        5. First keyword is correct, but missing open brace: { ...
+        6. First keyword is spelt wrong, and missing an open brace { ...
+        """
+        # If keyword is wrong
+        if not (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == KEYWORD_ID):
             # If first symbol is a NAME type
             if not (self.symbol.type == self.scanner.NAME):
                 # If open brace '{'
                 if self.symbol.type == self.scanner.BRACE_OPEN:
                     # Case 3: { ...
-                    self.display_error(self.symbol, self.NO_DEVICES_KEYWORD)
+                    self.display_error(self.symbol, missing_error_type)
                     self.symbol = self.scanner.get_symbol()
             else:
                 self.symbol = self.scanner.get_symbol()
@@ -223,25 +233,31 @@ class Parser:
                 if not (self.symbol.type == self.scanner.BRACE_OPEN):
                     # Case 4: ...
                     # and Case 6: D ...
-                    self.display_error(self.symbol, self.NO_DEVICES_KEYWORD)
+                    self.display_error(self.symbol, missing_error_type)
                     self.display_error(
                         self.symbol, self.NO_BRACE_OPEN, proceed=False)
                     self.symbol = self.scanner.get_symbol()
                 else:
                     # Case 2: D { ...
                     self.display_error(
-                        self.symbol, self.NO_DEVICES_KEYWORD)
+                        self.symbol, missing_error_type)
                     self.symbol = self.scanner.get_symbol()
-        # If DEVICES keyword is present
+        # If keyword is present
         else:
             self.symbol = self.scanner.get_symbol()
             # If open brace '{'
             if not (self.symbol.type == self.scanner.BRACE_OPEN):
-                # Case 5. DEVICES ...
+                # Case 5. KEYWORD ...
                 self.display_error(self.symbol, self.NO_BRACE_OPEN)
             else:
-                # Case 1. DEVICES{ ...
+                # Case 1. KEYWORD{ ...
                 self.symbol = self.scanner.get_symbol()
+
+    def device_list(self):
+        """Parse device list."""
+        DEVICES_ID = self.names.lookup(["DEVICES"])[0]
+        # Common initial error handling
+        self.initial_error_checks(DEVICES_ID, self.NO_DEVICES_KEYWORD)
         # Parse device
         self.device()
         # Check if semicolon is missing but next symbol is a NAME type
@@ -423,42 +439,8 @@ class Parser:
     def connection_list(self):
         """Parse connection list."""
         CONNECTIONS_ID = self.names.lookup(["CONNECTIONS"])[0]
-        # If CONNECTIONS keyword is wrong
-        if not (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == CONNECTIONS_ID):
-            # If first symbol is a NAME type
-            if not (self.symbol.type == self.scanner.NAME):
-                # If open brace '{'
-                if self.symbol.type == self.scanner.BRACE_OPEN:
-                    # Case 3: { ...
-                    self.display_error(
-                        self.symbol, self.NO_CONNECTIONS_KEYWORD)
-                    self.symbol = self.scanner.get_symbol()
-            else:
-                self.symbol = self.scanner.get_symbol()
-                # If open brace '{'
-                if not (self.symbol.type == self.scanner.BRACE_OPEN):
-                    # Case 4: ...
-                    # and Case 6: D ...
-                    self.display_error(
-                        self.symbol, self.NO_CONNECTIONS_KEYWORD)
-                    self.display_error(
-                        self.symbol, self.NO_BRACE_OPEN, proceed=False)
-                    self.symbol = self.scanner.get_symbol()
-                else:
-                    # Case 2: D { ...
-                    self.display_error(
-                        self.symbol, self.NO_CONNECTIONS_KEYWORD)
-                    self.symbol = self.scanner.get_symbol()
-        # If CONNECTIONS keyword is present
-        else:
-            self.symbol = self.scanner.get_symbol()
-            # If open brace '{'
-            if not (self.symbol.type == self.scanner.BRACE_OPEN):
-                # Case 5. CONNECTIONS ...
-                self.display_error(self.symbol, self.NO_BRACE_OPEN)
-            else:
-                # Case 1. CONNECTIONS{ ...
-                self.symbol = self.scanner.get_symbol()
+        # Common initial error handling
+        self.initial_error_checks(CONNECTIONS_ID, self.NO_CONNECTIONS_KEYWORD)
         # Parse a connection
         self.connection()
         # Check if semicolon is missing but next symbol is a NAME type
@@ -567,40 +549,8 @@ class Parser:
     def monitor_list(self):
         """Parse monitor list."""
         MONITORS_ID = self.names.lookup(["MONITORS"])[0]
-        # If MONITORS keyword is wrong
-        if not (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == MONITORS_ID):
-            # If first symbol is a NAME type
-            if not (self.symbol.type == self.scanner.NAME):
-                # If open brace '{'
-                if self.symbol.type == self.scanner.BRACE_OPEN:
-                    # Case 3: { ...
-                    self.display_error(self.symbol, self.NO_MONITORS_KEYWORD)
-                    self.symbol = self.scanner.get_symbol()
-            else:
-                self.symbol = self.scanner.get_symbol()
-                # If open brace '{'
-                if not (self.symbol.type == self.scanner.BRACE_OPEN):
-                    # Case 4: ...
-                    # and Case 6: D ...
-                    self.display_error(self.symbol, self.NO_MONITORS_KEYWORD)
-                    self.display_error(
-                        self.symbol, self.NO_BRACE_OPEN, proceed=False)
-                    self.symbol = self.scanner.get_symbol()
-                else:
-                    # Case 2: D { ...
-                    self.display_error(
-                        self.symbol, self.NO_MONITORS_KEYWORD)
-                    self.symbol = self.scanner.get_symbol()
-        # If MONITORS keyword is present
-        else:
-            self.symbol = self.scanner.get_symbol()
-            # If open brace '{'
-            if not (self.symbol.type == self.scanner.BRACE_OPEN):
-                # Case 5. MONITORS ...
-                self.display_error(self.symbol, self.NO_BRACE_OPEN)
-            else:
-                # Case 1. MONITORS{ ...
-                self.symbol = self.scanner.get_symbol()
+        # Common initial error handling
+        self.initial_error_checks(MONITORS_ID, self.NO_MONITORS_KEYWORD)
         # Parse a monitor
         self.output()
         # Check if semicolon is missing but next symbol is a NAME type
@@ -673,16 +623,16 @@ class Parser:
             self.display_error(self.symbol, self.EMPTY_FILE)
         else:
             # Parse device list
-            # self.device_list()
+            self.device_list()
 
             # Parse connection list
-            # self.connection_list()
+            self.connection_list()
 
             # Parse monitor list
             self.monitor_list()
 
             # Check for END keyword
-            # self.end()
+            self.end()
 
             # Check if there are errors, and return True if error count is zero, otherwise return falsex
             if self.error_count == 0:
