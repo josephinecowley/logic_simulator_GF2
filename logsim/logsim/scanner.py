@@ -26,10 +26,10 @@ class Symbol:
 
     def __init__(self):
         """Initialise symbol properties."""
-        self.type = None
-        self.id = None
-        self.line_number = None
-        self.start_position = None
+        self.type = None # integer or None that corresponds to a symbol type in scanner.symbol_type_list
+        self.id = None # id given by the lookup function to names, keywords, and numbers
+        self.line_number = None # line number where this symbol is read
+        self.start_position = None # one-based index of the (first) character of the symbol from the beginning of the line
 
 
 class Scanner:
