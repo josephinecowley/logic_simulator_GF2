@@ -29,5 +29,10 @@ def parser_fixture(names_fixture, scanner_fixture):
     return Parser(names_fixture, scanner_fixture)
 
 
-def test_correct_initialisation(parser_fixture):
-    assert parser_fixture.error_count == 0
+def test_parser_initialisation(parser_fixture, names_fixture, scanner_fixture):
+    parser = parser_fixture
+    assert parser.names is names_fixture
+    assert parser.scanner is scanner_fixture
+    assert parser.error_count == 0
+
+    # KO! Need to add check for list of syntax error once JC has changed it to a dictionary
