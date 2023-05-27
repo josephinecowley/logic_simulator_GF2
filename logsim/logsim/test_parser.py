@@ -159,6 +159,15 @@ def test_parser_display_error_valid_error_code(parser_fixture, correct_error_arg
         parser.display_error(symbol, invalid_error_type, proceed, stopping_symbol_types)
 
 
+def test_parser_display_error_symbol_is_EOF(parser_fixture, correct_error_arguments):
+    parser = parser_fixture
+    symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
+
+    symbol.type = parser.scanner.EOF
+
+    assert parser.display_error(symbol, error_type, proceed, stopping_symbol_types) is None
+
+
 def test_error_recovery_instance_handling(parser_fixture, correct_error_arguments):
     parser = parser_fixture
     symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
