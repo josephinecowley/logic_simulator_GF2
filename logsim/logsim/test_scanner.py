@@ -144,7 +144,7 @@ def test_scanner_get_number(scanner_fixture, set_scanner_location):
     assert number == "25"
 
 @pytest.mark.parametrize("location, expected_line1, expected_line2", [
-    ((2, 12), "        dtype1 = DTYPE;", "               ^       "),
+    ((2, 12), "        dtype1 = DTYPE; #comment contents 1", "               ^                           "),
     ((10, 1), "        CONNECTIONS {", "        ~~~~~~~~~~~  "),
     ((7, 19), "        data = SWITCH(0);", "                      ^  "),
 
@@ -216,8 +216,11 @@ def test_get_symbol_punctuation(scanner_fixture, set_scanner_location, location,
 def test_skip_comment(scanner_fixture, set_scanner_location, location, expected_character, expected_line_number, expected_position):
     scanner = scanner_fixture 
     set_scanner_location(location)
+    assert scanner.line_number == location[0]
+    assert scanner.position == location[1]
+
     scanner.skip_comment()
-    assert scanner.position== expected_position
+    assert scanner.position == expected_position
     assert scanner.line_number == expected_line_number
     assert scanner.current_character == expected_character
 
