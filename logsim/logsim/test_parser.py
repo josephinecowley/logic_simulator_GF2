@@ -103,17 +103,22 @@ def test_parser_display_error(parser_fixture, correct_parser_display_error_argum
     symbol, error_type, proceed, stopping_symbol_types = correct_parser_display_error_arguments
 
     with pytest.raises(TypeError):
-        parser.display_error(symbol, "non-integer error_type")
-    with  pytest.raises(ValueError):
-        parser.display_error(symbol, 22)
-    with  pytest.raises(ValueError):
-        parser.display_error(symbol, 100)
-    with  pytest.raises(ValueError):
-        parser.display_error(symbol, -1)
-    with  pytest.raises(TypeError):
-        parser.display_error(symbol, error_type)
-    with  pytest.raises(TypeError):
-        parser.display_error(symbol, error_type, proceed, ())
-    with  pytest.raises(ValueError):
-        parser.display_error(symbol, error_type, proceed, range(12))
-    
+        parser.display_error(symbol, "non-integer error_type") # Expected error_type to be an integer type argument
+    with pytest.raises(ValueError):
+        parser.display_error(symbol, 22) # Expected an error code within range of error types
+    with pytest.raises(ValueError):
+        parser.display_error(symbol, 100) # Expected an error code within range of error types
+    with pytest.raises(ValueError):
+        parser.display_error(symbol, -1) # Cannot have a negative error code
+    with pytest.raises(TypeError):
+        parser.display_error("not an instance of Symbol class", error_type) # Expected an instance of the Symbol class
+    with pytest.raises(TypeError):
+        parser.display_error(symbol, error_type, proceed, "not a list") # Expected stopping symbol to be an integer type argument
+    with pytest.raises(ValueError):
+        parser.display_error(symbol, error_type, proceed, list(range(12))) # Expected stopping symbol to be within range of given symbols
+    with pytest.raises(ValueError):
+        parser.display_error(symbol, error_type, proceed, list(range(32))) # Expected stopping symbol to be within range of given symbols
+    with pytest.raises(ValueError):
+        parser.display_error(symbol, error_type, proceed, list(range(0))) # Expected stopping symbol to be within range of given symbols
+    with pytest.raises(ValueError):
+        parser.display_error(symbol, error_type, proceed, list(range(-8))) # Expected stopping symbol to be within range of given symbols

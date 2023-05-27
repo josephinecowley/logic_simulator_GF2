@@ -95,9 +95,8 @@ class Parser:
             raise ValueError("Cannot have a negative error code")
         elif not isinstance(symbol, Symbol):
             raise TypeError("Expected an instance of the Symbol class")
-        elif not isinstance(stopping_symbol_types,  list):
-            raise TypeError(
-                "Expected stopping symbol to be an integer type argument")
+        elif not isinstance(stopping_symbol_types, list):
+            raise TypeError("Expected stopping symbol to be an integer type argument")
         elif ((len(stopping_symbol_types) >= 12) or (len(stopping_symbol_types) <= 0)):
             raise ValueError(
                 "Expected stopping symbol to be within range of given symbols")
@@ -108,7 +107,7 @@ class Parser:
         self.error_count += 1
 
         # Display location and type of error
-        print(f"Line {self.symbol.line_number}:", end=" ")
+        print(f"Line {symbol.line_number}:", end=" ")
         if error_type == self.NO_DEVICES_KEYWORD:
             print("Syntax Error: Expected the keyword DEVICES")
         elif error_type == self.NO_CONNECTIONS_KEYWORD:
