@@ -1,4 +1,5 @@
 """Test the parser class"""
+import os
 
 from names import Names
 from scanner import Scanner, Symbol
@@ -24,18 +25,48 @@ def scanner_fixture(path_fixture, names_fixture):
 
 
 @pytest.fixture
+def create_testing_file_to_scan(names_fixture):
+    """This is an in-house helper function not strictly related to testing parse.py"""
+    def _create_testing_file(testing_example):
+        with open("testing_file.txt", "w") as file:
+            file_path = file.name # by structure, this will always create testing_file.txt within this directory
+            file.write(testing_example)
+
+        scanner = Scanner(file_path, names_fixture)
+
+        return scanner
+
+    return _create_testing_file
+
+
+def test_create_testing_file_to_scan(create_testing_file_to_scan):
+    """This is an in-house helper function not strictly related to testing parse.py"""
+    scanner = create_testing_file_to_scan(
+    """
+        DEVICES {
+        dtype1 = DTYPE;
+        dtype2 = DTYPE;
+        dtype3 = DTYPE;
+        dtype4 = DTYPE;
+        clock = CLK(25);
+        data = SWITCH(0);
+    }
+    """)
+
+    x = 4
+
+    assert scanner.current_character == " "
+    while scanner.current_character != "":
+        scanner.get_symbol()
+
+    assert scanner.names.names_list == \
+    ['DEVICES', 'CONNECTIONS', 'MONITORS', 'END', 'dtype1', 'DTYPE', 'dtype2', 'dtype3', 'dtype4', 'clock', 'CLK', '25', 'data', 'SWITCH', '0']
+
+
+@pytest.fixture
 def parser_fixture(names_fixture, scanner_fixture):
     """Return a new parser instance"""
     return Parser(names_fixture, scanner_fixture)
-
-
-def test_parser_initialisation(parser_fixture, names_fixture, scanner_fixture):
-    parser = parser_fixture
-    assert parser.names is names_fixture
-    assert parser.scanner is scanner_fixture
-    assert parser.error_count == 0
-
-    # KO! Need to add check for list of syntax error once JC has changed it to a dictionary
 
 
 @pytest.fixture
@@ -80,6 +111,16 @@ def symbol_fixture(scanner_fixture, set_scanner_location):
 def correct_error_arguments(symbol_fixture):
     symbol = symbol_fixture
     return symbol, 4, True, [2, 3, 6, 8]
+
+
+def test_parser_initialisation(parser_fixture, names_fixture, scanner_fixture):
+    parser = parser_fixture
+    assert parser.names is names_fixture
+    assert parser.scanner is scanner_fixture
+    assert parser.error_count == 0
+
+    # KO! Need to add check for list of syntax error once JC has changed it to a dictionary
+
 
 def test_parser_display_error_instance_handling(parser_fixture, correct_error_arguments):
     parser = parser_fixture
@@ -199,4 +240,16 @@ def test_error_recovery_check_built_in_error_handling(parser_fixture, correct_er
     symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
 
     proceed = True
-    assert parser.error_recovery(error_type, proceed, stopping_symbol_types) is None # KO! May need to check this again once parse.py is complete
+    assert parser.error_recovery(error_type, proceed, stopping_symbol_types) is None
+
+
+def test_initial_error_checks_case_3(parser_fixture):
+    pass
+
+
+def test_delete_testing_file():
+    """This is an in-house helper function not strictly related to testing parse.py"""
+    if os.path.exists("testing_file.txt"):
+        os.remove("testing_file.txt")
+    else:
+        print("The file does not exist")
