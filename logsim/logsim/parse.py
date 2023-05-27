@@ -108,60 +108,63 @@ class Parser:
         self.error_count += 1
 
         # Display location and type of error
-        print(f"Line {self.symbol.line_number}:", end=" ")
+        print(f"\n  Line {self.symbol.line_number}:", end=" ")
         if error_type == self.NO_DEVICES_KEYWORD:
-            print("Syntax Error: Expected the keyword DEVICES")
+            print("Syntax Error: Expected the keyword DEVICES", end="\n \n")
         elif error_type == self.NO_CONNECTIONS_KEYWORD:
-            print("Syntax Error: Expected the keyword CONNECTIONS")
+            print("Syntax Error: Expected the keyword CONNECTIONS", end="\n \n")
         elif error_type == self.NO_MONITORS_KEYWORD:
-            print("Syntax Error: Expected the keyword MONITORS")
+            print("Syntax Error: Expected the keyword MONITORS", end="\n \n")
         elif error_type == self.NO_END_KEYWORD:
-            print("Syntax Error: Expected the keyword END straight after monitors list")
+            print(
+                "Syntax Error: Expected the keyword END straight after monitors list", end="\n \n")
         elif error_type == self.NO_BRACE_OPEN:
-            print("Syntax Error: Expected a '{' sign")
+            print("Syntax Error: Expected a '{' sign", end="\n \n")
         elif error_type == self.NO_BRACE_CLOSE:
-            print("Syntax Error: Expected a '}' sign")
+            print("Syntax Error: Expected a '}' sign", end="\n \n")
         elif error_type == self.INVALID_NAME:
-            print("Syntax Error: Invalid user name entered")
+            print("Syntax Error: Invalid user name entered", end="\n \n")
         elif error_type == self.NO_EQUALS:
-            print("Syntax Error: Expected an '=' sign")
+            print("Syntax Error: Expected an '=' sign", end="\n \n")
         elif error_type == self.INVALID_COMPONENT:
-            print("Syntax Error: Invalid component name entered")
+            print("Syntax Error: Invalid component name entered", end="\n \n")
         elif error_type == self.NO_BRACKET_OPEN:
-            print("Syntax Error: Expected a '(' for an input")
+            print("Syntax Error: Expected a '(' for an input", end="\n \n")
         elif error_type == self.NO_BRACKET_CLOSE:
-            print("Syntax Error: Expected a ')' for an input")
+            print("Syntax Error: Expected a ')' for an input", end="\n \n")
         elif error_type == self.NO_NUMBER:
-            print("Syntax Error: Expected a positive integer")
+            print("Syntax Error: Expected a positive integer", end="\n \n")
         elif error_type == self.CLK_OUT_OF_RANGE:
             print(
-                "Semantic Error: Input clock half period is out of range. Must be a positive integer")
+                "Semantic Error: Input clock half period is out of range. Must be a positive integer", end="\n \n")
         elif error_type == self.SWITCH_OUT_OF_RANGE:
             print(
-                "Semantic Error: Input switch number is out of range. Must be either 1 or 0")
+                "Semantic Error: Input switch number is out of range. Must be either 1 or 0", end="\n \n")
         elif error_type == self.UNDEFINED_NAME:
-            print("Semantic Error: Undefined device name given")
+            print("Syntax Error: Undefined device name given", end="\n \n")
         elif error_type == self.NO_FULLSTOP:
-            print("Syntax Error: Expected a full stop")
+            print("Syntax Error: Expected a full stop", end="\n \n")
         elif error_type == self.NO_SEMICOLON:
-            print("Syntax Error: Expected a semicolon")
+            print("Syntax Error: Expected a semicolon", end="\n \n")
         elif error_type == self.NO_Q_OR_QBAR:
-            print("Syntax Error: Expected a Q or QBAR after the full stop")
+            print("Syntax Error: Expected a Q or QBAR after the full stop", end="\n \n")
         elif error_type == self.NO_INPUT_SUFFIX:
-            print("Syntax Error: Expected a valid input suffix")
+            print("Syntax Error: Expected a valid input suffix", end="\n \n")
         elif error_type == self.SYMBOL_AFTER_END:
-            print("Syntax Error: There should not be any text after the keyword END")
+            print(
+                "Syntax Error: There should not be any text after the keyword END", end="\n \n")
         elif error_type == self.EMPTY_FILE:
-            print("Syntax Error: Cannot parse an empty file")
+            print("Syntax Error: Cannot parse an empty file", end="\n \n")
         elif error_type == self.TERMINATE:
             print(
-                "Syntax Error: Could not find parsing point to restart, program terminated early")
+                "Syntax Error: Could not find parsing point to restart, program terminated early", end="\n \n")
         else:
-            raise ValueError("Expected a valid error code")
+            raise ValueError("Expected a valid error code", end="\n \n")
 
         # Display error line and visual marker
-        # Have commented out function because it seems to fail.
-        # self.scanner.display_line_and_marker(self.symbol)
+        if self.symbol.type == self.scanner.EOF:
+            return
+        self.scanner.display_line_and_marker(self.symbol)
         # Call error recovery function to resume parsing at appropriate point
         self.error_recovery(error_type, proceed, stopping_symbol_types)
         return
@@ -502,7 +505,7 @@ class Parser:
                     self.display_error(self.symbol, self.NO_Q_OR_QBAR,
                                        proceed=False)
         else:
-            self.display_error(self.symbol, self.UNDEFINED_NAME, proceed=False)
+            self.display_error(self.symbol, self.INVALID_NAME, proceed=False)
 
     def input(self):
         """Parse a single device input."""
@@ -640,7 +643,6 @@ class Parser:
             elif self.error_count == 1:
                 print("1 error detected")
                 return False
-
             else:
                 # Display total number of errors
                 print(
