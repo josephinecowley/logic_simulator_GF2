@@ -108,7 +108,7 @@ class Parser:
         self.error_count += 1
 
         # Display location and type of error
-        print(f"\n  Line {self.symbol.line_number}:", end=" ")
+        print(f"\n  Line {symbol.line_number}:", end=" ")
         if error_type == self.NO_DEVICES_KEYWORD:
             print("Syntax Error: Expected the keyword DEVICES", end="\n \n")
         elif error_type == self.NO_CONNECTIONS_KEYWORD:
@@ -162,9 +162,9 @@ class Parser:
             raise ValueError("Expected a valid error code", end="\n \n")
 
         # Display error line and visual marker
-        if self.symbol.type == self.scanner.EOF:
+        if symbol.type == self.scanner.EOF:
             return
-        self.scanner.display_line_and_marker(self.symbol)
+        self.scanner.display_line_and_marker(symbol)
         # Call error recovery function to resume parsing at appropriate point
         self.error_recovery(error_type, proceed, stopping_symbol_types)
         return
