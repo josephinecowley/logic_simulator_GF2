@@ -76,23 +76,6 @@ def symbol_fixture(scanner_fixture, set_scanner_location):
     return symbol
 
 
-'''@pytest.mark.parametrize("symbol, error_type, proceed, stopping_symbol_types", [
-    ("=", 4, True, [2, 3, 6, 8]),
-])
-def test_parser_display_error(parser_fixture, symbol, error_type, proceed, stopping_symbol_types):
-    parser = parser_fixture
-
-    with pytest.raises(TypeError):
-        parser.display_error(symbol, "non-integer error_type")
-    with  pytest.raises(ValueError):
-        parser.display_error(symbol, 22)
-    with  pytest.raises(ValueError):
-        parser.display_error(symbol, 100)
-    with  pytest.raises(ValueError):
-        parser.display_error(symbol, -1)
-    with  pytest.raises(TypeError):
-        parser.display_error(symbol, error_type)'''
-
 @pytest.fixture
 def correct_error_arguments(symbol_fixture):
     symbol = symbol_fixture
@@ -165,15 +148,6 @@ def test_parser_display_error_show_error_messages(parser_fixture, correct_error_
     output_lines = captured.out.splitlines()
 
     assert output_lines[1] == expected_message
-
-
-'''@pytest.mark.parametrize("error_type, expected_error_message", [
-    (4, "Syntax Error: Expected the keyword DEVICES"),
-])
-def test_parser_display_error_type_of_error(parser_fixture, correct_error_arguments):
-    parser = parser_fixture
-    symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
-    assert parser.display_error(symbol, error_type, proceed, stopping_symbol_types) == "Line 2: Syntax Error: Expected a '{' sign"'''
 
 
 def test_parser_display_error_valid_error_code(parser_fixture, correct_error_arguments):
