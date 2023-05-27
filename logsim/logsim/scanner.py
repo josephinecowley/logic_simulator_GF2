@@ -143,7 +143,7 @@ class Scanner:
 
         elif self.current_character in ['#', '"']:  # comment openers
             self.skip_comment()
-            self.get_symbol()
+            self.get_symbol() # return the next symbol
 
         elif self.current_character == "":  # end of file
             self.load_scanner_data(symbol)
@@ -151,6 +151,7 @@ class Scanner:
 
         else:  # not a valid character
             self.advance()
+            symbol = self.get_symbol() # return the next symbol
 
         return symbol
 
