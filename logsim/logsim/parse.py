@@ -8,8 +8,11 @@ Classes
 -------
 Parser - parses the definition file and builds the logic network.
 """
+
 from names import Names
-# Will need to add more imports once building network
+from devices import Devices, Device
+from network import Network
+from monitors import Monitors
 from scanner import Scanner, Symbol
 
 # JC! signifies a comment to Josephine for later development
@@ -75,10 +78,26 @@ class Parser:
 
     """
 
-#    def __init__(self, names, devices, network, monitors, scanner):
-    def __init__(self, names, scanner):
+    def __init__(self, names, devices, network, monitors, scanner):
         """Initialise constants."""
+
+        # Exception handling
+        if not isinstance(names, Names):
+            raise TypeError("Expected an instance of Names.")
+        elif not isinstance(devices, Devices):
+            raise TypeError("Expected an instance of Devies.")
+        elif not isinstance(network, Network):
+            raise TypeError("Expected an instance of Network.")
+        elif not isinstance(monitors, Monitors):
+            raise TypeError("Expected an instance of Monitors.")
+        elif not isinstance(scanner, Scanner):
+            raise TypeError("Expected an instance of Scanner.")
+
+        # Initialise each class
         self.names = names
+        self.devices = devices
+        self.network = network
+        self.monitors = monitors
         self.scanner = scanner
 
         # Initial symbol
@@ -93,12 +112,12 @@ class Parser:
                               self.UNDEFINED_NAME, self.NO_FULLSTOP, self.NO_SEMICOLON, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE, self.TERMINATE] = self.names.unique_error_codes(22)
 
     # Stopping symbols automatically assigned to semi-colons, braces and keywords
-    def display_error(self,  symbol, error_type,  proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
+    def display_error(self,  symbol, error_type,  syntax_error=True, proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
         """Display the error message and where it occured
 
         Calls the error handling method to resume from the next available point."""
 
-        # Exception handling
+        # Exception handling JC! need to add exception handling for syntax error if this goes ahead
         if not isinstance(error_type, int):
             raise TypeError(
                 "Expected error_type to be an integer type argument")
@@ -172,6 +191,18 @@ class Parser:
         elif error_type == self.TERMINATE:
             print(
                 "Syntax Error: Could not find parsing point to restart, program terminated early", end="\n \n")
+        elif error_type == self.devices.INVALID_QUALIFIER:
+            print("Semantic Error: Invalid device property", end="\n \n")
+        elif error_type == self.devices.NO_QUALIFIER:
+            print(
+                "Semantic Error: Expected a device property for initialisation", end="\n \n")
+        elif error_type == self.devices.QUALIFIER_PRESENT:
+            print(
+                "Semantic Error: Expected no device property for this device", end="\n \n")
+        elif error_type == self.devices.DEVICE_PRESENT:
+            print("Semantic Error: Device already exists in the device list", end="\n \n")
+        elif error_type == self.devices.BAD_DEVICE:
+            print("Semantic Error: Invalid type of device", end="\n \n")
         else:
             raise ValueError("Expected a valid error code")
 
@@ -183,10 +214,10 @@ class Parser:
         self.error_recovery(error_type, proceed, stopping_symbol_types)
         return
 
-    def error_recovery(self, error_type, proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
+    def error_recovery(self, error_type, syntax_error=True, proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
         """Recover from an error by resuming parsing at an appropriate point."""
 
-        # Exception handling
+        # Exception handling JC! need to add exception handling for syntax error if this goes ahead
         if not isinstance(error_type, int):
             raise TypeError(
                 "Expected error_type to be an integer type argument")
@@ -205,18 +236,21 @@ class Parser:
                 "Expected stopping symbol to be within range of given symbols")
 
         # Check if we have already built in error handling (have done so for obvious semantic errors, e.g. missing KEYWORD)
-        if proceed == True:
-            return
-        # Check if we need to skip symbols to recover parsing
+        if syntax_error:
+            if proceed == True:
+                return
+            # Check if we need to skip symbols to recover parsing
+            else:
+                while ((self.symbol.type not in stopping_symbol_types) and (self.symbol.type != self.scanner.EOF)):
+                    self.symbol = self.scanner.get_symbol()
+                # Stop when stopping symbol is encountered
+                if self.symbol.type in stopping_symbol_types:
+                    return
+                elif self.symbol.type == self.scanner.EOF:
+                    self.display_error(self.symbol, self.TERMINATE)
+                    return
         else:
-            while ((self.symbol.type not in stopping_symbol_types) and (self.symbol.type != self.scanner.EOF)):
-                self.symbol = self.scanner.get_symbol()
-            # Stop when stopping symbol is encountered
-            if self.symbol.type in stopping_symbol_types:
-                return
-            elif self.symbol.type == self.scanner.EOF:
-                self.display_error(self.symbol, self.TERMINATE)
-                return
+            pass
 
     def initial_error_checks(self, KEYWORD_ID, missing_error_type):
         """Check initial symbols for common errors. This function tests for 6 cases:
@@ -310,34 +344,45 @@ class Parser:
                 return
 
     def device(self):
-        """Parse user defined device."""
+        """Parse a user defined device.
+
+        Make the device if there are no errors."""
+
         if self.symbol.type == self.scanner.BRACE_CLOSE:
             return
         # Check that we have a valid user defined name
         if self.symbol.type == self.scanner.NAME:
+            device_ID = self.symbol.id
             self.symbol = self.scanner.get_symbol()
             # Check that the name is followed by an equals sign
             if self.symbol.type == self.scanner.EQUALS:
                 self.symbol = self.scanner.get_symbol()
                 # Check that we then get a valid component name
-                # JC! May need to change this assignment, but atm I believe this will be useful for creating the network
-                symbol_ID, device_input = self.check_device_is_valid()
-
+                device_kind, device_property = self.check_device_is_valid()
             else:
                 self.display_error(
                     self.symbol, self.NO_EQUALS, proceed=False)
         else:
             self.display_error(self.symbol, self.INVALID_NAME, proceed=False)
 
+        # If there are no errors, make the device
+        if self.error_count == 0:
+            error_type = self.devices.make_device(
+                device_ID, device_kind, device_property)
+            if error_type != self.devices.NO_ERROR:
+                self.display_error(self.symbol, error_type, syntax_error=False)
+
     def check_device_is_valid(self):
-        """Check if device is valid and return both device type ID and the input ID."""
+        """Check if device is valid. 
+
+        Return both device kind (eg AND gate) and the device property (eg number of inputs)."""
         [AND_ID, NAND_ID, OR_ID, NOR_ID, XOR_ID, DTYPE_ID, SWITCH_ID, CLK_ID] = self.names.lookup(
             ["AND", "NAND", "OR", "NOR", "XOR", "DTYPE",  "SWITCH", "CLK"])
         one_to_sixteen = range(1, 17)
         binary_digit = [0, 1]
         # Check that name is either a AND, NAND, OR, NOR gate
         if self.symbol.id in [AND_ID, NAND_ID, OR_ID, NOR_ID]:
-            symbol_ID = self.symbol
+            device_kind = self.symbol.id
             self.symbol = self.scanner.get_symbol()
             # Check that gate is followed by open bracket symbol
             if self.symbol.type == self.scanner.BRACKET_OPEN:
@@ -351,7 +396,8 @@ class Parser:
                         # Check that next symbol is a close bracket ")"
                         if self.symbol.type == self.scanner.BRACKET_CLOSE:
                             self.symbol = self.scanner.get_symbol()
-                            return symbol_ID, number_of_inputs_ID
+                            # Return device kind and the number of inputs as device property
+                            return device_kind, number_of_inputs_ID
                         else:
                             self.display_error(
                                 self.symbol, self.NO_BRACKET_CLOSE,
@@ -371,11 +417,13 @@ class Parser:
                 return None, None
         # Check if symbol is an XOR or DTYPE (with no inputs)
         elif self.symbol.id == XOR_ID or self.symbol.id == DTYPE_ID:
+            device_kind = self.symbol.id
             self.symbol = self.scanner.get_symbol()
-            return self.symbol.id, self.symbol.type
+            # Return device kind and None as device property
+            return device_kind, None
         # Check if symbol is a SWITCH type
         elif self.symbol.id == SWITCH_ID:
-            symbol_ID = self.symbol.id
+            device_kind = self.symbol.id
             self.symbol = self.scanner.get_symbol()
             # Check that gate is followed by open bracket symbol
             if self.symbol.type == self.scanner.BRACKET_OPEN:
@@ -390,7 +438,8 @@ class Parser:
                         self.symbol = self.scanner.get_symbol()
                         if self.symbol.type == self.scanner.BRACKET_CLOSE:
                             self.symbol = self.scanner.get_symbol()
-                            return symbol_ID, switch_initial_state
+                            # Return device kind and the initial switch state as device property
+                            return device_kind, switch_initial_state
                         else:
                             self.display_error(
                                 self.symbol, self.NO_BRACKET_CLOSE,
@@ -410,7 +459,7 @@ class Parser:
                 return None, None
         # Check if symbol is a CLK
         elif self.symbol.id == CLK_ID:
-            symbol_ID = self.symbol.id
+            device_kind = self.symbol.id
             self.symbol = self.scanner.get_symbol()
             # Check that the gate is followed by an open bracket symbol
             if self.symbol.type == self.scanner.BRACKET_OPEN:
@@ -425,7 +474,8 @@ class Parser:
                         self.symbol = self.scanner.get_symbol()
                         if self.symbol.type == self.scanner.BRACKET_CLOSE:
                             self.symbol = self.scanner.get_symbol()
-                            return symbol_ID, number_of_cycles
+                            # Return device kind and the number of cycles as device property
+                            return device_kind, number_of_cycles
                         else:
                             self.display_error(
                                 self.symbol, self.NO_BRACKET_CLOSE,
@@ -665,8 +715,11 @@ def main():
     # Check command line arguments
     file_path = "logsim/example1_logic_description.txt"
     names = Names()
+    devices = Devices(names)
+    network = Network(names, devices)
+    monitors = Monitors(names, devices, network)
     scanner = Scanner(file_path, names)
-    parser = Parser(names, scanner)
+    parser = Parser(names, devices, network, monitors, scanner)
     print(parser.parse_network())
 
 
