@@ -192,7 +192,7 @@ def test_parser_initialisation(scanner_fixture, parser_fixture):
     assert isinstance(parser.names, Names)
     assert isinstance(parser.scanner, Scanner)
     assert parser.error_count == 0
-    assert parser.syntax_errors == range(22) # KO! Come back to this just in case
+    assert parser.syntax_errors == range(23) # KO! Come back to this just in case
 
 
 def test_parser_display_error_instance_handling(scanner_fixture, parser_fixture):
@@ -205,9 +205,7 @@ def test_parser_display_error_instance_handling(scanner_fixture, parser_fixture)
     with pytest.raises(TypeError):
         parser.display_error(symbol, "non-integer error_type") # Expected error_type to be an integer type argument
     with pytest.raises(ValueError):
-        parser.display_error(symbol, 22) # Expected an error code within range of error types
-    with pytest.raises(ValueError):
-        parser.display_error(symbol, 100) # Expected an error code within range of error types
+        parser.display_error(symbol, 10000) # Expected an error code within range of error types
     with pytest.raises(ValueError):
         parser.display_error(symbol, -1) # Cannot have a negative error code
     with pytest.raises(TypeError):
@@ -384,9 +382,9 @@ def test_parser_initial_error_checks_case_1(parser_fixture, create_testing_file_
 
 
 @pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol, expected_message", [
-    ('DVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;', 'dtype1', '\n  Line 2: Syntax Error: Expected the keyword DEVICES\n \n    DVICES { dtype1 = DTYPE;'),
-    ('CONNETIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;', 'dtype1', '\n  Line 2: Syntax Error: Expected the keyword CONNECTIONS\n \n    CONNETIONS { dtype1.Q = dtype2.DATA;'),
-    ('MONITOS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;', 'dtype1', '\n  Line 2: Syntax Error: Expected the keyword MONITORS\n \n    MONITOS { dtype1.Q;'),
+    ('DVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;', 'dtype1', '\n  Line 2: Syntax Error: Expected the keyword DEVICES\n \n        DVICES { dtype1 = DTYPE;'),
+    ('CONNETIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;', 'dtype1', '\n  Line 2: Syntax Error: Expected the keyword CONNECTIONS\n \n        CONNETIONS { dtype1.Q = dtype2.DATA;'),
+    ('MONITOS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;', 'dtype1', '\n  Line 2: Syntax Error: Expected the keyword MONITORS\n \n        MONITOS { dtype1.Q;'),
 ])
 def test_parser_initial_error_checks_case_2(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol, expected_message):
     scanner = create_testing_file_to_scan(
@@ -410,9 +408,9 @@ def test_parser_initial_error_checks_case_2(parser_fixture, create_testing_file_
 
 
 @pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol, expected_message", [
-    ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;', 'dtype1', '\n  Line 2: Syntax Error: Expected the keyword DEVICES\n \n    { dtype1 = DTYPE;'),
-    ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;', 'dtype1', '\n  Line 2: Syntax Error: Expected the keyword CONNECTIONS\n \n    { dtype1.Q = dtype2.DATA;'),
-    ('MONITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;', 'dtype1', '\n  Line 2: Syntax Error: Expected the keyword MONITORS\n \n    { dtype1.Q;'),
+    ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;', 'dtype1', '\n  Line 2: Syntax Error: Expected the keyword DEVICES\n \n        { dtype1 = DTYPE;'),
+    ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;', 'dtype1', '\n  Line 2: Syntax Error: Expected the keyword CONNECTIONS\n \n        { dtype1.Q = dtype2.DATA;'),
+    ('MONITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;', 'dtype1', '\n  Line 2: Syntax Error: Expected the keyword MONITORS\n \n        { dtype1.Q;'),
 ])
 def test_parser_initial_error_checks_case_3(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol, expected_message):
     scanner = create_testing_file_to_scan(
@@ -428,7 +426,6 @@ def test_parser_initial_error_checks_case_3(parser_fixture, create_testing_file_
     output_lines = captured.out.splitlines()
     semicolon_location = captured.out.index(";")
     printed_message = captured.out[:semicolon_location + 1] # only up to and including the semicolon, i.e., ignore the caret/tilde placement line
-
     assert printed_message == expected_message
 
     symbol_id = parser.symbol.id
@@ -436,9 +433,9 @@ def test_parser_initial_error_checks_case_3(parser_fixture, create_testing_file_
 
 
 @pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_message_1, expected_message_2", [
-    ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;', '\n  Line 2: Syntax Error: Expected the keyword DEVICES\n \n    dtype1 = DTYPE;\n', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n    dtype1 = DTYPE;\n"),
-    ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;', '\n  Line 2: Syntax Error: Expected the keyword CONNECTIONS\n \n    dtype1.Q = dtype2.DATA;\n', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n    dtype1.Q = dtype2.DATA;\n"),
-    ('MONITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;', '\n  Line 2: Syntax Error: Expected the keyword MONITORS\n \n    dtype1.Q;\n', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n    dtype1.Q;\n"),
+    ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;', '\n  Line 2: Syntax Error: Expected the keyword DEVICES\n \n        dtype1 = DTYPE;\n', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n        dtype1 = DTYPE;\n"),
+    ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;', '\n  Line 2: Syntax Error: Expected the keyword CONNECTIONS\n \n        dtype1.Q = dtype2.DATA;\n', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n        dtype1.Q = dtype2.DATA;\n"),
+    ('MONITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;', '\n  Line 2: Syntax Error: Expected the keyword MONITORS\n \n        dtype1.Q;\n', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n        dtype1.Q;\n"),
 ])
 def test_parser_initial_error_checks_case_4(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_message_1, expected_message_2):
     scanner = create_testing_file_to_scan(
