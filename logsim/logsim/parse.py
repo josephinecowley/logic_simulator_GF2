@@ -311,9 +311,9 @@ class Parser:
 
     def device(self):
         """Parse user defined device."""
-        # Check that we have a valid user defined name
         if self.symbol.type == self.scanner.BRACE_CLOSE:
             return
+        # Check that we have a valid user defined name
         if self.symbol.type == self.scanner.NAME:
             self.symbol = self.scanner.get_symbol()
             # Check that the name is followed by an equals sign
