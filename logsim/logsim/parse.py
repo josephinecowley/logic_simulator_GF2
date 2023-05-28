@@ -46,13 +46,13 @@ class Parser:
 
     initial_error_checks(self, KEYWORD_ID, missing_error_type): Check initial symbols for common errors. This function tests for 6 cases:
 
-        ... represents the first line of the list. For cases 4 and 6, because it is difficult 
+        ... represents the first line of the list. For cases 4 and 6, because it is difficult
         to distinguish between them, we merely skip to the next stopping symbol.
 
         1. Correct - when both keyword and open brace are present: KEYWORD { ...
         2. First keyword is spelt wrong, but open brace follows: KYWORD { ...
         3. Missing first keyword, but open brace follows: { ...
-        4. Missing both the first keyword and open brace: ... 
+        4. Missing both the first keyword and open brace: ...
         5. First keyword is correct, but missing open brace: { ...
         6. First keyword is spelt wrong, and missing an open brace { ...
 
@@ -277,13 +277,13 @@ class Parser:
     def initial_error_checks(self, KEYWORD_ID, missing_error_type):
         """Check initial symbols for common errors. This function tests for 6 cases:
 
-        ... represents the first line of the list. For cases 4 and 6, because it is difficult 
+        ... represents the first line of the list. For cases 4 and 6, because it is difficult
         to distinguish between them, we merely skip to the next stopping symbol.
 
         1. Correct - when both keyword and open brace are present: KEYWORD { ...
         2. First keyword is spelt wrong, but open brace follows: KYWORD { ...
         3. Missing first keyword, but open brace follows: { ...
-        4. Missing both the first keyword and open brace: ... 
+        4. Missing both the first keyword and open brace: ...
         5. First keyword is correct, but missing open brace: { ...
         6. First keyword is spelt wrong, and missing an open brace { ...
         """
@@ -395,7 +395,7 @@ class Parser:
                 self.display_error(self.symbol, error_type, syntax_error=False)
 
     def check_device_is_valid(self):
-        """Check if device is valid. 
+        """Check if device is valid.
 
         Return both device kind (eg AND gate) and the device property (eg number of inputs)."""
         [AND_ID, NAND_ID, OR_ID, NOR_ID, XOR_ID, DTYPE_ID, SWITCH_ID, CLK_ID] = self.names.lookup(
@@ -710,7 +710,7 @@ class Parser:
         # If there are no errors, make a monitor
         if self.error_count == 0:
             error_type = self.monitors.make_monitor(
-                monitor_device_id, monitor_port_id)
+                monitor_device_id, monitor_port_id, cycles_completed=0)
             if error_type != self.monitors.NO_ERROR:
                 self.display_error(self.symbol, error_type, syntax_error=False)
 
@@ -762,6 +762,9 @@ class Parser:
             # Parse monitor list
             self.monitor_list()
 
+            # Record the signal traces
+            for i in range(50):
+                self.monitors.record_signals()
             # Display signal traces in the monitor
             self.monitors.display_signals()
 
