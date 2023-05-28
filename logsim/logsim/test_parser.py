@@ -397,6 +397,22 @@ def test_parser_initial_error_checks_case_2(parser_fixture, create_testing_file_
     assert parser.initial_error_checks(eval(KEYWORD_ID), eval(missing_error_type)) is None
 
 
+@pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type", [
+    ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD'),
+    ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD'),
+    ('MONITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD'),
+])
+def test_parser_initial_error_checks_case_2(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type):
+    scanner = create_testing_file_to_scan(
+    f"""
+    {{
+    """ 
+    )
+    parser = parser_fixture(scanner)
+
+    assert parser.initial_error_checks(eval(KEYWORD_ID), eval(missing_error_type)) is None
+
+
 def test_delete_testing_file():
     """This is an in-house helper function not strictly related to testing parse.py"""
     if os.path.exists("testing_file.txt"):
