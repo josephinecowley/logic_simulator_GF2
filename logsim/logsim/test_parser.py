@@ -347,6 +347,25 @@ def test_parser_error_recovery_check_built_in_error_handling(scanner_fixture, pa
     assert parser.error_recovery(error_type, proceed) is None
 
 
+def test_parser_error_recovery_stops_when_stopping_symbol_is_encountered(create_testing_file_to_scan, parser_fixture):
+    scanner = create_testing_file_to_scan(
+    """
+    DEVICES {
+        dtype1 = DTYPE;
+        dtype2 = DTYPE;
+        dtype3 = DTYPE;
+        dtype4 = DTYPE;
+        clock = CLK(25);
+        data = SWITCH(0);
+    }
+    """, scan_through_all=False)
+
+    parser = parser_fixture(scanner)
+    error_type = parser.syntax_errors[0]
+
+    assert parser.error_recovery(error_type, proceed=False) is None
+
+
 def test_parser_initial_error_checks_case_3(parser_fixture, create_testing_file_to_scan, capfd):
     scanner = create_testing_file_to_scan(
     """
