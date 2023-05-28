@@ -380,7 +380,7 @@ class Parser:
 
         Return both device kind (eg AND gate) and the device property (eg number of inputs)."""
         [AND_ID, NAND_ID, OR_ID, NOR_ID, XOR_ID, DTYPE_ID, SWITCH_ID, CLK_ID] = self.names.lookup(
-            ["AND", "NAND", "OR", "NOR", "XOR", "DTYPE",  "SWITCH", "CLK"])
+            ["AND", "NAND", "OR", "NOR", "XOR", "DTYPE",  "SWITCH", "CLOCK"])
         one_to_sixteen = list(range(1, 17))
         binary_digit = [0, 1]
         # Check that name is either a AND, NAND, OR, NOR gate
