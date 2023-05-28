@@ -89,8 +89,8 @@ class Parser:
 
         # List of syntax errors
         self.syntax_errors = [self.NO_DEVICES_KEYWORD, self.NO_CONNECTIONS_KEYWORD, self.NO_MONITORS_KEYWORD, self.NO_END_KEYWORD, self.NO_BRACE_OPEN, self.NO_BRACE_CLOSE,
-                              self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_BRACKET_OPEN, self.NO_BRACKET_CLOSE, self.NO_NUMBER, self.CLK_OUT_OF_RANGE, self.SWITCH_OUT_OF_RANGE,
-                              self.UNDEFINED_NAME, self.NO_FULLSTOP, self.NO_SEMICOLON, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE, self.TERMINATE] = self.names.unique_error_codes(22)
+                              self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_BRACKET_OPEN, self.NO_BRACKET_CLOSE, self.NO_NUMBER, self.INPUT_OUT_OF_RANGE, self.CLK_OUT_OF_RANGE, self.SWITCH_OUT_OF_RANGE,
+                              self.UNDEFINED_NAME, self.NO_FULLSTOP, self.NO_SEMICOLON, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE, self.TERMINATE] = self.names.unique_error_codes(23)
 
     # Stopping symbols automatically assigned to semi-colons, braces and keywords
     def display_error(self,  symbol, error_type,  proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
@@ -148,6 +148,9 @@ class Parser:
             print("Syntax Error: Expected a ')' for an input", end="\n \n")
         elif error_type == self.NO_NUMBER:
             print("Syntax Error: Expected a positive integer", end="\n \n")
+        elif error_type == self.INPUT_OUT_OF_RANGE:
+            print(
+                "Semantic Error: Input number of gates is out of range. Must be an integer between 1 and 16", end="\n \n")
         elif error_type == self.CLK_OUT_OF_RANGE:
             print(
                 "Semantic Error: Input clock half period is out of range. Must be a positive integer", end="\n \n")
@@ -333,7 +336,7 @@ class Parser:
         """Check if device is valid and return both device type ID and the input ID."""
         [AND_ID, NAND_ID, OR_ID, NOR_ID, XOR_ID, DTYPE_ID, SWITCH_ID, CLK_ID] = self.names.lookup(
             ["AND", "NAND", "OR", "NOR", "XOR", "DTYPE",  "SWITCH", "CLK"])
-        one_to_sixteen = range(1, 17)
+        one_to_sixteen = list(range(1, 17))
         binary_digit = [0, 1]
         # Check that name is either a AND, NAND, OR, NOR gate
         if self.symbol.id in [AND_ID, NAND_ID, OR_ID, NOR_ID]:
@@ -345,20 +348,21 @@ class Parser:
                 # Check that number of inputs is an integer
                 if self.symbol.type == self.scanner.NUMBER:
                     # Check that number is within range
-                    if self.symbol.id in one_to_sixteen:
-                        number_of_inputs_ID = self.symbol.id
+                    number_of_inputs = int(
+                        self.names.get_name_string(self.symbol.id))
+                    if number_of_inputs in one_to_sixteen:
                         self.symbol = self.scanner.get_symbol()
                         # Check that next symbol is a close bracket ")"
                         if self.symbol.type == self.scanner.BRACKET_CLOSE:
                             self.symbol = self.scanner.get_symbol()
-                            return symbol_ID, number_of_inputs_ID
+                            return symbol_ID, number_of_inputs
                         else:
                             self.display_error(
                                 self.symbol, self.NO_BRACKET_CLOSE,
                                 proceed=False)
                             return None, None
                     else:
-                        self.display_error(self.symbol, self.CLK_OUT_OF_RANGE,
+                        self.display_error(self.symbol, self.INPUT_OUT_OF_RANGE,
                                            proceed=False)
                         return None, None
                 else:
@@ -663,7 +667,7 @@ class Parser:
 # JC! This will be deleted once development is complete
 def main():
     # Check command line arguments
-    file_path = "logsim/example1_logic_description.txt"
+    file_path = "logsim/example2_logic_description.txt"
     names = Names()
     scanner = Scanner(file_path, names)
     parser = Parser(names, scanner)
