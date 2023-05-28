@@ -427,7 +427,7 @@ def test_parser_initial_error_checks_case_3(parser_fixture, create_testing_file_
     captured = capfd.readouterr()
     output_lines = captured.out.splitlines()
     semicolon_location = captured.out.index(";")
-    printed_message = captured.out[:semicolon_location + 1] # only up to and including the semicolon, i.e., ignore the caret/tilde/placement line
+    printed_message = captured.out[:semicolon_location + 1] # only up to and including the semicolon, i.e., ignore the caret/tilde placement line
 
     assert printed_message == expected_message
 
@@ -435,12 +435,12 @@ def test_parser_initial_error_checks_case_3(parser_fixture, create_testing_file_
     assert parser.names.get_name_string(symbol_id) == expected_symbol
 
 
-'''@pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example", [
-    ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;'),
-    ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;'),
-    ('MONITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;'),
+@pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_message_1, expected_message_2", [
+    ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;', '\n  Line 2: Syntax Error: Expected the keyword DEVICES\n \n    dtype1 = DTYPE;\n', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n    dtype1 = DTYPE;\n"),
+    ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;', '\n  Line 2: Syntax Error: Expected the keyword CONNECTIONS\n \n    dtype1.Q = dtype2.DATA;\n', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n    dtype1.Q = dtype2.DATA;\n"),
+    ('MONITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;', '\n  Line 2: Syntax Error: Expected the keyword MONITORS\n \n    dtype1.Q;\n', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n    dtype1.Q;\n"),
 ])
-def test_parser_initial_error_checks_case_4(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example):
+def test_parser_initial_error_checks_case_4(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_message_1, expected_message_2):
     scanner = create_testing_file_to_scan(
     f"""
     {correct_example}
@@ -448,7 +448,17 @@ def test_parser_initial_error_checks_case_4(parser_fixture, create_testing_file_
     )
     parser = parser_fixture(scanner)
 
-    assert parser.initial_error_checks(eval(KEYWORD_ID), eval(missing_error_type)) is None'''
+    parser.initial_error_checks(eval(KEYWORD_ID), eval(missing_error_type))
+
+    captured = capfd.readouterr()
+    output_lines = captured.out.splitlines(True)
+    first_printed_message = ''.join(output_lines[:4]) # indexing done to ignore caret/tilde placement line
+    second_printed_message = ''.join(output_lines[6:10]) # indexing done to ignore caret/tilde placement line
+
+    assert first_printed_message == expected_message_1
+    assert second_printed_message == expected_message_2
+
+    assert parser.symbol.type == parser.scanner.EOF
 
 
 def test_delete_testing_file():
