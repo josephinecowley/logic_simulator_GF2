@@ -482,6 +482,32 @@ def test_parser_initial_error_checks_case_5(parser_fixture, create_testing_file_
     assert parser.names.get_name_string(symbol_id) == expected_symbol
 
 
+@pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_message_1, expected_message_2", [
+    ('DEICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;', '\n  Line 2: Syntax Error: Expected the keyword DEVICES\n \n        DEICES dtype1 = DTYPE;\n', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n        DEICES dtype1 = DTYPE;\n"),
+    ('CONNECTIOS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;', '\n  Line 2: Syntax Error: Expected the keyword CONNECTIONS\n \n        CONNECTIOS dtype1.Q = dtype2.DATA;\n', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n        CONNECTIOS dtype1.Q = dtype2.DATA;\n"),
+    ('MOITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;', '\n  Line 2: Syntax Error: Expected the keyword MONITORS\n \n        MOITORS dtype1.Q;\n', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n        MOITORS dtype1.Q;\n"),
+])
+def test_parser_initial_error_checks_case_6(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_message_1, expected_message_2):
+    scanner = create_testing_file_to_scan(
+    f"""
+    {KEYWORD} {correct_example}
+    """ 
+    )
+    parser = parser_fixture(scanner)
+
+    parser.initial_error_checks(eval(KEYWORD_ID), eval(missing_error_type))
+
+    captured = capfd.readouterr()
+    output_lines = captured.out.splitlines(True)
+    first_printed_message = ''.join(output_lines[:4]) # indexing done to ignore caret/tilde placement line
+    second_printed_message = ''.join(output_lines[6:10]) # indexing done to ignore caret/tilde placement line
+
+    assert first_printed_message == expected_message_1
+    assert second_printed_message == expected_message_2
+
+    assert parser.symbol.type == parser.scanner.EOF
+
+
 def test_delete_testing_file():
     """This is an in-house helper function not strictly related to testing parse.py"""
     if os.path.exists("testing_file.txt"):
