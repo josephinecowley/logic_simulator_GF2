@@ -195,12 +195,13 @@ class Parser:
             return
         # Check if we need to skip symbols to recover parsing
         else:
-            while ((self.symbol.type not in stopping_symbol_types) and (self.symbol.type != self.scanner.EOF)):
-                self.symbol = self.scanner.get_symbol()
+            symbol = self.scanner.get_symbol()
+            while ((symbol.type not in stopping_symbol_types) and (symbol.type != self.scanner.EOF)):
+                symbol = self.scanner.get_symbol()
             # Stop when stopping symbol is encountered
-            if self.symbol.type in stopping_symbol_types:
+            if symbol.type in stopping_symbol_types:
                 return
-            elif self.symbol.type == self.scanner.EOF:
+            elif symbol.type == self.scanner.EOF:
                 self.display_error(self.symbol, self.TERMINATE)
                 return
 
