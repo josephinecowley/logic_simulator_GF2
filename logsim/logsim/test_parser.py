@@ -19,7 +19,7 @@ def names_fixture():
 
 
 @pytest.fixture
-def scanner_fixture(path_fixture, names_fixture):
+def old_scanner_fixture(path_fixture, names_fixture):
     scanner = Scanner(path_fixture, names_fixture)
     return scanner
 
@@ -65,8 +65,7 @@ def test_create_testing_file_to_scan(create_testing_file_to_scan):
 
 
 @pytest.fixture
-def new_scanner_fixture(create_testing_file_to_scan):
-    breakpoint()
+def scanner_fixture(create_testing_file_to_scan):
     scanner = create_testing_file_to_scan(
     """
     DEVICES {
@@ -105,9 +104,9 @@ def new_scanner_fixture(create_testing_file_to_scan):
 @pytest.fixture
 def parser_fixture(names_fixture):
     """Return a new parser instance"""
-    def _new_parser_fixture(scanner):
+    def _parser_fixture(scanner):
         return Parser(names_fixture, scanner)
-    return _new_parser_fixture
+    return _parser_fixture
 
 
 def test_parser_fixture(parser_fixture, create_testing_file_to_scan):
@@ -124,23 +123,22 @@ def test_parser_fixture(parser_fixture, create_testing_file_to_scan):
     """, scan_through_all=True)
 
     parser = parser_fixture(scanner)
-    breakpoint()
 
     assert parser.names.names_list == \
     ['DEVICES', 'CONNECTIONS', 'MONITORS', 'END', 'dtype1', 'DTYPE', 'dtype2', 'dtype3', 'dtype4', 'clock', 'CLK', '25', 'data', 'SWITCH', '0']
 
 
 @pytest.fixture
-def old_parser_fixture(names_fixture, scanner_fixture):
+def old_parser_fixture(names_fixture, old_scanner_fixture):
     """Return a new parser instance"""
-    return Parser(names_fixture, scanner_fixture)
+    return Parser(names_fixture, old_scanner_fixture)
 
 
 @pytest.fixture
-def set_scanner_location(scanner_fixture):
+def set_scanner_location(old_scanner_fixture):
     def _set_scanner_location(target_location):
         target_line_number, target_position = target_location
-        scanner = scanner_fixture # call scanner instance
+        scanner = old_scanner_fixture # call scanner instance
         
 
         # Reset the file pointer to the beginning of the file
@@ -166,8 +164,8 @@ def set_scanner_location(scanner_fixture):
 
 
 @pytest.fixture
-def symbol_fixture(scanner_fixture, set_scanner_location):
-    scanner = scanner_fixture
+def symbol_fixture(old_scanner_fixture, set_scanner_location):
+    scanner = old_scanner_fixture
     set_scanner_location((2, 5))
     symbol = scanner.get_symbol()
 
@@ -180,17 +178,9 @@ def correct_error_arguments(symbol_fixture):
     return symbol, 4, True, [2, 3, 6, 8]
 
 
-def test_parser_initialisation(old_parser_fixture, names_fixture, scanner_fixture):
-    parser = old_parser_fixture
-    assert parser.names is names_fixture
-    assert parser.scanner is scanner_fixture
-    assert parser.error_count == 0
-
-    # KO! Need to add check for list of syntax error once JC has changed it to a dictionary
-
-
-def test_parser_initialisation(parser_fixture):
-    parser = parser_fixture
+def test_parser_initialisation(parser_fixture, scanner_fixture):
+    scanner = scanner_fixture
+    parser = parser_fixture(scanner)
     assert isinstance(parser.names, Names)
     assert isinstance(parser.scanner, Scanner)
     assert parser.error_count == 0
