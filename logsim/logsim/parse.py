@@ -221,6 +221,7 @@ class Parser:
         # If keyword is wrong
         symbol = self.scanner.get_symbol()
         if not (symbol.type == self.scanner.KEYWORD and symbol.id == KEYWORD_ID):
+            #breakpoint()
             # If first symbol is a NAME type
             if not (symbol.type == self.scanner.NAME):
                 # If open brace '{'
@@ -229,9 +230,11 @@ class Parser:
                     self.display_error(symbol, missing_error_type)
                     symbol = self.scanner.get_symbol()
             else:
+                #breakpoint()
                 symbol = self.scanner.get_symbol()
                 # If open brace '{'
                 if not (symbol.type == self.scanner.BRACE_OPEN):
+                    #breakpoint()
                     # Case 4: ...
                     # and Case 6: D ...
                     self.display_error(symbol, missing_error_type)
@@ -239,12 +242,14 @@ class Parser:
                         symbol, self.NO_BRACE_OPEN, proceed=False)
                     symbol = self.scanner.get_symbol()
                 else:
+                    #breakpoint()
                     # Case 2: D { ...
                     self.display_error(
                         symbol, missing_error_type)
                     symbol = self.scanner.get_symbol()
         # If keyword is present
         else:
+            #breakpoint()
             symbol = self.scanner.get_symbol()
             # If open brace '{'
             if not (symbol.type == self.scanner.BRACE_OPEN):

@@ -2,7 +2,7 @@
 import os
 
 from names import Names
-from scanner import Scanner, Symbol
+from scanner import Scanner
 from parse import Parser
 import pytest
 
@@ -402,10 +402,26 @@ def test_parser_initial_error_checks_case_2(parser_fixture, create_testing_file_
     ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD'),
     ('MONITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD'),
 ])
-def test_parser_initial_error_checks_case_2(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type):
+def test_parser_initial_error_checks_case_3(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type):
     scanner = create_testing_file_to_scan(
     f"""
     {{
+    """ 
+    )
+    parser = parser_fixture(scanner)
+
+    assert parser.initial_error_checks(eval(KEYWORD_ID), eval(missing_error_type)) is None
+
+
+@pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example", [
+    ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;'),
+    ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;'),
+    ('MONITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;'),
+])
+def test_parser_initial_error_checks_case_4(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example):
+    scanner = create_testing_file_to_scan(
+    f"""
+    {correct_example}
     """ 
     )
     parser = parser_fixture(scanner)
