@@ -109,7 +109,7 @@ class Parser:
         # List of syntax errors
         self.syntax_errors = [self.NO_DEVICES_KEYWORD, self.NO_CONNECTIONS_KEYWORD, self.NO_MONITORS_KEYWORD, self.NO_END_KEYWORD, self.NO_BRACE_OPEN, self.NO_BRACE_CLOSE,
                               self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_BRACKET_OPEN, self.NO_BRACKET_CLOSE, self.NO_NUMBER, self.INPUT_OUT_OF_RANGE, self.CLK_OUT_OF_RANGE, self.SWITCH_OUT_OF_RANGE,
-                              self.UNDEFINED_NAME, self.NO_FULLSTOP, self.NO_SEMICOLON, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE, self.TERMINATE] = self.names.unique_error_codes(23)
+                              self.UNDEFINED_NAME, self.NO_FULLSTOP, self.NO_SEMICOLON, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE, self.FLOATING_INPUT, self.TERMINATE] = self.names.unique_error_codes(24)
 
     # Stopping symbols automatically assigned to semi-colons, braces and keywords
     def display_error(self,  symbol, error_type,  syntax_error=True, proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
@@ -121,9 +121,6 @@ class Parser:
         if not isinstance(error_type, int):
             raise TypeError(
                 "Expected error_type to be an integer type argument")
-        elif error_type >= len(self.syntax_errors):
-            raise ValueError(
-                "Expected an error code within range of error types")
         elif error_type < 0:
             raise ValueError("Cannot have a negative error code")
         elif not isinstance(symbol, Symbol):
@@ -206,6 +203,24 @@ class Parser:
             print("Semantic Error: Device already exists in the device list", end="\n \n")
         elif error_type == self.devices.BAD_DEVICE:
             print("Semantic Error: Invalid type of device", end="\n \n")
+        elif error_type == self.network.INPUT_TO_INPUT:
+            print(
+                "Semantic Error: Cannot connect an input port to another input port.", end="\n \n")
+        elif error_type == self.network.OUTPUT_TO_OUTPUT:
+            print(
+                "Semantic Error: Cannot connect an output port to another output port.", end="\n \n")
+        elif error_type == self.network.INPUT_CONNECTED:
+            print(
+                "Semantic Error: Cannot connect input port as it is already connected.", end="\n \n")
+        elif error_type == self.network.PORT_ABSENT:
+            print(
+                "Semantic Error: Cannot make connection as specified port does not exist.", end="\n \n")
+        elif error_type == self.network.DEVICE_ABSENT:
+            print(
+                "Semantic Error: Cannot make connection as device is undefined in DEVICE list.", end="\n \n")
+        elif error_type == self.FLOATING_INPUT:
+            print(
+                "Semantic Error: Cannot make network as not all inputs are connected to an output.", end="\n \n")
         else:
             raise ValueError("Expected a valid error code")
 
@@ -224,9 +239,6 @@ class Parser:
         if not isinstance(error_type, int):
             raise TypeError(
                 "Expected error_type to be an integer type argument")
-        elif error_type >= len(self.syntax_errors):
-            raise ValueError(
-                "Expected an error code within range of error types")
         elif error_type < 0:
             raise ValueError("Cannot have a negative error code")
         elif not isinstance(proceed, bool):
@@ -545,71 +557,98 @@ class Parser:
                 return
 
     def connection(self):
-        """Parse a connection."""
-        # self.symbol = self.scanner.get_symbol()
-        # If after the semicolon we have a } , assume we can move onto the monitor_list
+        """Parse a connection.
+
+        If there are no errors, make the connection."""
+        # If after the semicolon we have a } , assume we can move onto the monitor_list without making a connection
         if self.symbol.type == self.scanner.BRACE_CLOSE:
             return
         else:
-            self.output()
+            [output_device_id, output_port_id] = self.output()
             # Incase we have had to error handle and recover, such that the symbol is now a ';'
             while self.symbol.type == self.scanner.SEMICOLON:
                 self.symbol = self.scanner.get_symbol()
-                self.output()
+                [output_device_id, output_port_id] = self.output()
             # Check ouput connection is followed by an equals sign "="
             if self.symbol.type == self.scanner.EQUALS:
                 self.symbol = self.scanner.get_symbol()
-                self.input()
+                [input_device_id, input_port_id] = self.input()
             else:
                 self.display_error(self.symbol, self.NO_EQUALS,
                                    proceed=False)
 
+        # If there are no errors, make the connection
+        if self.error_count == 0:
+            error_type = self.network.make_connection(
+                output_device_id, output_port_id, input_device_id, input_port_id)
+            if error_type != self.network.NO_ERROR:
+                self.display_error(self.symbol, error_type, syntax_error=False)
+
     def output(self):
-        """Parse a single device output."""
+        """Parse a single device output.
+
+        Return the output device_ID and the corresponding output_port_ID.
+
+        Return None, None if error occurs."""
         valid_output_id_list = self.names.lookup(["Q", "QBAR"])
         # If after the semicolon we have a '}' , assume we can move onto the monitor_list
         if self.symbol.type == self.scanner.BRACE_CLOSE:
-            return
+            return None, None
         # Check that the output to be connected is an already user-defined name
         if self.symbol.type == self.scanner.NAME:
+            output_device_ID = self.symbol.id
             self.symbol = self.scanner.get_symbol()
-            # Check if gate is followed by a full stop
+            # Check if gate is followed by a full stop (it has more than one output)
             if self.symbol.type == self.scanner.FULLSTOP:
                 self.symbol = self.scanner.get_symbol()
                 # Check that output suffix is Q or QBAR
-                # JC! this may need to be redone to ensure semantic checking of non dtypes don't have fullstops after them
                 if self.symbol.id in valid_output_id_list:
+                    output_port_ID = self.symbol.id
                     self.symbol = self.scanner.get_symbol()
-                    return
+                    return output_device_ID, output_port_ID
                 else:
                     self.display_error(self.symbol, self.NO_Q_OR_QBAR,
                                        proceed=False)
+                    return None, None
+            # If this device only has one output
+            else:
+                return output_device_ID, None
         else:
             self.display_error(self.symbol, self.INVALID_NAME, proceed=False)
+            return None, None
 
     def input(self):
-        """Parse a single device input."""
+        """Parse a single device input.
+
+        Return the input device_ID and the corresponding input_port_ID.
+
+        Return None, None if error occurs."""
         valid_input_suffix_id_list = self.names.lookup(["I1", "I2", "I3", "I4", "I5", "I6", "I7", "I8", "I9",
                                                         "I10", "I11", "I12", "I13", "I14", "I15", "I16", "DATA", "CLK", "SET", "CLEAR"])
         # Check that the input is valid syntax
         if self.symbol.type == self.scanner.NAME:
+            input_device_ID = self.symbol.id
             self.symbol = self.scanner.get_symbol()
             # Check that the input is followed by a fullstop
             if self.symbol.type == self.scanner.FULLSTOP:
                 self.symbol = self.scanner.get_symbol()
                 # Check that name is a valid input suffix
-                # JC! Need to include an input suffix out of range semantic error
                 if self.symbol.id in valid_input_suffix_id_list:
+                    input_port_ID = self.symbol.id
                     self.symbol = self.scanner.get_symbol()
+                    return input_device_ID, input_port_ID
                 else:
                     self.display_error(self.symbol, self.NO_INPUT_SUFFIX,
                                        proceed=False)
+                    return None, None
             else:
                 self.display_error(self.symbol, self.NO_FULLSTOP,
                                    proceed=False)
+                return None, None
         else:
             self.display_error(self.symbol, self.UNDEFINED_NAME,
                                proceed=False)
+            return None, None
 
     def monitor_list(self):
         """Parse monitor list."""
@@ -693,7 +732,14 @@ class Parser:
             # Parse connection list
             self.connection_list()
 
-            # Parse monitor list
+            # Check all inputs in network are connected to an output
+            if self.error_count == 0:
+                if not self.network.check_network():
+                    print("hereee", self.NO_SEMICOLON)
+                    self.display_error(
+                        self.symbol, self.FLOATING_INPUT, syntax_error=False)
+
+                # Parse monitor list
             self.monitor_list()
 
             # Check for END keyword
