@@ -69,6 +69,9 @@ class Parser:
         self.names = names
         self.scanner = scanner
 
+        # Initial symbol
+        self.symbol = Symbol()
+
         # Count number of errors
         self.error_count = 0
 
@@ -195,13 +198,13 @@ class Parser:
             return
         # Check if we need to skip symbols to recover parsing
         else:
-            symbol = self.scanner.get_symbol()
-            while ((symbol.type not in stopping_symbol_types) and (symbol.type != self.scanner.EOF)):
-                symbol = self.scanner.get_symbol()
+            self.symbol = self.scanner.get_symbol()
+            while ((self.symbol.type not in stopping_symbol_types) and (self.symbol.type != self.scanner.EOF)):
+                self.symbol = self.scanner.get_symbol()
             # Stop when stopping symbol is encountered
-            if symbol.type in stopping_symbol_types:
+            if self.symbol.type in stopping_symbol_types:
                 return
-            elif symbol.type == self.scanner.EOF:
+            elif self.symbol.type == self.scanner.EOF:
                 self.display_error(self.symbol, self.TERMINATE)
                 return
 
@@ -219,45 +222,46 @@ class Parser:
         6. First keyword is spelt wrong, and missing an open brace { ...
         """
         # If keyword is wrong
-        symbol = self.scanner.get_symbol()
-        if not (symbol.type == self.scanner.KEYWORD and symbol.id == KEYWORD_ID):
+        self.symbol = self.scanner.get_symbol()
+        if not (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == KEYWORD_ID):
             #breakpoint()
             # If first symbol is a NAME type
-            if not (symbol.type == self.scanner.NAME):
+            if not (self.symbol.type == self.scanner.NAME):
                 # If open brace '{'
-                if symbol.type == self.scanner.BRACE_OPEN:
+                if self.symbol.type == self.scanner.BRACE_OPEN:
                     # Case 3: { ...
-                    self.display_error(symbol, missing_error_type)
-                    symbol = self.scanner.get_symbol()
+                    self.display_error(self.symbol, missing_error_type)
+                    self.symbol = self.scanner.get_symbol()
             else:
                 #breakpoint()
-                symbol = self.scanner.get_symbol()
+                self.symbol = self.scanner.get_symbol()
                 # If open brace '{'
-                if not (symbol.type == self.scanner.BRACE_OPEN):
+                if not (self.symbol.type == self.scanner.BRACE_OPEN):
                     #breakpoint()
                     # Case 4: ...
                     # and Case 6: D ...
-                    self.display_error(symbol, missing_error_type)
+                    self.display_error(self.symbol, missing_error_type)
                     self.display_error(
-                        symbol, self.NO_BRACE_OPEN, proceed=False)
-                    symbol = self.scanner.get_symbol()
+                        self.symbol, self.NO_BRACE_OPEN, proceed=False)
+                    self.symbol = self.scanner.get_symbol()
                 else:
                     #breakpoint()
                     # Case 2: D { ...
                     self.display_error(
-                        symbol, missing_error_type)
-                    symbol = self.scanner.get_symbol()
+                        self.symbol, missing_error_type)
+                    self.symbol = self.scanner.get_symbol()
         # If keyword is present
         else:
             #breakpoint()
-            symbol = self.scanner.get_symbol()
+            self.symbol = self.scanner.get_symbol()
             # If open brace '{'
-            if not (symbol.type == self.scanner.BRACE_OPEN):
+            if not (self.symbol.type == self.scanner.BRACE_OPEN):
                 # Case 5. KEYWORD ...
-                self.display_error(symbol, self.NO_BRACE_OPEN)
+                self.display_error(self.symbol, self.NO_BRACE_OPEN)
             else:
                 # Case 1. KEYWORD{ ...
-                symbol = self.scanner.get_symbol()
+                breakpoint()
+                self.symbol = self.scanner.get_symbol()
 
     def device_list(self):
         """Parse device list."""
