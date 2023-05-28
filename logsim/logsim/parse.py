@@ -229,7 +229,8 @@ class Parser:
             return
         self.scanner.display_line_and_marker(symbol)
         # Call error recovery function to resume parsing at appropriate point
-        self.error_recovery(error_type, proceed, stopping_symbol_types)
+        self.error_recovery(error_type, syntax_error,
+                            proceed, stopping_symbol_types)
         return
 
     def error_recovery(self, error_type, syntax_error=True, proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
@@ -242,6 +243,7 @@ class Parser:
         elif error_type < 0:
             raise ValueError("Cannot have a negative error code")
         elif not isinstance(proceed, bool):
+            print("here", proceed, self.FLOATING_INPUT, stopping_symbol_types)
             raise TypeError("Expected bool type argument for proceed")
         elif not isinstance(stopping_symbol_types, list):
             raise TypeError(
@@ -735,7 +737,6 @@ class Parser:
             # Check all inputs in network are connected to an output
             if self.error_count == 0:
                 if not self.network.check_network():
-                    print("hereee", self.NO_SEMICOLON)
                     self.display_error(
                         self.symbol, self.FLOATING_INPUT, syntax_error=False)
 
