@@ -260,7 +260,7 @@ class Parser:
                 self.display_error(self.symbol, self.NO_BRACE_OPEN)
             else:
                 # Case 1. KEYWORD{ ...
-                breakpoint()
+                #breakpoint()
                 self.symbol = self.scanner.get_symbol()
 
     def device_list(self):
