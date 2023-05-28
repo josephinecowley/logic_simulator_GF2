@@ -219,39 +219,40 @@ class Parser:
         6. First keyword is spelt wrong, and missing an open brace { ...
         """
         # If keyword is wrong
-        if not (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == KEYWORD_ID):
+        symbol = self.scanner.get_symbol()
+        if not (symbol.type == self.scanner.KEYWORD and symbol.id == KEYWORD_ID):
             # If first symbol is a NAME type
-            if not (self.symbol.type == self.scanner.NAME):
+            if not (symbol.type == self.scanner.NAME):
                 # If open brace '{'
-                if self.symbol.type == self.scanner.BRACE_OPEN:
+                if symbol.type == self.scanner.BRACE_OPEN:
                     # Case 3: { ...
-                    self.display_error(self.symbol, missing_error_type)
-                    self.symbol = self.scanner.get_symbol()
+                    self.display_error(symbol, missing_error_type)
+                    symbol = self.scanner.get_symbol()
             else:
-                self.symbol = self.scanner.get_symbol()
+                symbol = self.scanner.get_symbol()
                 # If open brace '{'
-                if not (self.symbol.type == self.scanner.BRACE_OPEN):
+                if not (symbol.type == self.scanner.BRACE_OPEN):
                     # Case 4: ...
                     # and Case 6: D ...
-                    self.display_error(self.symbol, missing_error_type)
+                    self.display_error(symbol, missing_error_type)
                     self.display_error(
-                        self.symbol, self.NO_BRACE_OPEN, proceed=False)
-                    self.symbol = self.scanner.get_symbol()
+                        symbol, self.NO_BRACE_OPEN, proceed=False)
+                    symbol = self.scanner.get_symbol()
                 else:
                     # Case 2: D { ...
                     self.display_error(
-                        self.symbol, missing_error_type)
-                    self.symbol = self.scanner.get_symbol()
+                        symbol, missing_error_type)
+                    symbol = self.scanner.get_symbol()
         # If keyword is present
         else:
-            self.symbol = self.scanner.get_symbol()
+            symbol = self.scanner.get_symbol()
             # If open brace '{'
-            if not (self.symbol.type == self.scanner.BRACE_OPEN):
+            if not (symbol.type == self.scanner.BRACE_OPEN):
                 # Case 5. KEYWORD ...
-                self.display_error(self.symbol, self.NO_BRACE_OPEN)
+                self.display_error(symbol, self.NO_BRACE_OPEN)
             else:
                 # Case 1. KEYWORD{ ...
-                self.symbol = self.scanner.get_symbol()
+                symbol = self.scanner.get_symbol()
 
     def device_list(self):
         """Parse device list."""
