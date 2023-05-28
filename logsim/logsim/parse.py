@@ -81,6 +81,9 @@ class Parser:
         self.names = names
         self.scanner = scanner
 
+        # Initial symbol
+        self.symbol = None
+
         # Count number of errors
         self.error_count = 0
 
@@ -170,7 +173,7 @@ class Parser:
             print(
                 "Syntax Error: Could not find parsing point to restart, program terminated early", end="\n \n")
         else:
-            raise ValueError("Expected a valid error code", end="\n \n")
+            raise ValueError("Expected a valid error code")
 
         # Display error line and visual marker
         if symbol.type == self.scanner.EOF:
