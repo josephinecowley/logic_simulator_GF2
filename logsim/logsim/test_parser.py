@@ -458,6 +458,30 @@ def test_parser_initial_error_checks_case_4(parser_fixture, create_testing_file_
     assert parser.symbol.type == parser.scanner.EOF
 
 
+@pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol, expected_message", [
+    ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;', 'dtype1', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n        DEVICES dtype1 = DTYPE;\n"),
+    ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;', 'dtype1', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n        CONNECTIONS dtype1.Q = dtype2.DATA;\n"),
+    ('MONITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;', 'dtype1', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n        MONITORS dtype1.Q;\n"),
+])
+def test_parser_initial_error_checks_case_5(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol, expected_message):
+    scanner = create_testing_file_to_scan(
+    f"""
+    {KEYWORD} {correct_example}
+    """ 
+    )
+    parser = parser_fixture(scanner)
+
+    parser.initial_error_checks(eval(KEYWORD_ID), eval(missing_error_type))
+
+    captured = capfd.readouterr()
+    output_lines = captured.out.splitlines(True)
+    printed_message = ''.join(output_lines[:4]) # indexing done to ignore caret/tilde placement line
+    assert printed_message == expected_message
+
+    symbol_id = parser.symbol.id
+    assert parser.names.get_name_string(symbol_id) == expected_symbol
+
+
 def test_delete_testing_file():
     """This is an in-house helper function not strictly related to testing parse.py"""
     if os.path.exists("testing_file.txt"):
