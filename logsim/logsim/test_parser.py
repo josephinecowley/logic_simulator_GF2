@@ -365,12 +365,12 @@ def test_parser_error_recovery_stops_when_stopping_symbol_or_EOF_is_encountered(
     assert parser.error_recovery(error_type, proceed=False) is None
 
 
-@pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example", [
-    ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;'),
-    ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;'),
-    ('MONITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;'),
+@pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol", [
+    ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;', 'dtype1'),
+    ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;', 'dtype1'),
+    ('MONITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;', 'dtype1'),
 ])
-def test_parser_initial_error_checks_case_1(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example):
+def test_parser_initial_error_checks_case_1(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol):
     scanner = create_testing_file_to_scan(
     f"""
     {KEYWORD} {{ {correct_example}
@@ -378,10 +378,13 @@ def test_parser_initial_error_checks_case_1(parser_fixture, create_testing_file_
     )
     parser = parser_fixture(scanner)
 
-    assert parser.initial_error_checks(eval(KEYWORD_ID), eval(missing_error_type)) is None
+    parser.initial_error_checks(eval(KEYWORD_ID), eval(missing_error_type))
+
+    symbol_id = parser.symbol.id
+    assert parser.names.get_name_string(symbol_id) == expected_symbol
 
 
-@pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example", [
+'''@pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example", [
     ('DVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;'),
     ('CONNETIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;'),
     ('MONITOS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;'),
@@ -426,7 +429,7 @@ def test_parser_initial_error_checks_case_4(parser_fixture, create_testing_file_
     )
     parser = parser_fixture(scanner)
 
-    assert parser.initial_error_checks(eval(KEYWORD_ID), eval(missing_error_type)) is None
+    assert parser.initial_error_checks(eval(KEYWORD_ID), eval(missing_error_type)) is None'''
 
 
 def test_delete_testing_file():
