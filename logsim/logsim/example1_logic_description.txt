@@ -1,10 +1,11 @@
 DEVICES {
+
+    data = SWITCH(0);
     dtype1 = DTYPE;
     dtype2 = DTYPE;
     dtype3 = DTYPE;
     dtype4 = DTYPE;
-    clock = CLK(25);
-    data = SWITCH(0);
+    clock = CLOCK(25);
 }
 
 CONNECTIONS {
@@ -12,10 +13,10 @@ CONNECTIONS {
     dtype1.Q = dtype2.DATA;
     dtype2.Q = dtype3.DATA;
     dtype3.Q = dtype4.DATA;
-    clock = dtype1.CLOCK;
-    clock = dtype2.CLOCK;
-    clock = dtype3.CLOCK;
-    clock = dtype4.CLOCK;
+    clock = dtype1.CLK;
+    clock = dtype2.CLK;
+    clock = dtype3.CLK;
+    clock = dtype4.CLK;
 }
 
 MONITORS {
@@ -24,3 +25,4 @@ MONITORS {
     dtype3.Q;
     dtype4.Q;
 }
+END
