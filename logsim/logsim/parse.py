@@ -85,7 +85,6 @@ class Parser:
         self.error_count = 0
 
         # List of syntax errors
-        # JC! come back and change this to a dictionary such that manual changes to number of errors is unecessary
         self.syntax_errors = [self.NO_DEVICES_KEYWORD, self.NO_CONNECTIONS_KEYWORD, self.NO_MONITORS_KEYWORD, self.NO_END_KEYWORD, self.NO_BRACE_OPEN, self.NO_BRACE_CLOSE,
                               self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_BRACKET_OPEN, self.NO_BRACKET_CLOSE, self.NO_NUMBER, self.CLK_OUT_OF_RANGE, self.SWITCH_OUT_OF_RANGE,
                               self.UNDEFINED_NAME, self.NO_FULLSTOP, self.NO_SEMICOLON, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE, self.TERMINATE] = self.names.unique_error_codes(22)
@@ -188,7 +187,6 @@ class Parser:
         if not isinstance(error_type, int):
             raise TypeError(
                 "Expected error_type to be an integer type argument")
-        # JC! need to fix this to not rely on a '19'
         elif error_type >= len(self.syntax_errors):
             raise ValueError(
                 "Expected an error code within range of error types")
@@ -431,7 +429,6 @@ class Parser:
                                 proceed=False)
                             return None, None
                     else:
-                        # JC! Might want to make this out of range more specific
                         self.display_error(self.symbol, self.CLK_OUT_OF_RANGE,
                                            proceed=False)
                         return None, None
