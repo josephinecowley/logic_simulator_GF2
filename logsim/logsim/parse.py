@@ -221,6 +221,11 @@ class Parser:
         elif error_type == self.FLOATING_INPUT:
             print(
                 "Semantic Error: Cannot make network as not all inputs are connected to an output.", end="\n \n")
+        elif error_type == self.monitors.NOT_OUTPUT:
+            print("Semantic Error: Cannot assign a monitor as specified device port is not an output port.", end="\n \n")
+        elif error_type == self.monitors.MONITOR_PRESENT:
+            print(
+                "Semantic Error: Cannot assign more than one monitor to a single device output port.", end="\n \n")
         else:
             raise ValueError("Expected a valid error code")
 
@@ -658,7 +663,9 @@ class Parser:
         # Common initial error handling
         self.initial_error_checks(MONITORS_ID, self.NO_MONITORS_KEYWORD)
         # Parse a monitor
-        self.output()
+        [monitor_device_id, monitor_port_id] = self.output()
+        # Assign the monitor
+        self.assign_monitor(monitor_device_id, monitor_port_id)
         # Check if semicolon is missing but next symbol is a NAME type
         if self.symbol.type != self.scanner.SEMICOLON:
             self.display_error(
@@ -674,7 +681,9 @@ class Parser:
             elif self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.symbol = self.scanner.get_symbol()
                 return
-            self.output()
+            [monitor_device_id, monitor_port_id] = self.output()
+            # Assign the monitor
+            self.assign_monitor(monitor_device_id, monitor_port_id)
             # If semicolon is missing, but new NAME type symbol is entered, call error and parse to next stopping symbol
             if self.symbol.type == self.scanner.NAME:
                 self.display_error(self.symbol, self.NO_SEMICOLON,
@@ -694,6 +703,16 @@ class Parser:
             elif self.symbol.type != self.scanner.SEMICOLON:
                 self.display_error(self.symbol, self.NO_SEMICOLON)
                 return
+
+    def assign_monitor(self, monitor_device_id, monitor_port_id):
+        """Assign a single monitor to the given output port"""
+
+        # If there are no errors, make a monitor
+        if self.error_count == 0:
+            error_type = self.monitors.make_monitor(
+                monitor_device_id, monitor_port_id)
+            if error_type != self.monitors.NO_ERROR:
+                self.display_error(self.symbol, error_type, syntax_error=False)
 
     def end(self):
         """Parse an END keyword and check there are no symbols afterwards."""
@@ -740,8 +759,11 @@ class Parser:
                     self.display_error(
                         self.symbol, self.FLOATING_INPUT, syntax_error=False)
 
-                # Parse monitor list
+            # Parse monitor list
             self.monitor_list()
+
+            # Display signal traces in the monitor
+            self.monitors.display_signals()
 
             # Check for END keyword
             self.end()
