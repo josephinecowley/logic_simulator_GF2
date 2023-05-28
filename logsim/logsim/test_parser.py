@@ -17,9 +17,10 @@ def names_fixture():
     names = Names()
     return names
 
-
+# DEPRECATED
 @pytest.fixture
 def old_scanner_fixture(path_fixture, names_fixture):
+    """WILL BE DEPRECATED"""
     scanner = Scanner(path_fixture, names_fixture)
     return scanner
 
@@ -66,39 +67,40 @@ def test_create_testing_file_to_scan(create_testing_file_to_scan):
 
 @pytest.fixture
 def scanner_fixture(create_testing_file_to_scan):
-    scanner = create_testing_file_to_scan(
-    """
-    DEVICES {
-        dtype1 = DTYPE;
-        dtype2 = DTYPE;
-        dtype3 = DTYPE;
-        dtype4 = DTYPE;
-        clock = CLK(25);
-        data = SWITCH(0);
-    }
+    def _scanner_fixture(scan_through_all=True):
+        scanner = create_testing_file_to_scan(
+        """
+        DEVICES {
+            dtype1 = DTYPE;
+            dtype2 = DTYPE;
+            dtype3 = DTYPE;
+            dtype4 = DTYPE;
+            clock = CLK(25);
+            data = SWITCH(0);
+        }
 
-    CONNECTIONS {
-        data = dtype1.DATA;
-        dtype1.Q = dtype2.DATA;
-        dtype2.Q = dtype3.DATA;
-        dtype3.Q = dtype4.DATA;
-        clock = dtype1.CLK;
-        clock = dtype2.CLK;
-        clock = dtype3.CLK;
-        clock = dtype4.CLK;
-    }
+        CONNECTIONS {
+            data = dtype1.DATA;
+            dtype1.Q = dtype2.DATA;
+            dtype2.Q = dtype3.DATA;
+            dtype3.Q = dtype4.DATA;
+            clock = dtype1.CLK;
+            clock = dtype2.CLK;
+            clock = dtype3.CLK;
+            clock = dtype4.CLK;
+        }
 
-    MONITORS {
-        dtype1.Q;
-        dtype2.Q;
-        dtype3.Q;
-        dtype4.Q;
-    }
+        MONITORS {
+            dtype1.Q;
+            dtype2.Q;
+            dtype3.Q;
+            dtype4.Q;
+        }
 
-    END
-    """, scan_through_all=True)
-
-    return scanner
+        END
+        """, scan_through_all)
+        return scanner
+    return _scanner_fixture
 
 
 @pytest.fixture
@@ -128,14 +130,17 @@ def test_parser_fixture(parser_fixture, create_testing_file_to_scan):
     ['DEVICES', 'CONNECTIONS', 'MONITORS', 'END', 'dtype1', 'DTYPE', 'dtype2', 'dtype3', 'dtype4', 'clock', 'CLK', '25', 'data', 'SWITCH', '0']
 
 
+# DEPRECATED
 @pytest.fixture
 def old_parser_fixture(names_fixture, old_scanner_fixture):
-    """Return a new parser instance"""
+    """Return a new parser instance
+    DEPRECATED"""
     return Parser(names_fixture, old_scanner_fixture)
 
-
+# DEPRECATED
 @pytest.fixture
 def set_scanner_location(old_scanner_fixture):
+    """DEPRECATED"""
     def _set_scanner_location(target_location):
         target_line_number, target_position = target_location
         scanner = old_scanner_fixture # call scanner instance
@@ -162,35 +167,40 @@ def set_scanner_location(old_scanner_fixture):
 
     return _set_scanner_location
 
-
+# DEPRECATED
 @pytest.fixture
 def symbol_fixture(old_scanner_fixture, set_scanner_location):
+    """DEPRECATED"""
     scanner = old_scanner_fixture
     set_scanner_location((2, 5))
     symbol = scanner.get_symbol()
 
     return symbol
 
-
+# DEPRECATED
 @pytest.fixture
 def correct_error_arguments(symbol_fixture):
+    """DEPRECATED"""
     symbol = symbol_fixture
     return symbol, 4, True, [2, 3, 6, 8]
 
 
-def test_parser_initialisation(parser_fixture, scanner_fixture):
-    scanner = scanner_fixture
+def test_parser_initialisation(scanner_fixture, parser_fixture):
+    scanner = scanner_fixture()
     parser = parser_fixture(scanner)
+
     assert isinstance(parser.names, Names)
     assert isinstance(parser.scanner, Scanner)
     assert parser.error_count == 0
+    assert parser.syntax_errors == range(22) # KO! Come back to this just in case
 
-    # KO! Need to add check for list of syntax error once JC has changed it to a dictionary
 
-
-def test_parser_display_error_instance_handling(old_parser_fixture, correct_error_arguments):
-    parser = old_parser_fixture
-    symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
+def test_parser_display_error_instance_handling(scanner_fixture, parser_fixture):
+    scanner = scanner_fixture(scan_through_all=False)
+    parser = parser_fixture(scanner)
+    symbol = parser.scanner.get_symbol()
+    error_type = parser.syntax_errors[0]
+    proceed=True
 
     with pytest.raises(TypeError):
         parser.display_error(symbol, "non-integer error_type") # Expected error_type to be an integer type argument
@@ -216,9 +226,21 @@ def test_parser_display_error_instance_handling(old_parser_fixture, correct_erro
 
 def test_parser_display_error_error_count_increment(old_parser_fixture, correct_error_arguments):
     parser = old_parser_fixture
-    parser.display_error(*correct_error_arguments)
+    
 
     assert parser.error_count == 1
+
+
+def test_parser_display_error_see_error_count_increment_by_one(scanner_fixture, parser_fixture):
+    scanner = scanner_fixture()
+    parser = parser_fixture(scanner)
+    symbol = parser.scanner.get_symbol()
+    error_type = parser.syntax_errors[0]
+
+    parser.display_error(symbol, error_type)
+
+    assert parser.error_count == 1
+
 
 @pytest.mark.parametrize("error_type, expected_message", [
     ("parser.NO_DEVICES_KEYWORD", "  Line 2: Syntax Error: Expected the keyword DEVICES"),
