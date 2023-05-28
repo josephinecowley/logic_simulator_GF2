@@ -343,11 +343,10 @@ def test_parser_error_recovery_check_built_in_error_handling(scanner_fixture, pa
     symbol = parser.scanner.get_symbol()
     error_type = parser.syntax_errors[0]
 
-    proceed = True
-    assert parser.error_recovery(error_type, proceed) is None
+    assert parser.error_recovery(error_type, proceed=True) is None
 
 
-def test_parser_error_recovery_stops_when_stopping_symbol_is_encountered(create_testing_file_to_scan, parser_fixture):
+def test_parser_error_recovery_stops_when_stopping_symbol_or_EOF_is_encountered(create_testing_file_to_scan, parser_fixture):
     scanner = create_testing_file_to_scan(
     """
     DEVICES {
@@ -374,6 +373,22 @@ def test_parser_initial_error_checks_case_3(parser_fixture, create_testing_file_
     """)
     parser = parser_fixture(scanner)
     DEVICES_ID = scanner.names.lookup(["DEVICES"])[0]
+
+
+@pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type", [
+    ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD'),
+    ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD'),
+    ('MONITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD'),
+])
+def test_parser_initial_error_checks_case_1(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type):
+    scanner = create_testing_file_to_scan(
+    f"""
+    {KEYWORD} {{
+    """ 
+    )
+    parser = parser_fixture(scanner)
+
+    assert parser.initial_error_checks(eval(KEYWORD_ID), eval(missing_error_type)) is None
 
 
 def test_delete_testing_file():
