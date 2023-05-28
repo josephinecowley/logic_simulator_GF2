@@ -27,20 +27,90 @@ def scanner_fixture(path_fixture, names_fixture):
 @pytest.fixture
 def create_testing_file_to_scan(names_fixture):
     """This is an in-house helper function not strictly related to testing parse.py"""
-    def _create_testing_file(testing_example):
+    def _create_testing_file(testing_example, scan_through_all=False):
         with open("testing_file.txt", "w") as file:
             file_path = file.name # by structure, this will always create testing_file.txt within this directory
             file.write(testing_example)
 
         scanner = Scanner(file_path, names_fixture)
 
-        return scanner
+        if scan_through_all:
+            while scanner.current_character != "":
+                scanner.get_symbol()
 
+        return scanner
     return _create_testing_file
+
+
+'''def test_new_scanner_fixture(new_scanner_fixture):
+    scanner = new_scanner_fixture'''
 
 
 def test_create_testing_file_to_scan(create_testing_file_to_scan):
     """This is an in-house helper function not strictly related to testing parse.py"""
+    scanner = create_testing_file_to_scan(
+    """
+    DEVICES {
+        dtype1 = DTYPE;
+        dtype2 = DTYPE;
+        dtype3 = DTYPE;
+        dtype4 = DTYPE;
+        clock = CLK(25);
+        data = SWITCH(0);
+    }
+    """, scan_through_all=True)
+
+    assert scanner.names.names_list == \
+    ['DEVICES', 'CONNECTIONS', 'MONITORS', 'END', 'dtype1', 'DTYPE', 'dtype2', 'dtype3', 'dtype4', 'clock', 'CLK', '25', 'data', 'SWITCH', '0']
+
+
+@pytest.fixture
+def new_scanner_fixture(create_testing_file_to_scan):
+    breakpoint()
+    scanner = create_testing_file_to_scan(
+    """
+    DEVICES {
+        dtype1 = DTYPE;
+        dtype2 = DTYPE;
+        dtype3 = DTYPE;
+        dtype4 = DTYPE;
+        clock = CLK(25);
+        data = SWITCH(0);
+    }
+
+    CONNECTIONS {
+        data = dtype1.DATA;
+        dtype1.Q = dtype2.DATA;
+        dtype2.Q = dtype3.DATA;
+        dtype3.Q = dtype4.DATA;
+        clock = dtype1.CLK;
+        clock = dtype2.CLK;
+        clock = dtype3.CLK;
+        clock = dtype4.CLK;
+    }
+
+    MONITORS {
+        dtype1.Q;
+        dtype2.Q;
+        dtype3.Q;
+        dtype4.Q;
+    }
+
+    END
+    """, scan_through_all=True)
+
+    return scanner
+
+
+@pytest.fixture
+def parser_fixture(names_fixture):
+    """Return a new parser instance"""
+    def _new_parser_fixture(scanner):
+        return Parser(names_fixture, scanner)
+    return _new_parser_fixture
+
+
+def test_parser_fixture(parser_fixture, create_testing_file_to_scan):
     scanner = create_testing_file_to_scan(
     """
         DEVICES {
@@ -51,20 +121,17 @@ def test_create_testing_file_to_scan(create_testing_file_to_scan):
         clock = CLK(25);
         data = SWITCH(0);
     }
-    """)
+    """, scan_through_all=True)
 
-    x = 4
+    parser = parser_fixture(scanner)
+    breakpoint()
 
-    assert scanner.current_character == " "
-    while scanner.current_character != "":
-        scanner.get_symbol()
-
-    assert scanner.names.names_list == \
+    assert parser.names.names_list == \
     ['DEVICES', 'CONNECTIONS', 'MONITORS', 'END', 'dtype1', 'DTYPE', 'dtype2', 'dtype3', 'dtype4', 'clock', 'CLK', '25', 'data', 'SWITCH', '0']
 
 
 @pytest.fixture
-def parser_fixture(names_fixture, scanner_fixture):
+def old_parser_fixture(names_fixture, scanner_fixture):
     """Return a new parser instance"""
     return Parser(names_fixture, scanner_fixture)
 
@@ -113,8 +180,8 @@ def correct_error_arguments(symbol_fixture):
     return symbol, 4, True, [2, 3, 6, 8]
 
 
-def test_parser_initialisation(parser_fixture, names_fixture, scanner_fixture):
-    parser = parser_fixture
+def test_parser_initialisation(old_parser_fixture, names_fixture, scanner_fixture):
+    parser = old_parser_fixture
     assert parser.names is names_fixture
     assert parser.scanner is scanner_fixture
     assert parser.error_count == 0
@@ -122,8 +189,17 @@ def test_parser_initialisation(parser_fixture, names_fixture, scanner_fixture):
     # KO! Need to add check for list of syntax error once JC has changed it to a dictionary
 
 
-def test_parser_display_error_instance_handling(parser_fixture, correct_error_arguments):
+def test_parser_initialisation(parser_fixture):
     parser = parser_fixture
+    assert isinstance(parser.names, Names)
+    assert isinstance(parser.scanner, Scanner)
+    assert parser.error_count == 0
+
+    # KO! Need to add check for list of syntax error once JC has changed it to a dictionary
+
+
+def test_parser_display_error_instance_handling(old_parser_fixture, correct_error_arguments):
+    parser = old_parser_fixture
     symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
 
     with pytest.raises(TypeError):
@@ -148,8 +224,8 @@ def test_parser_display_error_instance_handling(parser_fixture, correct_error_ar
         parser.display_error(symbol, error_type, proceed, list(range(-8))) # Expected stopping symbol to be within range of given symbols
 
 
-def test_parser_display_error_error_count_increment(parser_fixture, correct_error_arguments):
-    parser = parser_fixture
+def test_parser_display_error_error_count_increment(old_parser_fixture, correct_error_arguments):
+    parser = old_parser_fixture
     parser.display_error(*correct_error_arguments)
 
     assert parser.error_count == 1
@@ -178,9 +254,9 @@ def test_parser_display_error_error_count_increment(parser_fixture, correct_erro
     ("parser.EMPTY_FILE", "  Line 2: Syntax Error: Cannot parse an empty file"),
     ("parser.TERMINATE", "  Line 2: Syntax Error: Could not find parsing point to restart, program terminated early"),
 ])
-def test_parser_display_error_show_appropriate_error_message(parser_fixture, correct_error_arguments, capfd, error_type, expected_message):
-    parser = parser_fixture
-    symbol, fake_error_type, proceed, stopping_symbol_types = correct_error_arguments
+def test_parser_display_error_show_appropriate_error_message(old_parser_fixture, correct_error_arguments, capfd, error_type, expected_message):
+    parser = old_parser_fixture
+    symbol, _, proceed, stopping_symbol_types = correct_error_arguments
     error_type = eval(error_type)
 
     parser.display_error(symbol, error_type, proceed, stopping_symbol_types)
@@ -191,8 +267,8 @@ def test_parser_display_error_show_appropriate_error_message(parser_fixture, cor
     assert output_lines[1] == expected_message
 
 
-def test_parser_display_error_valid_error_code(parser_fixture, correct_error_arguments):
-    parser = parser_fixture
+def test_parser_display_error_valid_error_code(old_parser_fixture, correct_error_arguments):
+    parser = old_parser_fixture
     symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
     invalid_error_type = max(parser.syntax_errors) + 1
 
@@ -200,8 +276,8 @@ def test_parser_display_error_valid_error_code(parser_fixture, correct_error_arg
         parser.display_error(symbol, invalid_error_type, proceed, stopping_symbol_types)
 
 
-def test_parser_display_error_symbol_is_EOF(parser_fixture, correct_error_arguments):
-    parser = parser_fixture
+def test_parser_display_error_symbol_is_EOF(old_parser_fixture, correct_error_arguments):
+    parser = old_parser_fixture
     symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
 
     symbol.type = parser.scanner.EOF
@@ -209,8 +285,14 @@ def test_parser_display_error_symbol_is_EOF(parser_fixture, correct_error_argume
     assert parser.display_error(symbol, error_type, proceed, stopping_symbol_types) is None
 
 
-def test_error_recovery_instance_handling(parser_fixture, correct_error_arguments):
-    parser = parser_fixture
+def test_parser_display_error_symbol_is_EOF(parser_fixture, create_testing_file_to_scan):
+    scanner = create_testing_file_to_scan(
+    """
+    """, scan_through_all=True)
+
+
+def test_error_recovery_instance_handling(old_parser_fixture, correct_error_arguments):
+    parser = old_parser_fixture
     symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
 
     with pytest.raises(TypeError):
@@ -235,16 +317,22 @@ def test_error_recovery_instance_handling(parser_fixture, correct_error_argument
         parser.error_recovery(error_type, proceed, list(range(-8))) # Expected stopping symbol to be within range of given symbols
 
 
-def test_error_recovery_check_built_in_error_handling(parser_fixture, correct_error_arguments, capfd):
-    parser = parser_fixture
+def test_parser_error_recovery_check_built_in_error_handling(old_parser_fixture, correct_error_arguments):
+    parser = old_parser_fixture
     symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
 
     proceed = True
     assert parser.error_recovery(error_type, proceed, stopping_symbol_types) is None
 
 
-def test_initial_error_checks_case_3(parser_fixture):
-    pass
+def test_parser_initial_error_checks_case_3(old_parser_fixture, create_testing_file_to_scan, capfd):
+    parser = old_parser_fixture
+    scanner = create_testing_file_to_scan(
+    """
+        { dtype1 = DTYPE;
+    }
+    """)
+    DEVICES_ID = scanner.names.lookup(["DEVICES"])[0]
 
 
 def test_delete_testing_file():
