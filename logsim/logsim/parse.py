@@ -41,6 +41,18 @@ class Parser:
 
     error_recovery(self, error_type, proceed=True, stopping_symbol_types=[6]): Recover from an error by resuming parsing at an appropriate point specified by the stopping_symbol.
 
+    initial_error_checks(self, KEYWORD_ID, missing_error_type): Check initial symbols for common errors. This function tests for 6 cases:
+
+        ... represents the first line of the list. For cases 4 and 6, because it is difficult 
+        to distinguish between them, we merely skip to the next stopping symbol.
+
+        1. Correct - when both keyword and open brace are present: KEYWORD { ...
+        2. First keyword is spelt wrong, but open brace follows: KYWORD { ...
+        3. Missing first keyword, but open brace follows: { ...
+        4. Missing both the first keyword and open brace: ... 
+        5. First keyword is correct, but missing open brace: { ...
+        6. First keyword is spelt wrong, and missing an open brace { ...
+
     device_list(self): Parse device list.
 
     device(self): Parse user defined device.
@@ -76,10 +88,9 @@ class Parser:
         self.error_count = 0
 
         # List of syntax errors
-        # JC! come back and change this to a dictionary such that manual changes to number of errors is unecessary
         self.syntax_errors = [self.NO_DEVICES_KEYWORD, self.NO_CONNECTIONS_KEYWORD, self.NO_MONITORS_KEYWORD, self.NO_END_KEYWORD, self.NO_BRACE_OPEN, self.NO_BRACE_CLOSE,
-                              self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_BRACKET_OPEN, self.NO_BRACKET_CLOSE, self.NO_NUMBER, self.CLK_OUT_OF_RANGE, self.SWITCH_OUT_OF_RANGE,
-                              self.UNDEFINED_NAME, self.NO_FULLSTOP, self.NO_SEMICOLON, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE, self.TERMINATE] = self.names.unique_error_codes(22)
+                              self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_BRACKET_OPEN, self.NO_BRACKET_CLOSE, self.NO_NUMBER, self.INPUT_OUT_OF_RANGE, self.CLK_OUT_OF_RANGE, self.SWITCH_OUT_OF_RANGE,
+                              self.UNDEFINED_NAME, self.NO_FULLSTOP, self.NO_SEMICOLON, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE, self.TERMINATE] = self.names.unique_error_codes(23)
 
     # Stopping symbols automatically assigned to semi-colons, braces and keywords
     def display_error(self,  symbol, error_type,  proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
@@ -136,6 +147,9 @@ class Parser:
             print("Syntax Error: Expected a ')' for an input", end="\n \n")
         elif error_type == self.NO_NUMBER:
             print("Syntax Error: Expected a positive integer", end="\n \n")
+        elif error_type == self.INPUT_OUT_OF_RANGE:
+            print(
+                "Semantic Error: Input number of gates is out of range. Must be an integer between 1 and 16", end="\n \n")
         elif error_type == self.CLK_OUT_OF_RANGE:
             print(
                 "Semantic Error: Input clock half period is out of range. Must be a positive integer", end="\n \n")
@@ -178,7 +192,6 @@ class Parser:
         if not isinstance(error_type, int):
             raise TypeError(
                 "Expected error_type to be an integer type argument")
-        # JC! need to fix this to not rely on a '19'
         elif error_type >= len(self.syntax_errors):
             raise ValueError(
                 "Expected an error code within range of error types")
@@ -308,9 +321,9 @@ class Parser:
 
     def device(self):
         """Parse user defined device."""
-        # Check that we have a valid user defined name
         if self.symbol.type == self.scanner.BRACE_CLOSE:
             return
+        # Check that we have a valid user defined name
         if self.symbol.type == self.scanner.NAME:
             self.symbol = self.scanner.get_symbol()
             # Check that the name is followed by an equals sign
@@ -329,8 +342,8 @@ class Parser:
     def check_device_is_valid(self):
         """Check if device is valid and return both device type ID and the input ID."""
         [AND_ID, NAND_ID, OR_ID, NOR_ID, XOR_ID, DTYPE_ID, SWITCH_ID, CLK_ID] = self.names.lookup(
-            ["AND", "NAND", "OR", "NOR", "XOR", "DTYPE",  "SWITCH", "CLK"])
-        one_to_sixteen = range(1, 17)
+            ["AND", "NAND", "OR", "NOR", "XOR", "DTYPE",  "SWITCH", "CLOCK"])
+        one_to_sixteen = list(range(1, 17))
         binary_digit = [0, 1]
         # Check that name is either a AND, NAND, OR, NOR gate
         if self.symbol.id in [AND_ID, NAND_ID, OR_ID, NOR_ID]:
@@ -342,20 +355,21 @@ class Parser:
                 # Check that number of inputs is an integer
                 if self.symbol.type == self.scanner.NUMBER:
                     # Check that number is within range
-                    if self.symbol.id in one_to_sixteen:
-                        number_of_inputs_ID = self.symbol.id
+                    number_of_inputs = int(
+                        self.names.get_name_string(self.symbol.id))
+                    if number_of_inputs in one_to_sixteen:
                         self.symbol = self.scanner.get_symbol()
                         # Check that next symbol is a close bracket ")"
                         if self.symbol.type == self.scanner.BRACKET_CLOSE:
                             self.symbol = self.scanner.get_symbol()
-                            return symbol_ID, number_of_inputs_ID
+                            return symbol_ID, number_of_inputs
                         else:
                             self.display_error(
                                 self.symbol, self.NO_BRACKET_CLOSE,
                                 proceed=False)
                             return None, None
                     else:
-                        self.display_error(self.symbol, self.CLK_OUT_OF_RANGE,
+                        self.display_error(self.symbol, self.INPUT_OUT_OF_RANGE,
                                            proceed=False)
                         return None, None
                 else:
@@ -429,7 +443,6 @@ class Parser:
                                 proceed=False)
                             return None, None
                     else:
-                        # JC! Might want to make this out of range more specific
                         self.display_error(self.symbol, self.CLK_OUT_OF_RANGE,
                                            proceed=False)
                         return None, None
@@ -661,7 +674,7 @@ class Parser:
 # JC! This will be deleted once development is complete
 def main():
     # Check command line arguments
-    file_path = "logsim/example1_logic_description.txt"
+    file_path = "logsim/example2_logic_description.txt"
     names = Names()
     scanner = Scanner(file_path, names)
     parser = Parser(names, scanner)
