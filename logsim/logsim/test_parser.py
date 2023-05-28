@@ -224,13 +224,6 @@ def test_parser_display_error_instance_handling(scanner_fixture, parser_fixture)
         parser.display_error(symbol, error_type, proceed, list(range(-8))) # Expected stopping symbol to be within range of given symbols
 
 
-def test_parser_display_error_error_count_increment(old_parser_fixture, correct_error_arguments):
-    parser = old_parser_fixture
-    
-
-    assert parser.error_count == 1
-
-
 def test_parser_display_error_see_error_count_increment_by_one(scanner_fixture, parser_fixture):
     scanner = scanner_fixture()
     parser = parser_fixture(scanner)
@@ -266,12 +259,13 @@ def test_parser_display_error_see_error_count_increment_by_one(scanner_fixture, 
     ("parser.EMPTY_FILE", "  Line 2: Syntax Error: Cannot parse an empty file"),
     ("parser.TERMINATE", "  Line 2: Syntax Error: Could not find parsing point to restart, program terminated early"),
 ])
-def test_parser_display_error_show_appropriate_error_message(old_parser_fixture, correct_error_arguments, capfd, error_type, expected_message):
-    parser = old_parser_fixture
-    symbol, _, proceed, stopping_symbol_types = correct_error_arguments
+def test_parser_display_error_show_appropriate_error_message(scanner_fixture, parser_fixture, capfd, error_type, expected_message):
+    scanner = scanner_fixture(False)
+    parser = parser_fixture(scanner)
+    symbol = parser.scanner.get_symbol()
     error_type = eval(error_type)
 
-    parser.display_error(symbol, error_type, proceed, stopping_symbol_types)
+    parser.display_error(symbol, error_type)
 
     captured = capfd.readouterr()
     output_lines = captured.out.splitlines()
@@ -288,13 +282,25 @@ def test_parser_display_error_valid_error_code(old_parser_fixture, correct_error
         parser.display_error(symbol, invalid_error_type, proceed, stopping_symbol_types)
 
 
-def test_parser_display_error_symbol_is_EOF(old_parser_fixture, correct_error_arguments):
-    parser = old_parser_fixture
-    symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
+def test_parser_display_error_valid_error_code(scanner_fixture, parser_fixture):
+    scanner = scanner_fixture()
+    parser = parser_fixture(scanner)
+    symbol = parser.scanner.get_symbol()
+    invalid_error_type = max(parser.syntax_errors) + 1
 
+    with pytest.raises(ValueError):
+        parser.display_error(symbol, invalid_error_type)
+
+
+def test_parser_display_error_symbol_is_EOF(scanner_fixture, parser_fixture):
+    scanner = scanner_fixture()
+    parser = parser_fixture(scanner)
+    error_type = parser.syntax_errors[0]
+
+    symbol = parser.scanner.get_symbol()
     symbol.type = parser.scanner.EOF
 
-    assert parser.display_error(symbol, error_type, proceed, stopping_symbol_types) is None
+    assert parser.display_error(symbol, error_type) is None
 
 
 def test_parser_display_error_symbol_is_EOF(parser_fixture, create_testing_file_to_scan):
@@ -303,9 +309,11 @@ def test_parser_display_error_symbol_is_EOF(parser_fixture, create_testing_file_
     """, scan_through_all=True)
 
 
-def test_error_recovery_instance_handling(old_parser_fixture, correct_error_arguments):
-    parser = old_parser_fixture
-    symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
+def test_error_recovery_instance_handling(scanner_fixture, parser_fixture, correct_error_arguments):
+    scanner = scanner_fixture()
+    parser = parser_fixture(scanner)
+    symbol = parser.scanner.get_symbol()
+    error_type = parser.syntax_errors[0]
 
     with pytest.raises(TypeError):
         parser.error_recovery("not an integer") # Expected error_type to be an integer type argument
@@ -318,32 +326,34 @@ def test_error_recovery_instance_handling(old_parser_fixture, correct_error_argu
     with pytest.raises(TypeError):
         parser.error_recovery(error_type, "not a boolean") # Expected bool type argument for proceed
     with pytest.raises(TypeError):
-        parser.error_recovery(error_type, proceed, "not a list") # Expected stopping symbol to be an integer type argument
+        parser.error_recovery(error_type, True, "not a list") # Expected stopping symbol to be an integer type argument
     with pytest.raises(ValueError):
-        parser.error_recovery(error_type, proceed, list(range(12))) # Expected stopping symbol to be within range of given symbols
+        parser.error_recovery(error_type, True, list(range(12))) # Expected stopping symbol to be within range of given symbols
     with pytest.raises(ValueError):
-        parser.error_recovery(error_type, proceed, list(range(32))) # Expected stopping symbol to be within range of given symbols
+        parser.error_recovery(error_type, True, list(range(32))) # Expected stopping symbol to be within range of given symbols
     with pytest.raises(ValueError):
-        parser.error_recovery(error_type, proceed, list(range(0))) # Expected stopping symbol to be within range of given symbols
+        parser.error_recovery(error_type, True, list(range(0))) # Expected stopping symbol to be within range of given symbols
     with pytest.raises(ValueError):
-        parser.error_recovery(error_type, proceed, list(range(-8))) # Expected stopping symbol to be within range of given symbols
+        parser.error_recovery(error_type, True, list(range(-8))) # Expected stopping symbol to be within range of given symbols
 
 
-def test_parser_error_recovery_check_built_in_error_handling(old_parser_fixture, correct_error_arguments):
-    parser = old_parser_fixture
-    symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
+def test_parser_error_recovery_check_built_in_error_handling(scanner_fixture, parser_fixture):
+    scanner = scanner_fixture()
+    parser = parser_fixture(scanner)
+    symbol = parser.scanner.get_symbol()
+    error_type = parser.syntax_errors[0]
 
     proceed = True
-    assert parser.error_recovery(error_type, proceed, stopping_symbol_types) is None
+    assert parser.error_recovery(error_type, proceed) is None
 
 
-def test_parser_initial_error_checks_case_3(old_parser_fixture, create_testing_file_to_scan, capfd):
-    parser = old_parser_fixture
+def test_parser_initial_error_checks_case_3(parser_fixture, create_testing_file_to_scan, capfd):
     scanner = create_testing_file_to_scan(
     """
         { dtype1 = DTYPE;
     }
     """)
+    parser = parser_fixture(scanner)
     DEVICES_ID = scanner.names.lookup(["DEVICES"])[0]
 
 
