@@ -508,6 +508,23 @@ def test_parser_initial_error_checks_case_6(parser_fixture, create_testing_file_
     assert parser.symbol.type == parser.scanner.EOF
 
 
+def test_parser_device_correct_parsing_of_device_list(parser_fixture, create_testing_file_to_scan):
+    scanner = create_testing_file_to_scan(
+    """
+    DEVICES {
+        dtype1 = DTYPE;
+        dtype2 = DTYPE;
+        dtype3 = DTYPE;
+        dtype4 = DTYPE;
+        clock = CLK(25);
+        data = SWITCH(0);
+    }
+    """, scan_through_all=False)
+
+    parser = parser_fixture(scanner)
+    assert parser.device_list() is None
+
+
 def test_delete_testing_file():
     """This is an in-house helper function not strictly related to testing parse.py"""
     if os.path.exists("testing_file.txt"):
