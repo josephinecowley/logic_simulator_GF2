@@ -213,7 +213,7 @@ def symbol_fixture(scanner_fixture, set_scanner_location):
 def correct_error_arguments(symbol_fixture):
     """Return the correct error arguments"""
     symbol = symbol_fixture
-    return symbol, 4, True, [2, 3, 6, 8]
+    return symbol, 4, True, True, [2, 3, 6, 8]
 
 
 def test_parser_initialisation(scanner_fixture, parser_fixture):
@@ -256,7 +256,7 @@ def test_parser_display_error_instance_handling(scanner_fixture, parser_fixture)
     with pytest.raises(ValueError):
         # Expected stopping symbol to be within range of given symbols
         parser.display_error(symbol, error_type,
-                             stopping_symbol_types=list(range(32)))
+                             stopping_symbol_types=list(range(max(parser.syntax_errors) + 16)))
     with pytest.raises(ValueError):
         # Expected stopping symbol to be within range of given symbols
         parser.display_error(symbol, error_type, proceed,
@@ -341,6 +341,7 @@ def test_parser_display_error_see_error_count_increment_by_one(scanner_fixture, 
 
 ])
 def test_parser_display_error_show_appropriate_error_message(scanner_fixture, parser_fixture, capfd, error_type, expected_message):
+    """Test display_error returns the correct error strings"""
     scanner = scanner_fixture(False)
     parser = parser_fixture(scanner)
     symbol = parser.scanner.get_symbol()
@@ -354,78 +355,67 @@ def test_parser_display_error_show_appropriate_error_message(scanner_fixture, pa
     assert output_lines[1] == expected_message
 
 
-# def test_parser_display_error_valid_error_code(old_parser_fixture, correct_error_arguments):
-#     parser = old_parser_fixture
-#     symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
-#     invalid_error_type = max(parser.syntax_errors) + 1
+def test_parser_display_error_valid_error_code(scanner_fixture, parser_fixture, correct_error_arguments):
+    """Test display_error returns ValueError for out of range error_code"""
+    scanner = scanner_fixture()
+    parser = parser_fixture(scanner)
+    symbol, error_type, syntax_error, proceed, stopping_symbol_types = correct_error_arguments
+    invalid_error_type = max(parser.syntax_errors) + 16
 
-#     with pytest.raises(ValueError):
-#         parser.display_error(symbol, invalid_error_type,
-#                              proceed, stopping_symbol_types)
-
-
-# def test_parser_display_error_valid_error_code(scanner_fixture, parser_fixture):
-#     scanner = scanner_fixture()
-#     parser = parser_fixture(scanner)
-#     symbol = parser.scanner.get_symbol()
-#     invalid_error_type = max(parser.syntax_errors) + 1
-
-#     with pytest.raises(ValueError):
-#         parser.display_error(symbol, invalid_error_type)
+    with pytest.raises(ValueError):
+        parser.display_error(symbol, invalid_error_type,
+                             syntax_error, proceed, stopping_symbol_types)
 
 
-# def test_parser_display_error_symbol_is_EOF(scanner_fixture, parser_fixture):
-#     scanner = scanner_fixture()
-#     parser = parser_fixture(scanner)
-#     error_type = parser.syntax_errors[0]
+def test_arser_display_error_symbol_is_EOF(parser_fixture, create_testing_file_to_scan):
+    """Test display_error when symbol is EOF"""
+    scanner = create_testing_file_to_scan(
+        """
+    """, scan_through_all=True)
+    parser = parser_fixture(scanner)
+    error_type = parser.syntax_errors[0]
 
-#     symbol = parser.scanner.get_symbol()
-#     symbol.type = parser.scanner.EOF
+    symbol = parser.scanner.get_symbol()
+    symbol.type = parser.scanner.EOF
 
-#     assert parser.display_error(symbol, error_type) is None
-
-
-# def test_parser_display_error_symbol_is_EOF(parser_fixture, create_testing_file_to_scan):
-#     scanner = create_testing_file_to_scan(
-#         """
-#     """, scan_through_all=True)
+    assert parser.display_error(symbol, error_type) is None
 
 
-# def test_error_recovery_instance_handling(scanner_fixture, parser_fixture, correct_error_arguments):
-#     scanner = scanner_fixture()
-#     parser = parser_fixture(scanner)
-#     symbol = parser.scanner.get_symbol()
-#     error_type = parser.syntax_errors[0]
+def test_error_recovery_instance_handling(scanner_fixture, parser_fixture, correct_error_arguments):
+    scanner = scanner_fixture()
+    parser = parser_fixture(scanner)
+    symbol = parser.scanner.get_symbol()
+    error_type = parser.syntax_errors[0]
 
-#     with pytest.raises(TypeError):
-#         # Expected error_type to be an integer type argument
-#         parser.error_recovery("not an integer")
-#     with pytest.raises(ValueError):
-#         # Expected an error code within range of error types
-#         parser.error_recovery(len(parser.syntax_errors))
-#     with pytest.raises(ValueError):
-#         # Expected an error code within range of error types
-#         parser.error_recovery(len(parser.syntax_errors) + 10)
-#     with pytest.raises(ValueError):
-#         parser.error_recovery(-4)  # Cannot have a negative error code
-#     with pytest.raises(TypeError):
-#         # Expected bool type argument for proceed
-#         parser.error_recovery(error_type, "not a boolean")
-#     with pytest.raises(TypeError):
-#         # Expected stopping symbol to be an integer type argument
-#         parser.error_recovery(error_type, True, "not a list")
-#     with pytest.raises(ValueError):
-#         # Expected stopping symbol to be within range of given symbols
-#         parser.error_recovery(error_type, True, list(range(12)))
-#     with pytest.raises(ValueError):
-#         # Expected stopping symbol to be within range of given symbols
-#         parser.error_recovery(error_type, True, list(range(32)))
-#     with pytest.raises(ValueError):
-#         # Expected stopping symbol to be within range of given symbols
-#         parser.error_recovery(error_type, True, list(range(0)))
-#     with pytest.raises(ValueError):
-#         # Expected stopping symbol to be within range of given symbols
-#         parser.error_recovery(error_type, True, list(range(-8)))
+    with pytest.raises(TypeError):
+        # Expected error_type to be an integer type argument
+        parser.error_recovery("not an integer")
+    with pytest.raises(ValueError):
+        # Expected an error code within range of error types
+        parser.error_recovery(len(parser.syntax_errors))
+    with pytest.raises(ValueError):
+        # Expected an error code within range of error types
+        parser.error_recovery(len(parser.syntax_errors) + 10)
+    with pytest.raises(ValueError):
+        parser.error_recovery(-4)  # Cannot have a negative error code
+    with pytest.raises(TypeError):
+        # Expected bool type argument for proceed
+        parser.error_recovery(error_type, "not a boolean")
+    with pytest.raises(TypeError):
+        # Expected stopping symbol to be an integer type argument
+        parser.error_recovery(error_type, True, "not a list")
+    with pytest.raises(ValueError):
+        # Expected stopping symbol to be within range of given symbols
+        parser.error_recovery(error_type, True, list(range(12)))
+    with pytest.raises(ValueError):
+        # Expected stopping symbol to be within range of given symbols
+        parser.error_recovery(error_type, True, list(range(32)))
+    with pytest.raises(ValueError):
+        # Expected stopping symbol to be within range of given symbols
+        parser.error_recovery(error_type, True, list(range(0)))
+    with pytest.raises(ValueError):
+        # Expected stopping symbol to be within range of given symbols
+        parser.error_recovery(error_type, True, list(range(-8)))
 
 
 # def test_parser_error_recovery_check_built_in_error_handling(scanner_fixture, parser_fixture):
