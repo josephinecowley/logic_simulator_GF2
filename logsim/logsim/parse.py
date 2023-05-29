@@ -347,7 +347,7 @@ class Parser:
         binary_digit = [0, 1]
         # Check that name is either a AND, NAND, OR, NOR gate
         if self.symbol.id in [AND_ID, NAND_ID, OR_ID, NOR_ID]:
-            symbol_ID = self.symbol
+            symbol_ID = self.symbol.id
             self.symbol = self.scanner.get_symbol()
             # Check that gate is followed by open bracket symbol
             if self.symbol.type == self.scanner.BRACKET_OPEN:
