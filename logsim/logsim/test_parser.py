@@ -268,6 +268,9 @@ def test_parser_display_error_instance_handling(scanner_fixture, parser_fixture)
     with pytest.raises(TypeError):
         # Expected bool type argument for proceed
         parser.display_error(symbol, error_type, proceed="not a bool")
+    with pytest.raises(TypeError):
+        # Expected bool type argument for proceed
+        parser.display_error(symbol, error_type, syntax_error="not a bool")
 
 
 def test_parser_display_error_see_error_count_increment_by_one(scanner_fixture, parser_fixture):
@@ -382,6 +385,7 @@ def test_arser_display_error_symbol_is_EOF(parser_fixture, create_testing_file_t
 
 
 def test_error_recovery_instance_handling(scanner_fixture, parser_fixture, correct_error_arguments):
+    """Test exception handling in error_recovery function"""
     scanner = scanner_fixture()
     parser = parser_fixture(scanner)
     symbol = parser.scanner.get_symbol()
@@ -392,30 +396,34 @@ def test_error_recovery_instance_handling(scanner_fixture, parser_fixture, corre
         parser.error_recovery("not an integer")
     with pytest.raises(ValueError):
         # Expected an error code within range of error types
-        parser.error_recovery(len(parser.syntax_errors))
+        parser.error_recovery(max(parser.syntax_errors) + 16)
     with pytest.raises(ValueError):
-        # Expected an error code within range of error types
-        parser.error_recovery(len(parser.syntax_errors) + 10)
-    with pytest.raises(ValueError):
-        parser.error_recovery(-4)  # Cannot have a negative error code
+        # Cannot have a negative error code
+        parser.error_recovery(-4)
+    with pytest.raises(TypeError):
+        # Expected bool type argument for syntax_error
+        parser.error_recovery(error_type, syntax_error="not a boolean")
     with pytest.raises(TypeError):
         # Expected bool type argument for proceed
-        parser.error_recovery(error_type, "not a boolean")
+        parser.error_recovery(error_type, proceed="not a boolean")
     with pytest.raises(TypeError):
         # Expected stopping symbol to be an integer type argument
-        parser.error_recovery(error_type, True, "not a list")
+        parser.error_recovery(error_type, stopping_symbol_types="not a list")
     with pytest.raises(ValueError):
         # Expected stopping symbol to be within range of given symbols
-        parser.error_recovery(error_type, True, list(range(12)))
+        parser.error_recovery(
+            error_type, stopping_symbol_types=list(range(12)))
     with pytest.raises(ValueError):
         # Expected stopping symbol to be within range of given symbols
-        parser.error_recovery(error_type, True, list(range(32)))
+        parser.error_recovery(
+            error_type, stopping_symbol_types=list(range(32)))
     with pytest.raises(ValueError):
         # Expected stopping symbol to be within range of given symbols
-        parser.error_recovery(error_type, True, list(range(0)))
+        parser.error_recovery(error_type, stopping_symbol_types=list(range(0)))
     with pytest.raises(ValueError):
         # Expected stopping symbol to be within range of given symbols
-        parser.error_recovery(error_type, True, list(range(-8)))
+        parser.error_recovery(
+            error_type, stopping_symbol_types=list(range(-8)))
 
 
 # def test_parser_error_recovery_check_built_in_error_handling(scanner_fixture, parser_fixture):
