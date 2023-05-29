@@ -72,6 +72,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
 
+        # Initialise trace objects
+        self.traces = []
+        self.y_spacing = 50
+
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
         size = self.GetClientSize()
@@ -87,16 +91,36 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glTranslated(self.pan_x, self.pan_y, 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
 
-    def draw_signal_trace(
-        self, 
-        signal: list, 
-        x_pos: int, 
-        y_pos: int, 
-        label: str, 
-        color: tuple = (0.0, 0.0, 1.0)):
-        """Draws a signal: 
-        takes a signal (list) of 1s and 0s
-        """
+    def get_trace_dict(self, signal: list, x_pos: int, y_pos: int, label: str, color: tuple = (0.0, 0.0, 1.0)):
+        """Puts trace arguments into a dictionary and appends this to self.traces list
+        signal (list): list of 1s and 0s that define trace
+        x_pos: relative x position
+        y_pos: relative y position"""
+
+        trace = {
+            'signal': signal,
+            'x_pos': x_pos,
+            'y_pos': y_pos,
+            'label': label,
+            'color': color
+        }
+        self.traces.append(trace)
+
+    def draw_canvas(self):
+        """Iterates through each trace and draws adds it to the canvas with an offset"""
+        y_offset = 0
+        for trace in self.traces:
+            self._draw_trace(trace, y_offset)
+            y_offset += self.y_spacing
+
+    def _draw_trace(self, trace, y_offset):
+        """Draws trace with axes and ticks"""
+        signal = trace['signal']
+        x_pos = trace['x_pos']
+        y_pos = trace['y_pos'] + y_offset
+        label = trace['label']
+        color = trace['color']
+
         # draw trace
         GL.glColor3f(*color)
         GL.glBegin(GL.GL_LINE_STRIP)
@@ -113,7 +137,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         # draw axis
         y_pos -= 10
-        GL.glColor3f((0.0, 0.0, 0.0)) # black
+        GL.glColor3f(0.0, 0.0, 0.0)  # black
         GL.glBegin(GL.GL_LINES)
         GL.glVertex2f(x_pos, y_pos)
         GL.glVertex2f(x_pos, y_pos + 40)
@@ -124,7 +148,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # draw axis ticks
         for i in range(len(signal) + 1):
             x = (i * 20) + x_pos
-            GL.glColor3f((0.0, 0.0, 0.0)) # black
+            GL.glColor3f(0.0, 0.0, 0.0)  # black
             GL.glBegin(GL.GL_LINES)
             GL.glVertex2f(x_pos, y_pos)
             GL.glVertex2f(x_pos, y_pos - 4)
@@ -133,15 +157,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         x_pos -= int(40 / 3 * len(label))
         self.render_text(label, x_pos, y_pos + 18)
-
-    def add_signal(self, signal: list, label: str):
-        """Adds a signal to the bottom of a canvas"""
-        ### TH! need to work out how to append to bottom
-        x_pos = 0  # Set the initial x position
-        y_pos = 0  # Set the initial y position
-
-        # Call the existing draw_signal_trace method with the provided signal and label
-        self.draw_signal_trace(signal, x_pos, y_pos, label)
 
     def render(self, text):
         """Handle all drawing operations."""
