@@ -248,7 +248,6 @@ class Parser:
         elif error_type < 0:
             raise ValueError("Cannot have a negative error code")
         elif not isinstance(proceed, bool):
-            print("here", proceed, self.FLOATING_INPUT, stopping_symbol_types)
             raise TypeError("Expected bool type argument for proceed")
         elif not isinstance(stopping_symbol_types, list):
             raise TypeError(
@@ -571,6 +570,7 @@ class Parser:
         if self.symbol.type == self.scanner.BRACE_CLOSE:
             return
         else:
+            # JC! to change the output = input to input = output
             [output_device_id, output_port_id] = self.output()
             # Incase we have had to error handle and recover, such that the symbol is now a ';'
             while self.symbol.type == self.scanner.SEMICOLON:
@@ -710,7 +710,7 @@ class Parser:
         # If there are no errors, make a monitor
         if self.error_count == 0:
             error_type = self.monitors.make_monitor(
-                monitor_device_id, monitor_port_id, cycles_completed=0)
+                monitor_device_id, monitor_port_id)
             if error_type != self.monitors.NO_ERROR:
                 self.display_error(self.symbol, error_type, syntax_error=False)
 
@@ -764,8 +764,10 @@ class Parser:
 
             # Record the signal traces
             for i in range(50):
+                self.network.execute_network()
                 self.monitors.record_signals()
-            # Display signal traces in the monitor
+
+            # Display the signals
             self.monitors.display_signals()
 
             # Check for END keyword
