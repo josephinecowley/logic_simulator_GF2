@@ -5,13 +5,9 @@ DEVICES {
     dtype2 = DTYPE;
     dtype3 = DTYPE;
     dtype4 = DTYPE;
-<<<<<<< HEAD
-    clock = CLOCK(25);
-=======
     clock = CLK(25);
     data = SWITCH(0);
     set = SWITCH(0);
->>>>>>> cddaa869e7250bfbdafc9734127acce0d1748ac6
 }
 
 CONNECTIONS {
