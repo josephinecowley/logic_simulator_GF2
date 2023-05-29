@@ -87,6 +87,17 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glTranslated(self.pan_x, self.pan_y, 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
 
+    def draw_signal_trace(
+        self, 
+        signal: list, 
+        x_pos: int, 
+        y_pos: int, 
+        label: str, 
+        color: tuple = (0.0, 0.0, 1.0)):
+        """Draws a signal: 
+        takes a signal (list) of 1s and 0s
+        """
+
     def render(self, text):
         """Handle all drawing operations."""
         self.SetCurrent(self.context)
