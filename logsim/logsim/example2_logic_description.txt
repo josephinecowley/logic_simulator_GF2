@@ -25,12 +25,29 @@ DEVICES {
 }
 
 CONNECTIONS {
-    A1 = A2.I1;
-    A2 = B1.I1;
-    A3 = B1.I3;
-    A4 = B2.I1;
-    B1 = C1.I1;
-    B2 = C1.I2;
+    A1.I1=  SW1;
+    A1.I2 =  SW2;
+
+    A2.I1 = A1;
+    A2.I2 = SW3;
+
+    A3.I1 =  SW5;
+    A3.I2 = SW6;
+    A3.I3 = SW7;
+
+    A4.I1 =  SW8;
+    A4.I2 = SW9;
+
+    B1.I1 = A2;
+    B1.I2 = SW4;
+    B1.I3 = A3;
+
+    B2.I1 = A4;
+    B2.I2 = SW10;
+
+    C1.I1 = B1;
+    C1.I2 = B2;
+    
 }
 
 MONITORS {
