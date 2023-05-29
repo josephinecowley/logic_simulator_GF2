@@ -509,17 +509,21 @@ def test_parser_initial_error_checks_case_6(parser_fixture, create_testing_file_
 
 
 '''@pytest.mark.parametrize("example, expected", [
-    ("AND(12)", ""),
-])'''
-def test_parser_check_device_is_valid_correct_example(parser_fixture, create_testing_file_to_scan, capfd):
+    ("AND(12)", "(parser.symbol.id, 12)"),
+    ("XOR", "(parser.symbol.id, parser.symbol.type)"),
+    ("DTYPE", "(parser.symbol.id, parser.symbol.type)"),
+])
+def test_parser_check_device_is_valid_correct_example(parser_fixture, create_testing_file_to_scan, example, expected):
     scanner = create_testing_file_to_scan(
-    """
-    AND(12);
-    """, scan_through_all=False)
+    f"""
+    {example}
+    """ 
+    )
     parser = parser_fixture(scanner)
     parser.symbol = parser.scanner.get_symbol()
-    expected = parser.symbol.id, 12
-    assert parser.check_device_is_valid() == expected
+    result = eval(expected)
+
+    assert parser.check_device_is_valid() == result'''
 
 
 @pytest.mark.parametrize("example, expected", [
