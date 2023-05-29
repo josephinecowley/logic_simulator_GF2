@@ -571,15 +571,15 @@ class Parser:
             return
         else:
             # JC! to change the output = input to input = output
-            [output_device_id, output_port_id] = self.output()
+            [input_device_id, input_port_id] = self.input()
             # Incase we have had to error handle and recover, such that the symbol is now a ';'
             while self.symbol.type == self.scanner.SEMICOLON:
                 self.symbol = self.scanner.get_symbol()
-                [output_device_id, output_port_id] = self.output()
+                [input_device_id, input_port_id] = self.input()
             # Check ouput connection is followed by an equals sign "="
             if self.symbol.type == self.scanner.EQUALS:
                 self.symbol = self.scanner.get_symbol()
-                [input_device_id, input_port_id] = self.input()
+                [output_device_id, output_port_id] = self.output()
             else:
                 self.display_error(self.symbol, self.NO_EQUALS,
                                    proceed=False)
