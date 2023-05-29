@@ -519,7 +519,8 @@ def test_parser_check_device_is_valid_correct_example(parser_fixture, create_tes
     """, scan_through_all=False)
     parser = parser_fixture(scanner)
     parser.symbol = parser.scanner.get_symbol()
-    parser.check_device_is_valid()
+    expected = parser.symbol.id, 12
+    assert parser.check_device_is_valid() == expected
 
 
 def test_parser_device_correct_parsing_of_device_list(parser_fixture, create_testing_file_to_scan):
