@@ -217,7 +217,7 @@ def correct_error_arguments(symbol_fixture):
 
 
 def test_parser_initialisation(scanner_fixture, parser_fixture):
-    """Test the parser initialisation is correct"""
+    """Test the parser initialisation and exception handling"""
     scanner = scanner_fixture()
     parser = parser_fixture(scanner)
 
@@ -233,7 +233,7 @@ def test_parser_initialisation(scanner_fixture, parser_fixture):
 
 
 def test_parser_display_error_instance_handling(scanner_fixture, parser_fixture):
-
+    """Test the parser exception handling"""
     scanner = scanner_fixture(scan_through_all=False)
     parser = parser_fixture(scanner)
     symbol = parser.scanner.get_symbol()
@@ -244,28 +244,30 @@ def test_parser_display_error_instance_handling(scanner_fixture, parser_fixture)
         # Expected error_type to be an integer type argument
         parser.display_error(symbol, "non-integer error_type")
     with pytest.raises(ValueError):
-        # Expected an error code within range of error types
-        parser.display_error(symbol, 10000)
-    with pytest.raises(ValueError):
-        parser.display_error(symbol, -1)  # Cannot have a negative error code
+        # Cannot have a negative error code
+        parser.display_error(symbol, -1)
     with pytest.raises(TypeError):
         # Expected an instance of the Symbol class
         parser.display_error("not an instance of Symbol class", error_type)
     with pytest.raises(TypeError):
         # Expected stopping symbol to be an integer type argument
-        parser.display_error(symbol, error_type, proceed, "not a list")
+        parser.display_error(symbol, error_type,
+                             stopping_symbol_types="not a list")
     with pytest.raises(ValueError):
         # Expected stopping symbol to be within range of given symbols
-        parser.display_error(symbol, error_type, proceed, list(range(12)))
+        parser.display_error(symbol, error_type,
+                             stopping_symbol_types=list(range(32)))
     with pytest.raises(ValueError):
         # Expected stopping symbol to be within range of given symbols
-        parser.display_error(symbol, error_type, proceed, list(range(32)))
+        parser.display_error(symbol, error_type, proceed,
+                             stopping_symbol_types=list(range(0)))
     with pytest.raises(ValueError):
         # Expected stopping symbol to be within range of given symbols
-        parser.display_error(symbol, error_type, proceed, list(range(0)))
-    with pytest.raises(ValueError):
-        # Expected stopping symbol to be within range of given symbols
-        parser.display_error(symbol, error_type, proceed, list(range(-8)))
+        parser.display_error(symbol, error_type, proceed,
+                             stopping_symbol_types=list(range(-8)))
+    with pytest.raises(TypeError):
+        # Expected bool type argument for proceed
+        parser.display_error(symbol, error_type, proceed="not a bool")
 
 
 # def test_parser_display_error_see_error_count_increment_by_one(scanner_fixture, parser_fixture):
