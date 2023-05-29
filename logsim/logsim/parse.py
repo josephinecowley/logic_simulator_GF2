@@ -85,7 +85,7 @@ class Parser:
         if not isinstance(names, Names):
             raise TypeError("Expected an instance of Names.")
         elif not isinstance(devices, Devices):
-            raise TypeError("Expected an instance of Devies.")
+            raise TypeError("Expected an instance of Devices.")
         elif not isinstance(network, Network):
             raise TypeError("Expected an instance of Network.")
         elif not isinstance(monitors, Monitors):
