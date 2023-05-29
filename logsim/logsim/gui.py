@@ -113,7 +113,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         # draw axis
         y_pos -= 10
-        self.set_graph_color()
+        GL.glColor3f((0.0, 0.0, 0.0)) # black
         GL.glBegin(GL.GL_LINES)
         GL.glVertex2f(x_pos, y_pos)
         GL.glVertex2f(x_pos, y_pos + 40)
@@ -124,7 +124,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # draw axis ticks
         for i in range(len(signal) + 1):
             x = (i * 20) + x_pos
-            self.set_graph_colour()
+            GL.glColor3f((0.0, 0.0, 0.0)) # black
             GL.glBegin(GL.GL_LINES)
             GL.glVertex2f(x_pos, y_pos)
             GL.glVertex2f(x_pos, y_pos - 4)
@@ -134,8 +134,14 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         x_pos -= int(40 / 3 * len(label))
         self.render_text(label, x_pos, y_pos + 18)
 
+    def add_signal(self, signal: list, label: str):
+        """Adds a signal to the bottom of a canvas"""
+        ### TH! need to work out how to append to bottom
+        x_pos = 0  # Set the initial x position
+        y_pos = 0  # Set the initial y position
 
-
+        # Call the existing draw_signal_trace method with the provided signal and label
+        self.draw_signal_trace(signal, x_pos, y_pos, label)
 
     def render(self, text):
         """Handle all drawing operations."""
