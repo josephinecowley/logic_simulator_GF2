@@ -97,6 +97,45 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         """Draws a signal: 
         takes a signal (list) of 1s and 0s
         """
+        # draw trace
+        GL.glColor3f(*color)
+        GL.glBegin(GL.GL_LINE_STRIP)
+        for i in range(len(signal)):
+            x = (i * 20) + x_pos
+            x_next = (i * 20) + x_pos + 20
+            if signal[i] == 0:
+                y = y_pos
+            else:
+                y = y_pos + 25
+            GL.glVertex2f(x, y)
+            GL.glVertex2f(x_next, y)
+        GL.glEnd()
+
+        # draw axis
+        y_pos -= 10
+        self.set_graph_color()
+        GL.glBegin(GL.GL_LINES)
+        GL.glVertex2f(x_pos, y_pos)
+        GL.glVertex2f(x_pos, y_pos + 40)
+        GL.glVertex2f(x_pos, y_pos)
+        GL.glVertex2f(x_pos + (len(signal) * 20), y_pos)
+        GL.glEnd()
+
+        # draw axis ticks
+        for i in range(len(signal) + 1):
+            x = (i * 20) + x_pos
+            self.set_graph_colour()
+            GL.glBegin(GL.GL_LINES)
+            GL.glVertex2f(x_pos, y_pos)
+            GL.glVertex2f(x_pos, y_pos - 4)
+            GL.glEnd()
+            self.render_text(str(i), x - 5, y_pos - 15)
+
+        x_pos -= int(40 / 3 * len(label))
+        self.render_text(label, x_pos, y_pos + 18)
+
+
+
 
     def render(self, text):
         """Handle all drawing operations."""
