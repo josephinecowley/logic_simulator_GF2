@@ -106,7 +106,7 @@ def scanner_fixture(create_testing_file_to_scan):
             dtype3.SET = set;
             dtype3.CLEAR = set;
             dtype3.CLK = clock;
-            
+
             dtype4.DATA = dtype3.Q;
             dtype4.SET = set;
             dtype4.CLEAR = set;
@@ -165,100 +165,107 @@ def test_parser_fixture(parser_fixture, create_testing_file_to_scan):
 #     return Parser(names_fixture, old_scanner_fixture)
 
 
-# @pytest.fixture
-# def set_scanner_location(old_scanner_fixture):
-#     """DEPRECATED"""
-#     def _set_scanner_location(target_location):
-#         target_line_number, target_position = target_location
-#         scanner = old_scanner_fixture  # call scanner instance
+@pytest.fixture
+def set_scanner_location(scanner_fixture):
+    """Returns _set_scanner_location function to target location within parameters"""
+    def _set_scanner_location(target_location):
+        target_line_number, target_position = target_location
+        scanner = scanner_fixture()  # call scanner instance
 
-#         # Reset the file pointer to the beginning of the file
-#         scanner.file.seek(0, 0)
+        # Reset the file pointer to the beginning of the file
+        scanner.file.seek(0, 0)
 
-#         current_line_number = 1
+        current_line_number = 1
 
-#         while not current_line_number == target_line_number:  # reads file until target line reached
-#             scanner.current_character = scanner.file.read(1)
-#             if scanner.current_character == "\n":
-#                 current_line_number += 1
+        while not current_line_number == target_line_number:  # reads file until target line reached
+            scanner.current_character = scanner.file.read(1)
+            if scanner.current_character == "\n":
+                current_line_number += 1
 
-#         current_position = 0
+        current_position = 0
 
-#         while not current_position == target_position:  # reads file until target line reached
-#             scanner.current_character = scanner.file.read(1)
-#             current_position += 1
+        while not current_position == target_position:  # reads file until target line reached
+            scanner.current_character = scanner.file.read(1)
+            current_position += 1
 
-#         scanner.line_number = target_line_number
-#         scanner.position = target_position
+        scanner.line_number = target_line_number
+        scanner.position = target_position
 
-#     return _set_scanner_location
-
-# # DEPRECATED
-
-
-# @pytest.fixture
-# def symbol_fixture(old_scanner_fixture, set_scanner_location):
-#     """DEPRECATED"""
-#     scanner = old_scanner_fixture
-#     set_scanner_location((2, 5))
-#     symbol = scanner.get_symbol()
-
-#     return symbol
+    return _set_scanner_location
 
 # # DEPRECATED
 
 
-# @pytest.fixture
-# def correct_error_arguments(symbol_fixture):
-#     """DEPRECATED"""
-#     symbol = symbol_fixture
-#     return symbol, 4, True, [2, 3, 6, 8]
+@pytest.fixture
+def symbol_fixture(scanner_fixture, set_scanner_location):
+    """Returns a symbol instance at a particular place"""
+    scanner = scanner_fixture()
+    set_scanner_location((2, 5))
+    symbol = scanner.get_symbol()
+
+    return symbol
 
 
-# def test_parser_initialisation(scanner_fixture, parser_fixture):
-#     scanner = scanner_fixture()
-#     parser = parser_fixture(scanner)
-
-#     assert isinstance(parser.names, Names)
-#     assert isinstance(parser.scanner, Scanner)
-#     assert parser.error_count == 0
-#     # KO! Come back to this just in case
-#     assert parser.syntax_errors == range(23)
+# # # DEPRECATED
 
 
-# def test_parser_display_error_instance_handling(scanner_fixture, parser_fixture):
-#     scanner = scanner_fixture(scan_through_all=False)
-#     parser = parser_fixture(scanner)
-#     symbol = parser.scanner.get_symbol()
-#     error_type = parser.syntax_errors[0]
-#     proceed = True
+@pytest.fixture
+def correct_error_arguments(symbol_fixture):
+    """Return the correct error arguments"""
+    symbol = symbol_fixture
+    return symbol, 4, True, [2, 3, 6, 8]
 
-#     with pytest.raises(TypeError):
-#         # Expected error_type to be an integer type argument
-#         parser.display_error(symbol, "non-integer error_type")
-#     with pytest.raises(ValueError):
-#         # Expected an error code within range of error types
-#         parser.display_error(symbol, 10000)
-#     with pytest.raises(ValueError):
-#         parser.display_error(symbol, -1)  # Cannot have a negative error code
-#     with pytest.raises(TypeError):
-#         # Expected an instance of the Symbol class
-#         parser.display_error("not an instance of Symbol class", error_type)
-#     with pytest.raises(TypeError):
-#         # Expected stopping symbol to be an integer type argument
-#         parser.display_error(symbol, error_type, proceed, "not a list")
-#     with pytest.raises(ValueError):
-#         # Expected stopping symbol to be within range of given symbols
-#         parser.display_error(symbol, error_type, proceed, list(range(12)))
-#     with pytest.raises(ValueError):
-#         # Expected stopping symbol to be within range of given symbols
-#         parser.display_error(symbol, error_type, proceed, list(range(32)))
-#     with pytest.raises(ValueError):
-#         # Expected stopping symbol to be within range of given symbols
-#         parser.display_error(symbol, error_type, proceed, list(range(0)))
-#     with pytest.raises(ValueError):
-#         # Expected stopping symbol to be within range of given symbols
-#         parser.display_error(symbol, error_type, proceed, list(range(-8)))
+
+def test_parser_initialisation(scanner_fixture, parser_fixture):
+    """Test the parser initialisation is correct"""
+    scanner = scanner_fixture()
+    parser = parser_fixture(scanner)
+
+    assert isinstance(parser.names, Names)
+    assert isinstance(parser.devices, Devices)
+    assert isinstance(parser.network, Network)
+    assert isinstance(parser.monitors, Monitors)
+    assert isinstance(parser.scanner, Scanner)
+
+    assert parser.error_count == 0
+    # Check unique error coes are appended onto existing syntax_errors of which there are 15 from devices, network and monitors initialisation
+    assert parser.syntax_errors == range(15, 39)
+
+
+def test_parser_display_error_instance_handling(scanner_fixture, parser_fixture):
+
+    scanner = scanner_fixture(scan_through_all=False)
+    parser = parser_fixture(scanner)
+    symbol = parser.scanner.get_symbol()
+    error_type = parser.syntax_errors[0]
+    proceed = True
+
+    with pytest.raises(TypeError):
+        # Expected error_type to be an integer type argument
+        parser.display_error(symbol, "non-integer error_type")
+    with pytest.raises(ValueError):
+        # Expected an error code within range of error types
+        parser.display_error(symbol, 10000)
+    with pytest.raises(ValueError):
+        parser.display_error(symbol, -1)  # Cannot have a negative error code
+    with pytest.raises(TypeError):
+        # Expected an instance of the Symbol class
+        parser.display_error("not an instance of Symbol class", error_type)
+    with pytest.raises(TypeError):
+        # Expected stopping symbol to be an integer type argument
+        parser.display_error(symbol, error_type, proceed, "not a list")
+    with pytest.raises(ValueError):
+        # Expected stopping symbol to be within range of given symbols
+        parser.display_error(symbol, error_type, proceed, list(range(12)))
+    with pytest.raises(ValueError):
+        # Expected stopping symbol to be within range of given symbols
+        parser.display_error(symbol, error_type, proceed, list(range(32)))
+    with pytest.raises(ValueError):
+        # Expected stopping symbol to be within range of given symbols
+        parser.display_error(symbol, error_type, proceed, list(range(0)))
+    with pytest.raises(ValueError):
+        # Expected stopping symbol to be within range of given symbols
+        parser.display_error(symbol, error_type, proceed, list(range(-8)))
 
 
 # def test_parser_display_error_see_error_count_increment_by_one(scanner_fixture, parser_fixture):
