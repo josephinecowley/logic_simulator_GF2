@@ -695,7 +695,7 @@ def test_parser_check_device_is_valid_erroneous_examples(parser_fixture, create_
 
 
 def test_parser_device_correct_parsing_of_device_list(parser_fixture, create_testing_file_to_scan):
-    """Test parsing of whole device list"""
+    """Test parsing of whole device list and check no device_list yet"""
     scanner = create_testing_file_to_scan(
         """
     DEVICES {
@@ -738,6 +738,83 @@ def test_parser_device_erroneous_parsing_of_device_line(parser_fixture, create_t
     parser.symbol = parser.scanner.get_symbol()
 
     parser.device_list()
+    captured = capfd.readouterr()
+    printed_message = captured.out.splitlines(True)[1]
+
+    assert printed_message == expected
+
+
+def test_parser_input_correct_parsing_of_input(parser_fixture, create_testing_file_to_scan):
+    """Test parsing of single correct input"""
+    scanner = create_testing_file_to_scan(
+        """
+    dtype1.DATA 
+    """, scan_through_all=False)
+
+    parser = parser_fixture(scanner)
+    parser.symbol = parser.scanner.get_symbol()
+
+    assert parser.input() is not (None, None)
+
+
+def test_parser_output_correct_parsing_of_output(parser_fixture, create_testing_file_to_scan):
+    """Test parsing of single correct output"""
+    scanner = create_testing_file_to_scan(
+        """
+    dtype1
+    """, scan_through_all=False)
+
+    parser = parser_fixture(scanner)
+    parser.symbol = parser.scanner.get_symbol()
+
+    assert parser.output() is not (None, None)
+
+
+@pytest.mark.parametrize("example, expected", [
+    ("""
+    4dtype1.I1
+    """, "  Line 2: Syntax Error: Undefined device name given\n"),
+    ("""
+    dtype1
+    """, "  Line 3: Syntax Error: Expected a full stop\n"),
+    ("""
+    dtype1.ni
+    """, "  Line 2: Syntax Error: Expected a valid input suffix\n")
+])
+def test_parser_input_erroneous_parsing_of_connection_line(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+    """Test parsing of device list invalid name error"""
+
+    scanner = create_testing_file_to_scan(
+        example, scan_through_all=False)
+
+    parser = parser_fixture(scanner)
+    parser.symbol = parser.scanner.get_symbol()
+
+    parser.input()
+    captured = capfd.readouterr()
+    printed_message = captured.out.splitlines(True)[1]
+
+    assert printed_message == expected
+
+
+@pytest.mark.parametrize("example, expected", [
+    ("""
+    4dtype1
+    """, "  Line 2: Syntax Error: Invalid user name entered\n"),
+    ("""
+    dtype1.qbar
+    """, "  Line 2: Syntax Error: Expected a Q or QBAR after the full stop\n")
+])
+def test_parser_output_erroneous_parsing_of_connection_line(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+    """Test parsing of device list invalid name error"""
+
+    scanner = create_testing_file_to_scan(
+        example, scan_through_all=False)
+
+    parser = parser_fixture(scanner)
+    parser.symbol = parser.scanner.get_symbol()
+
+    parser.output()
     captured = capfd.readouterr()
     printed_message = captured.out.splitlines(True)[1]
 
