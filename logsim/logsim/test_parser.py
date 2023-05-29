@@ -515,12 +515,31 @@ def test_parser_check_device_is_valid_correct_example(parser_fixture, create_tes
     scanner = create_testing_file_to_scan(
     """
     AND(12);
-    }
     """, scan_through_all=False)
     parser = parser_fixture(scanner)
     parser.symbol = parser.scanner.get_symbol()
     expected = parser.symbol.id, 12
     assert parser.check_device_is_valid() == expected
+
+
+@pytest.mark.parametrize("example, expected", [
+    ("AND(12", "\n  Line 3: Syntax Error: Expected a ')' for an input\n \n"),
+])
+def test_parser_check_device_is_valid_erroneous_examples(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+    scanner = create_testing_file_to_scan(
+    f"""
+    {example}
+    """ 
+    )
+    parser = parser_fixture(scanner)
+    parser.symbol = parser.scanner.get_symbol()
+
+    parser.check_device_is_valid()
+    
+    captured = capfd.readouterr()
+    printed_message = captured.out
+
+    assert printed_message == expected
 
 
 def test_parser_device_correct_parsing_of_device_list(parser_fixture, create_testing_file_to_scan):
