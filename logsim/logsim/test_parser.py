@@ -523,9 +523,10 @@ def test_parser_check_device_is_valid_correct_example(parser_fixture, create_tes
 
 
 @pytest.mark.parametrize("example, expected", [
-    #("AND(12", "  Line 3: Syntax Error: Expected a ')' for an input\n"),
+    ("AND(12", "  Line 3: Syntax Error: Expected a ')' for an input\n"),
     ("AND(34)", "  Line 2: Semantic Error: Input number of gates is out of range. Must be an integer between 1 and 16\n"),
-    ("AND()", "  Line 2: Syntax Error: Expected a positive integer"),
+    ("AND()", "  Line 2: Syntax Error: Expected a positive integer\n"),
+    ("AND 12)", "  Line 2: Syntax Error: Expected a '(' for an input\n"),
 ])
 def test_parser_check_device_is_valid_erroneous_examples(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
     scanner = create_testing_file_to_scan(
@@ -535,7 +536,6 @@ def test_parser_check_device_is_valid_erroneous_examples(parser_fixture, create_
     )
     parser = parser_fixture(scanner)
     parser.symbol = parser.scanner.get_symbol()
-    breakpoint()
     parser.check_device_is_valid()
     
     captured = capfd.readouterr()
