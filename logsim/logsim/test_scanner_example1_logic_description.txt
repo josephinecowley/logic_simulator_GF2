@@ -1,0 +1,28 @@
+DEVICES {
+    dtype1 = DTYPE; #comment contents 1
+    dtype2 = DTYPE;
+    dtype3 = DTYPE;
+    dtype4 = DTYPE;
+    clock = CLK(25);
+    data = SWITCH(0);
+}
+"this is comment2"
+CONNECTIONS {
+    data = dtype1.DATA;
+    dtype1.Q = dtype2.DATA;
+    dtype2.Q = dtype3.DATA;
+    dtype3.Q = dtype4.DATA;
+    clock = dtype1.CLK;
+    clock = dtype2.CLK;
+    clock = dtype3.CLK;
+    clock = dtype4.CLK;
+}
+
+MONITORS {
+    dtype1.Q;
+    dtype2.Q;
+    dtype3.Q;
+    dtype4.Q;
+}
+
+END
