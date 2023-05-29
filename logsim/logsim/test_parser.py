@@ -270,62 +270,88 @@ def test_parser_display_error_instance_handling(scanner_fixture, parser_fixture)
         parser.display_error(symbol, error_type, proceed="not a bool")
 
 
-# def test_parser_display_error_see_error_count_increment_by_one(scanner_fixture, parser_fixture):
-#     scanner = scanner_fixture()
-#     parser = parser_fixture(scanner)
-#     symbol = parser.scanner.get_symbol()
-#     error_type = parser.syntax_errors[0]
+def test_parser_display_error_see_error_count_increment_by_one(scanner_fixture, parser_fixture):
+    """Test display_error functionality"""
+    scanner = scanner_fixture()
+    parser = parser_fixture(scanner)
+    symbol = parser.scanner.get_symbol()
+    error_type = parser.syntax_errors[0]
 
-#     parser.display_error(symbol, error_type)
+    parser.display_error(symbol, error_type)
 
-#     assert parser.error_count == 1
+    assert parser.error_count == 1
 
 
-# @pytest.mark.parametrize("error_type, expected_message", [
-#     ("parser.NO_DEVICES_KEYWORD", "  Line 2: Syntax Error: Expected the keyword DEVICES"),
-#     ("parser.NO_CONNECTIONS_KEYWORD",
-#      "  Line 2: Syntax Error: Expected the keyword CONNECTIONS"),
-#     ("parser.NO_MONITORS_KEYWORD",
-#      "  Line 2: Syntax Error: Expected the keyword MONITORS"),
-#     ("parser.NO_END_KEYWORD",
-#      "  Line 2: Syntax Error: Expected the keyword END straight after monitors list"),
-#     ("parser.NO_BRACE_OPEN", "  Line 2: Syntax Error: Expected a '{' symbol"),
-#     ("parser.NO_BRACE_CLOSE", "  Line 2: Syntax Error: Expected a '}' symbol"),
-#     ("parser.INVALID_NAME", "  Line 2: Syntax Error: Invalid user name entered"),
-#     ("parser.NO_EQUALS", "  Line 2: Syntax Error: Expected an '=' symbol"),
-#     ("parser.INVALID_COMPONENT",
-#      "  Line 2: Syntax Error: Invalid component name entered"),
-#     ("parser.NO_BRACKET_OPEN",
-#      "  Line 2: Syntax Error: Expected a '(' for an input"),
-#     ("parser.NO_BRACKET_CLOSE", "  Line 2: Syntax Error: Expected a ')' for an input"),
-#     ("parser.NO_NUMBER", "  Line 2: Syntax Error: Expected a positive integer"),
-#     ("parser.CLK_OUT_OF_RANGE",
-#      "  Line 2: Semantic Error: Input clock half period is out of range. Must be a positive integer"),
-#     ("parser.SWITCH_OUT_OF_RANGE",
-#      "  Line 2: Semantic Error: Input switch number is out of range. Must be either 1 or 0"),
-#     ("parser.UNDEFINED_NAME", "  Line 2: Syntax Error: Undefined device name given"),
-#     ("parser.NO_FULLSTOP", "  Line 2: Syntax Error: Expected a full stop"),
-#     ("parser.NO_SEMICOLON", "  Line 2: Syntax Error: Expected a semicolon"),
-#     ("parser.NO_Q_OR_QBAR",
-#      "  Line 2: Syntax Error: Expected a Q or QBAR after the full stop"),
-#     ("parser.NO_INPUT_SUFFIX", "  Line 2: Syntax Error: Expected a valid input suffix"),
-#     ("parser.SYMBOL_AFTER_END",
-#      "  Line 2: Syntax Error: There should not be any text after the keyword END"),
-#     ("parser.EMPTY_FILE", "  Line 2: Syntax Error: Cannot parse an empty file"),
-#     ("parser.TERMINATE", "  Line 2: Syntax Error: Could not find parsing point to restart, program terminated early"),
-# ])
-# def test_parser_display_error_show_appropriate_error_message(scanner_fixture, parser_fixture, capfd, error_type, expected_message):
-#     scanner = scanner_fixture(False)
-#     parser = parser_fixture(scanner)
-#     symbol = parser.scanner.get_symbol()
-#     error_type = eval(error_type)
+@pytest.mark.parametrize("error_type, expected_message", [
+    ("parser.NO_DEVICES_KEYWORD", "  Line 2: Syntax Error: Expected the keyword DEVICES"),
+    ("parser.NO_CONNECTIONS_KEYWORD",
+     "  Line 2: Syntax Error: Expected the keyword CONNECTIONS"),
+    ("parser.NO_MONITORS_KEYWORD",
+     "  Line 2: Syntax Error: Expected the keyword MONITORS"),
+    ("parser.NO_END_KEYWORD",
+     "  Line 2: Syntax Error: Expected the keyword END straight after monitors list"),
+    ("parser.NO_BRACE_OPEN", "  Line 2: Syntax Error: Expected a '{' symbol"),
+    ("parser.NO_BRACE_CLOSE", "  Line 2: Syntax Error: Expected a '}' symbol"),
+    ("parser.INVALID_NAME", "  Line 2: Syntax Error: Invalid user name entered"),
+    ("parser.NO_EQUALS", "  Line 2: Syntax Error: Expected an '=' symbol"),
+    ("parser.INVALID_COMPONENT",
+     "  Line 2: Syntax Error: Invalid component name entered"),
+    ("parser.NO_BRACKET_OPEN",
+     "  Line 2: Syntax Error: Expected a '(' for an input"),
+    ("parser.NO_BRACKET_CLOSE", "  Line 2: Syntax Error: Expected a ')' for an input"),
+    ("parser.NO_NUMBER", "  Line 2: Syntax Error: Expected a positive integer"),
+    ("parser.INPUT_OUT_OF_RANGE",
+     "  Line 2: Semantic Error: Input number of gates is out of range. Must be an integer between 1 and 16"),
+    ("parser.CLK_OUT_OF_RANGE",
+     "  Line 2: Semantic Error: Input clock half period is out of range. Must be a positive integer"),
+    ("parser.SWITCH_OUT_OF_RANGE",
+     "  Line 2: Semantic Error: Input switch number is out of range. Must be either 1 or 0"),
+    ("parser.UNDEFINED_NAME", "  Line 2: Syntax Error: Undefined device name given"),
+    ("parser.NO_FULLSTOP", "  Line 2: Syntax Error: Expected a full stop"),
+    ("parser.NO_SEMICOLON", "  Line 2: Syntax Error: Expected a semicolon"),
+    ("parser.NO_Q_OR_QBAR",
+     "  Line 2: Syntax Error: Expected a Q or QBAR after the full stop"),
+    ("parser.NO_INPUT_SUFFIX", "  Line 2: Syntax Error: Expected a valid input suffix"),
+    ("parser.SYMBOL_AFTER_END",
+     "  Line 2: Syntax Error: There should not be any text after the keyword END"),
+    ("parser.EMPTY_FILE", "  Line 2: Syntax Error: Cannot parse an empty file"),
+    ("parser.TERMINATE", "  Line 2: Syntax Error: Could not find parsing point to restart, program terminated early"),
+    ("parser.devices.NO_QUALIFIER",
+     "  Line 2: Semantic Error: Expected a device property for initialisation"),
+    ("parser.devices.QUALIFIER_PRESENT",
+     "  Line 2: Semantic Error: Expected no device property for this device"),
+    ("parser.devices.DEVICE_PRESENT",
+     "  Line 2: Semantic Error: Device already exists in the device list"),
+    ("parser.devices.BAD_DEVICE", "  Line 2: Semantic Error: Invalid type of device"),
+    ("parser.network.INPUT_TO_INPUT",
+     "  Line 2: Semantic Error: Cannot connect an input port to another input port"),
+    ("parser.network.OUTPUT_TO_OUTPUT",
+     "  Line 2: Semantic Error: Cannot connect an output port to another output port"),
+    ("parser.network.INPUT_CONNECTED",
+     "  Line 2: Semantic Error: Cannot connect input port as it is already connected"),
+    ("parser.network.PORT_ABSENT",
+     "  Line 2: Semantic Error: Cannot make connection as specified port does not exist"),
+    ("parser.network.DEVICE_ABSENT",
+     "  Line 2: Semantic Error: Cannot make connection as device is undefined in DEVICE list"),
+    ("parser.FLOATING_INPUT",
+     "  Line 2: Semantic Error: Cannot make network as not all inputs are connected to an output"),
+    ("parser.monitors.MONITOR_PRESENT",
+     "  Line 2: Semantic Error: Cannot assign more than one monitor to a single device output port")
 
-#     parser.display_error(symbol, error_type)
 
-#     captured = capfd.readouterr()
-#     output_lines = captured.out.splitlines()
+])
+def test_parser_display_error_show_appropriate_error_message(scanner_fixture, parser_fixture, capfd, error_type, expected_message):
+    scanner = scanner_fixture(False)
+    parser = parser_fixture(scanner)
+    symbol = parser.scanner.get_symbol()
+    error_type = eval(error_type)
 
-#     assert output_lines[1] == expected_message
+    parser.display_error(symbol, error_type)
+
+    captured = capfd.readouterr()
+    output_lines = captured.out.splitlines()
+
+    assert output_lines[1] == expected_message
 
 
 # def test_parser_display_error_valid_error_code(old_parser_fixture, correct_error_arguments):
