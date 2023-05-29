@@ -647,66 +647,106 @@ def test_parser_initial_error_checks_case_6(parser_fixture, create_testing_file_
     assert parser.symbol.type == parser.scanner.EOF
 
 
-# '''@pytest.mark.parametrize("example, expected", [
-#     ("AND(12)", "(parser.symbol.id, 12)"),
-#     ("XOR", "(parser.symbol.id, parser.symbol.type)"),
-#     ("DTYPE", "(parser.symbol.id, parser.symbol.type)"),
-# ])
-# def test_parser_check_device_is_valid_correct_example(parser_fixture, create_testing_file_to_scan, example, expected):
-#     scanner = create_testing_file_to_scan(
-#     f"""
-#     {example}
-#     """
-#     )
-#     parser = parser_fixture(scanner)
-#     parser.symbol = parser.scanner.get_symbol()
-#     result = eval(expected)
+@pytest.mark.parametrize("example, expected", [
+    ("AND(10)", "(parser.symbol.id, 10)"),
+    ("NAND(11)", "(parser.symbol.id, 11)"),
+    ("OR(12)", "(parser.symbol.id, 12)"),
+    ("NOR(13)", "(parser.symbol.id, 13)"),
+    ("CLOCK(14)", "(parser.symbol.id, 14)"),
+    ("SWITCH(1)", "(parser.symbol.id, 1)"),
+    ("XOR", "(parser.symbol.id, None)"),
+    ("DTYPE", "(parser.symbol.id, None)"),
+])
+def test_parser_check_device_is_valid_correct_example(parser_fixture, create_testing_file_to_scan, example, expected):
+    """Test check_device_is_valid works with some correct examples covering all gate types"""
+    scanner = create_testing_file_to_scan(
+        f"""
+    {example}
+    """
+    )
+    parser = parser_fixture(scanner)
+    parser.symbol = parser.scanner.get_symbol()
+    result = eval(expected)
 
-#     assert parser.check_device_is_valid() == result'''
-
-
-# @pytest.mark.parametrize("example, expected", [
-#     ("AND(12", "  Line 3: Syntax Error: Expected a ')' for an input\n"),
-#     ("AND(34)", "  Line 2: Semantic Error: Input number of gates is out of range. Must be an integer between 1 and 16\n"),
-#     ("AND()", "  Line 2: Syntax Error: Expected a positive integer\n"),
-#     ("AND 12)", "  Line 2: Syntax Error: Expected a '(' for an input\n"),
-# ])
-# def test_parser_check_device_is_valid_erroneous_examples(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
-#     scanner = create_testing_file_to_scan(
-#         f"""
-#     {example}
-#     """
-#     )
-#     parser = parser_fixture(scanner)
-#     parser.symbol = parser.scanner.get_symbol()
-#     parser.check_device_is_valid()
-
-#     captured = capfd.readouterr()
-#     printed_message = captured.out.splitlines(True)[1]
-
-#     assert printed_message == expected
+    assert parser.check_device_is_valid() == result
 
 
-# def test_parser_device_correct_parsing_of_device_list(parser_fixture, create_testing_file_to_scan):
-#     scanner = create_testing_file_to_scan(
-#         """
-#     DEVICES {
-#         dtype1 = DTYPE;
-#         dtype2 = DTYPE;
-#         dtype3 = DTYPE;
-#         dtype4 = DTYPE;
-#         clock = CLK(25);
-#         data = SWITCH(0);
-#     }
-#     """, scan_through_all=False)
+@pytest.mark.parametrize("example, expected", [
+    ("AND(12", "  Line 3: Syntax Error: Expected a ')' for an input\n"),
+    ("AND(34)", "  Line 2: Semantic Error: Input number of gates is out of range. Must be an integer between 1 and 16\n"),
+    ("AND()", "  Line 2: Syntax Error: Expected a positive integer\n"),
+    ("AND 12)", "  Line 2: Syntax Error: Expected a '(' for an input\n"),
+])
+def test_parser_check_device_is_valid_erroneous_examples(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+    """Test check_device_is_valid works with some correct examples"""
+    scanner = create_testing_file_to_scan(
+        f"""
+    {example}
+    """
+    )
+    parser = parser_fixture(scanner)
+    parser.symbol = parser.scanner.get_symbol()
+    parser.check_device_is_valid()
 
-#     parser = parser_fixture(scanner)
-#     assert parser.device_list() is None
+    captured = capfd.readouterr()
+    printed_message = captured.out.splitlines(True)[1]
+
+    assert printed_message == expected
 
 
-# def test_delete_testing_file():
-#     """This is an in-house helper function not strictly related to testing parse.py"""
-#     if os.path.exists("testing_file.txt"):
-#         os.remove("testing_file.txt")
-#     else:
-#         print("The file does not exist")
+def test_parser_device_correct_parsing_of_device_list(parser_fixture, create_testing_file_to_scan):
+    """Test parsing of whole device list"""
+    scanner = create_testing_file_to_scan(
+        """
+    DEVICES {
+        dtype1 = DTYPE;
+        dtype2 = DTYPE;
+        dtype3 = DTYPE;
+        dtype4 = DTYPE;
+        clock = CLK(25);
+        data = SWITCH(0);
+    }
+    """, scan_through_all=False)
+
+    parser = parser_fixture(scanner)
+    parser.symbol = parser.scanner.get_symbol()
+
+    assert parser.device_list() is None
+
+
+@pytest.mark.parametrize("example, expected", [
+    ("""
+    DEVICES {
+        4dtype1 = DTYPE;
+        dtype2 = DTYPE;
+    }
+    """, "  Line 3: Syntax Error: Invalid user name entered\n"),
+    ("""
+    DEVICES {
+        dtype1 DTYPE;
+        dtype2 = DTYPE;
+    }
+    """, "  Line 3: Syntax Error: Expected an '=' symbol\n")
+])
+def test_parser_device_erroneous_parsing_of_device_line(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+    """Test parsing of device list invalid name error"""
+
+    scanner = create_testing_file_to_scan(
+        example, scan_through_all=False)
+
+    parser = parser_fixture(scanner)
+    parser.symbol = parser.scanner.get_symbol()
+
+    parser.device_list()
+    captured = capfd.readouterr()
+    printed_message = captured.out.splitlines(True)[1]
+
+    assert printed_message == expected
+
+
+def test_delete_testing_file():
+    """This is an in-house helper function not strictly related to testing parse.py"""
+    if os.path.exists("testing_file.txt"):
+        os.remove("testing_file.txt")
+    else:
+        print("The file does not exist")
