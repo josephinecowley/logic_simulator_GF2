@@ -131,6 +131,8 @@ class Parser:
         elif ((len(stopping_symbol_types) >= 12) or (len(stopping_symbol_types) <= 0)):
             raise ValueError(
                 "Expected stopping symbol to be within range of given symbols")
+        elif not isinstance(syntax_error, bool):
+            raise TypeError("Expected bool type argument for syntax_error")
         elif not isinstance(proceed, bool):
             raise TypeError("Expected bool type argument for proceed")
 
@@ -205,27 +207,27 @@ class Parser:
             print("Semantic Error: Invalid type of device", end="\n \n")
         elif error_type == self.network.INPUT_TO_INPUT:
             print(
-                "Semantic Error: Cannot connect an input port to another input port.", end="\n \n")
+                "Semantic Error: Cannot connect an input port to another input port", end="\n \n")
         elif error_type == self.network.OUTPUT_TO_OUTPUT:
             print(
-                "Semantic Error: Cannot connect an output port to another output port.", end="\n \n")
+                "Semantic Error: Cannot connect an output port to another output port", end="\n \n")
         elif error_type == self.network.INPUT_CONNECTED:
             print(
-                "Semantic Error: Cannot connect input port as it is already connected.", end="\n \n")
+                "Semantic Error: Cannot connect input port as it is already connected", end="\n \n")
         elif error_type == self.network.PORT_ABSENT:
             print(
-                "Semantic Error: Cannot make connection as specified port does not exist.", end="\n \n")
+                "Semantic Error: Cannot make connection as specified port does not exist", end="\n \n")
         elif error_type == self.network.DEVICE_ABSENT:
             print(
-                "Semantic Error: Cannot make connection as device is undefined in DEVICE list.", end="\n \n")
+                "Semantic Error: Cannot make connection as device is undefined in DEVICE list", end="\n \n")
         elif error_type == self.FLOATING_INPUT:
             print(
-                "Semantic Error: Cannot make network as not all inputs are connected to an output.", end="\n \n")
+                "Semantic Error: Cannot make network as not all inputs are connected to an output", end="\n \n")
         elif error_type == self.monitors.NOT_OUTPUT:
-            print("Semantic Error: Cannot assign a monitor as specified device port is not an output port.", end="\n \n")
+            print("Semantic Error: Cannot assign a monitor as specified device port is not an output port", end="\n \n")
         elif error_type == self.monitors.MONITOR_PRESENT:
             print(
-                "Semantic Error: Cannot assign more than one monitor to a single device output port.", end="\n \n")
+                "Semantic Error: Cannot assign more than one monitor to a single device output port", end="\n \n")
         else:
             raise ValueError("Expected a valid error code")
 
@@ -245,8 +247,13 @@ class Parser:
         if not isinstance(error_type, int):
             raise TypeError(
                 "Expected error_type to be an integer type argument")
+        elif error_type > max(self.syntax_errors) + 15:
+            raise ValueError(
+                "Cannot have an error type greater than the number of errors present")
         elif error_type < 0:
             raise ValueError("Cannot have a negative error code")
+        elif not isinstance(syntax_error, bool):
+            raise TypeError("Expected bool type argument for syntax_error")
         elif not isinstance(proceed, bool):
             raise TypeError("Expected bool type argument for proceed")
         elif not isinstance(stopping_symbol_types, list):
@@ -271,7 +278,7 @@ class Parser:
                     self.display_error(self.symbol, self.TERMINATE)
                     return
         else:
-            pass
+            return
 
     def initial_error_checks(self, KEYWORD_ID, missing_error_type):
         """Check initial symbols for common errors. This function tests for 6 cases:
@@ -790,7 +797,7 @@ class Parser:
 # JC! This will be deleted once development is complete
 def main():
     # Check command line arguments
-    file_path = "logsim/example2_logic_description.txt"
+    file_path = "./example1_logic_description.txt"
     names = Names()
     devices = Devices(names)
     network = Network(names, devices)
