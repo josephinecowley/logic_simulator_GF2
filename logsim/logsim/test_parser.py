@@ -1,28 +1,31 @@
 """Test the parser class"""
+import pytest
 import os
 
 from names import Names
-from scanner import Scanner
-from parse import Parser
-import pytest
+from devices import Devices, Device
+from network import Network
+from monitors import Monitors
+from scanner import Scanner, Symbol
 
 
 @pytest.fixture
 def path_fixture():
+    """Return logic description file 1 fixture"""
     return "example1_logic_description.txt"
 
 
 @pytest.fixture
 def names_fixture():
-    names = Names()
-    return names
+    """Return names fixture"""
+    return Names()
 
-# DEPRECATED
+# # DEPRECATED
 
 
 @pytest.fixture
-def old_scanner_fixture(path_fixture, names_fixture):
-    """WILL BE DEPRECATED"""
+def scanner_fixture(path_fixture, names_fixture):
+    """Return scanner fixture"""
     scanner = Scanner(path_fixture, names_fixture)
     return scanner
 
@@ -44,10 +47,6 @@ def create_testing_file_to_scan(names_fixture):
 
         return scanner
     return _create_testing_file
-
-
-'''def test_new_scanner_fixture(new_scanner_fixture):
-    scanner = new_scanner_fixture'''
 
 
 def test_create_testing_file_to_scan(create_testing_file_to_scan):
@@ -75,23 +74,36 @@ def scanner_fixture(create_testing_file_to_scan):
         scanner = create_testing_file_to_scan(
             """
         DEVICES {
-            dtype1 = DTYPE;
-            dtype2 = DTYPE;
-            dtype3 = DTYPE;
-            dtype4 = DTYPE;
-            clock = CLK(25);
-            data = SWITCH(0);
+
+        data = SWITCH(0);
+        dtype1 = DTYPE;
+        dtype2 = DTYPE;
+        dtype3 = DTYPE;
+        dtype4 = DTYPE;
+        clock = CLOCK(2);
+        set = SWITCH(0);
         }
 
         CONNECTIONS {
-            data = dtype1.DATA;
-            dtype1.Q = dtype2.DATA;
-            dtype2.Q = dtype3.DATA;
-            dtype3.Q = dtype4.DATA;
-            clock = dtype1.CLK;
-            clock = dtype2.CLK;
-            clock = dtype3.CLK;
-            clock = dtype4.CLK;
+            dtype1.DATA = data;
+            dtype1.SET = set;
+            dtype1.CLEAR = set;
+            dtype1.CLK = clock;
+
+            dtype2.DATA = dtype1.Q;
+            dtype2.SET = set;
+            dtype2.CLEAR = set;
+            dtype2.CLK = clock;
+
+            dtype3.DATA = dtype2.Q;
+            dtype3.SET = set;
+            dtype3.CLEAR = set;
+            dtype3.CLK = clock;
+
+            dtype4.DATA = dtype3.Q;
+            dtype4.SET = set;
+            dtype4.CLEAR = set;
+            dtype4.CLK = clock;
         }
 
         MONITORS {
@@ -100,7 +112,6 @@ def scanner_fixture(create_testing_file_to_scan):
             dtype3.Q;
             dtype4.Q;
         }
-
         END
         """, scan_through_all)
         return scanner
@@ -579,7 +590,7 @@ def test_parser_check_device_is_valid_correct_example(parser_fixture, create_tes
     scanner = create_testing_file_to_scan(
     f"""
     {example}
-    """ 
+    """
     )
     parser = parser_fixture(scanner)
     parser.symbol = parser.scanner.get_symbol()
