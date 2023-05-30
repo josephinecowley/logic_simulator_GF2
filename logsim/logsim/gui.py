@@ -23,6 +23,7 @@ from network import Network
 from monitors import Monitors
 from scanner import Scanner
 from parse import Parser
+from userint import UserInterface
 
 
 class MyGLCanvas(wxcanvas.GLCanvas):
@@ -179,9 +180,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self.init = True
 
         size = self.GetClientSize()
-        text = "".join(["Canvas redrawn on paint event, size is ",
-                        str(size.width), ", ", str(size.height)])
-        self.render(text)
 
     def on_size(self, event):
         """Handle the canvas resize event."""
@@ -200,8 +198,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         if event.ButtonDown():
             self.last_mouse_x = event.GetX()
             self.last_mouse_y = event.GetY()
-            text = "".join(["Mouse button pressed at: ", str(event.GetX()),
-                            ", ", str(event.GetY())])
         if event.ButtonUp():
             text = "".join(["Mouse button released at: ", str(event.GetX()),
                             ", ", str(event.GetY())])
@@ -281,6 +277,8 @@ class Gui(wx.Frame):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(1000, 700))
 
+        self.simnet = UserInterface(names, devices, network, monitors)
+
         # Configure the file menu
         fileMenu = wx.Menu()
         menuBar = wx.MenuBar()
@@ -289,21 +287,6 @@ class Gui(wx.Frame):
         menuBar.Append(fileMenu, "&File")
         self.SetMenuBar(menuBar)
 
-
-        '''# Configure sizers for layout
-        main_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        side_sizer = wx.BoxSizer(wx.VERTICAL)
-
-        main_sizer.Add(self.canvas, 5, wx.EXPAND | wx.ALL, 5)
-        main_sizer.Add(side_sizer, 1, wx.ALL, 5)
-
-        side_sizer.Add(self.text, 1, wx.TOP, 10)
-        side_sizer.Add(self.spin, 1, wx.ALL, 5)
-        side_sizer.Add(self.run_button, 1, wx.ALL, 5)
-        side_sizer.Add(self.text_box, 1, wx.ALL, 5)
-
-        self.SetSizeHints(600, 600)
-        self.SetSizer(main_sizer)'''
 
         # Bind events to widgets
         self.Bind(wx.EVT_MENU, self.on_menu)
@@ -317,10 +300,6 @@ class Gui(wx.Frame):
         vbox.Add(data_panel, 8, wx.EXPAND)
         data_panel.SetSizer(hbox)
 
-        # Instantiate SwitchesPanel widget and add to Frame
-        switches_panel = SwitchesPanel(data_panel, names, devices)
-        hbox.Add(switches_panel, 1, wx.EXPAND, 0)
-
         # Instantiate SignalTracesPanel widget and add to Frame
         signal_traces_panel = SignalTracesPanel(data_panel, names, devices, monitors)
         hbox.Add(signal_traces_panel, 3, wx.EXPAND, 0)
@@ -328,6 +307,11 @@ class Gui(wx.Frame):
         # Instantiate RunSimulationPanel widget and add to Frame
         simulation_panel = RunSimulationPanel(self)
         vbox.Add(simulation_panel, 1, wx.EXPAND)
+
+        # Instantiate SwitchesPanel widget and add to Frame
+        switches_panel = SwitchesPanel(data_panel, simulation_panel, names, devices)
+        hbox.Add(switches_panel, 1, wx.EXPAND, 0)
+
 
         self.SetSizeHints(200, 200)
         self.SetSizer(vbox)
@@ -393,13 +377,13 @@ class RunSimulationPanel(wx.Panel):
         font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         text.SetFont(font)
         cycles_hbox.Add(text, 0, flag=wx.TOP|wx.LEFT)
-        self.spin_text = wx.TextCtrl(self.cycles_panel, wx.ID_ANY, "1", pos=wx.DefaultPosition, size=(60, -1))
-        spin = wx.SpinButton(self.cycles_panel, wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.SP_VERTICAL)
-        spin.SetRange(1, 100)
-        spin.SetValue(1)
-        self.Bind(wx.EVT_SPIN, self.on_spin, spin)
-        cycles_hbox.Add(self.spin_text, 0, flag=wx.LEFT, border=10)
-        cycles_hbox.Add(spin, 0, flag=wx.LEFT, border=10)
+        cycles_spin_control = wx.SpinCtrl(self.cycles_panel, -1, "", (30, 50))
+        cycles_spin_control.SetRange(1,100)
+        cycles_spin_control.SetValue(5)
+        self.cycles_spin_control = cycles_spin_control
+        self.Bind(wx.EVT_SPINCTRL, self.on_spin, self.cycles_spin_control)
+        cycles_hbox.Add(self.cycles_spin_control, 0, flag=wx.LEFT, border=10)
+
 
         # Create, bind running simulation event to and add the "Run simulation" button
         self.run_button = wxbuttons.GenButton(self.left_buttons_panel, wx.ID_ANY, "RUN", name="run button")
@@ -428,7 +412,7 @@ class RunSimulationPanel(wx.Panel):
 
         
         self.centre_panel = wx.Panel(self)
-        #centre_panel.SetBackgroundColour("GREEN") # layout identifier colour for visualisation purposes
+        #self.centre_panel.SetBackgroundColour("GREEN") # layout identifier colour for visualisation purposes
         centre_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
         hbox.Add(self.centre_panel, 2, flag=wx.EXPAND)
 
@@ -486,7 +470,8 @@ class RunSimulationPanel(wx.Panel):
         quit_button_pressed.SetBackgroundColour(wx.Colour(148, 148, 148))
 
     def on_spin(self, event):
-        self.spin_text.SetValue(str(event.GetPosition()))
+        #self.spin_text.SetValue(str(event.GetPosition()))
+        print(self.cycles_spin_control.GetValue())
 
     def on_upload_button(self, event):
         """Handle the event when the user clicks the upload button."""
@@ -643,8 +628,10 @@ class SignalTracesPanel(wx.Panel):
 
 
 class SwitchesPanel(wx.Panel):
-    def __init__(self, parent, names, devices):
+    def __init__(self, parent, simulation_panel, names, devices):
         super(SwitchesPanel, self).__init__(parent, size=(300, 200))
+        
+        self.simulation_panel = simulation_panel
 
         # Configure sizers for layout of SwitchesPanel panel
         vbox = wx.BoxSizer(wx.VERTICAL)
@@ -692,10 +679,10 @@ class SwitchesPanel(wx.Panel):
         self.left_panel = wx.Panel(self.switches_panel)
         left_panel_vbox = wx.BoxSizer(wx.VERTICAL)
         self.left_panel.SetSizer(left_panel_vbox)
-        '''self.add_new_switch_button = wx.Button(self.left_panel, wx.ID_ANY, "add new switch")
+        self.add_new_switch_button = wx.Button(self.left_panel, wx.ID_ANY, "add new switch")
         self.add_new_switch_button.SetToolTip("Add a new switch")
         self.Bind(wx.EVT_BUTTON, self.on_add_new_switch_button, self.add_new_switch_button)
-        left_panel_vbox.Add(self.add_new_switch_button, 1, flag=wx.EXPAND)'''
+        left_panel_vbox.Add(self.add_new_switch_button, 1, flag=wx.EXPAND)
         hbox.Add(self.left_panel, 1, wx.EXPAND)
 
         # Add the ScrolledPanel widget to SwitchesPanel panel
@@ -721,7 +708,10 @@ class SwitchesPanel(wx.Panel):
         #self.fgs = wx.FlexGridSizer(cols=1, rows=self.num_of_switches+1, vgap=4, hgap=4)
         self.Bind(wx.EVT_TOGGLEBUTTON, self.on_switch_toggle_button, new_switch)
         self.fgs.Add(new_switch, 1, flag=wx.ALL, border=10)
+        self.simulation_panel.centre_panel.SetBackgroundColour("GREEN")
+        self.simulation_panel.Refresh()
         #self.switch_buttons_scrolled_panel.Update()
+        #self.simulation_panel.centre_panel.SetBackgroundColour("GREEN")
         self.switch_buttons_scrolled_panel.Refresh()
         self.switches_panel.Layout()
 
