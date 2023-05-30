@@ -213,7 +213,7 @@ def symbol_fixture(scanner_fixture, set_scanner_location):
 def correct_error_arguments(symbol_fixture):
     """Return the correct error arguments"""
     symbol = symbol_fixture
-    return symbol, 4, True, True, [2, 3, 6, 8]
+    return symbol, 4, True, [2, 3, 6, 8]
 
 
 def test_parser_initialisation(scanner_fixture, parser_fixture):
@@ -362,12 +362,12 @@ def test_parser_display_error_valid_error_code(scanner_fixture, parser_fixture, 
     """Test display_error returns ValueError for out of range error_code"""
     scanner = scanner_fixture()
     parser = parser_fixture(scanner)
-    symbol, error_type, syntax_error, proceed, stopping_symbol_types = correct_error_arguments
+    symbol, error_type, proceed, stopping_symbol_types = correct_error_arguments
     invalid_error_type = max(parser.syntax_errors) + 16
 
     with pytest.raises(ValueError):
         parser.display_error(symbol, invalid_error_type,
-                             syntax_error, proceed, stopping_symbol_types)
+                             proceed, stopping_symbol_types)
 
 
 def test_parser_display_error_symbol_is_EOF(parser_fixture, create_testing_file_to_scan):
@@ -443,7 +443,7 @@ def test_parser_error_recovery_check_built_in_error_handling_semantic_error(scan
     symbol = parser.scanner.get_symbol()
     error_type = parser.syntax_errors[0]
 
-    assert parser.error_recovery(error_type, syntax_error=False) is None
+    assert parser.error_recovery(error_type) is None
 
 
 def test_parser_error_recovery_stops_when_stopping_symbol_or_EOF_is_encountered(create_testing_file_to_scan, parser_fixture):

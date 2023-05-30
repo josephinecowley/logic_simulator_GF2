@@ -118,7 +118,7 @@ class Parser:
                               self.FLOATING_INPUT, self.TERMINATE, self.WRONG_ORDER] = self.names.unique_error_codes(25)
 
     # Stopping symbols automatically assigned to semi-colons, braces and keywords
-    def display_error(self,  symbol, error_type,  syntax_error=True, proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
+    def display_error(self,  symbol, error_type, proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
         """Display the error message and where it occured.
 
         Calls the error handling method to resume from the next available point."""
@@ -126,6 +126,9 @@ class Parser:
         if not isinstance(error_type, int):
             raise TypeError(
                 "Expected error_type to be an integer type argument")
+        elif error_type > max(self.syntax_errors) + 15:
+            raise ValueError(
+                "Cannot have an error type greater than the number of errors present")
         elif error_type < 0:
             raise ValueError("Cannot have a negative error code")
         elif not isinstance(symbol, Symbol):
@@ -136,8 +139,6 @@ class Parser:
         elif ((len(stopping_symbol_types) >= 12) or (len(stopping_symbol_types) <= 0)):
             raise ValueError(
                 "Expected stopping symbol to be within range of given symbols")
-        elif not isinstance(syntax_error, bool):
-            raise TypeError("Expected bool type argument for syntax_error")
         elif not isinstance(proceed, bool):
             raise TypeError("Expected bool type argument for proceed")
 
@@ -247,12 +248,12 @@ class Parser:
         self.scanner.display_line_and_marker(symbol)
 
         # Call error recovery function to resume parsing at appropriate point
-        self.error_recovery(error_type, syntax_error,
+        self.error_recovery(error_type,
                             proceed, stopping_symbol_types)
         return
 
     # Stopping symbols automatically assigned to semi-colons, braces and keywords
-    def error_recovery(self, error_type, syntax_error=True, proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
+    def error_recovery(self, error_type,  proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
         """Recover from an error by resuming parsing at an appropriate point."""
 
         if not isinstance(error_type, int):
@@ -263,8 +264,6 @@ class Parser:
                 "Cannot have an error type greater than the number of errors present")
         elif error_type < 0:
             raise ValueError("Cannot have a negative error code")
-        elif not isinstance(syntax_error, bool):
-            raise TypeError("Expected bool type argument for syntax_error")
         elif not isinstance(proceed, bool):
             raise TypeError("Expected bool type argument for proceed")
         elif not isinstance(stopping_symbol_types, list):
@@ -275,23 +274,18 @@ class Parser:
                 "Expected stopping symbol to be within range of given symbols")
 
         # Recover from error
-        if syntax_error:
-            # If syntax error, need to take into account proceed
-            if proceed == True:
-                return
-            # Check if we need to skip symbols to recover parsing
-            else:
-                while ((self.symbol.type not in stopping_symbol_types) and (self.symbol.type != self.scanner.EOF)):
-                    self.symbol = self.scanner.get_symbol()
-                # Stop when stopping symbol is encountered
-                if self.symbol.type in stopping_symbol_types:
-                    return
-                elif self.symbol.type == self.scanner.EOF:
-                    self.display_error(self.symbol, self.TERMINATE)
-                    return
-        else:
-            # If semantic error, ignore proceed parameter and return
+        if proceed == True:
             return
+        # Check if we need to skip symbols to recover parsing
+        else:
+            while ((self.symbol.type not in stopping_symbol_types) and (self.symbol.type != self.scanner.EOF)):
+                self.symbol = self.scanner.get_symbol()
+            # Stop when stopping symbol is encountered
+            if self.symbol.type in stopping_symbol_types:
+                return
+            elif self.symbol.type == self.scanner.EOF:
+                self.display_error(self.symbol, self.TERMINATE)
+                return
 
     def initial_error_checks(self, KEYWORD_ID, missing_error_type):
         """Check initial symbols for common errors. This function tests for 6 cases:
@@ -446,7 +440,7 @@ class Parser:
             error_type = self.devices.make_device(
                 device_ID, device_kind, device_property)
             if error_type != self.devices.NO_ERROR:
-                self.display_error(self.symbol, error_type, syntax_error=False)
+                self.display_error(self.symbol, error_type)
 
     def check_device_is_valid(self):
         """Check if device is valid.
@@ -657,7 +651,7 @@ class Parser:
             error_type = self.network.make_connection(
                 output_device_id, output_port_id, input_device_id, input_port_id)
             if error_type != self.network.NO_ERROR:
-                self.display_error(self.symbol, error_type, syntax_error=False)
+                self.display_error(self.symbol, error_type)
 
     def output(self):
         """Parse a single device output.
@@ -794,7 +788,7 @@ class Parser:
             error_type = self.monitors.make_monitor(
                 monitor_device_id, monitor_port_id)
             if error_type != self.monitors.NO_ERROR:
-                self.display_error(self.symbol, error_type, syntax_error=False)
+                self.display_error(self.symbol, error_type)
 
     def end(self):
         """Parse an END keyword and check there are no symbols afterwards."""
@@ -846,7 +840,7 @@ class Parser:
                 if self.error_count == 0:
                     if not self.network.check_network():
                         self.display_error(
-                            self.symbol, self.FLOATING_INPUT, syntax_error=False)
+                            self.symbol, self.FLOATING_INPUT)
 
                 # If nothing after connections list
                 if self.symbol.type == self.scanner.EOF:
