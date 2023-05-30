@@ -182,7 +182,7 @@ class Monitors:
             monitor_name = self.devices.get_signal_name(device_id, output_id)
             signal_list = self.monitors_dictionary[(device_id, output_id)]
             signals.append((monitor_name, signal_list))
-        return signals
+        return signals[::-1] #reverse list
 
 
 
