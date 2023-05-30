@@ -673,6 +673,15 @@ class SwitchesPanel(wx.Panel):
 
 class LogicSimApp(wx.App):
     def OnInit(self):
+        file_path = "logsim\logsim\example2_logic_description.txt"
+        names = Names()
+        devices = Devices(names)
+        network = Network(names, devices)
+        monitors = Monitors(names, devices, network)
+        scanner = Scanner(file_path, names)
+        parser = Parser(names, devices, network, monitors, scanner)
+        print(parser.parse_network())
+        breakpoint()
         self.frame = Gui("GF2 Team 7 Logic Simulator GUI")
         self.frame.Show()
 
