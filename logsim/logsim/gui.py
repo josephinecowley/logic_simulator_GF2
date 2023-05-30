@@ -305,7 +305,7 @@ class Gui(wx.Frame):
         hbox.Add(signal_traces_panel, 3, wx.EXPAND, 0)
 
         # Instantiate RunSimulationPanel widget and add to Frame
-        simulation_panel = RunSimulationPanel(self, self.simnet)
+        simulation_panel = RunSimulationPanel(self, network, monitors)
         vbox.Add(simulation_panel, 1, wx.EXPAND)
 
         # Instantiate SwitchesPanel widget and add to Frame
@@ -328,10 +328,12 @@ class Gui(wx.Frame):
 
 
 class RunSimulationPanel(wx.Panel):
-    def __init__(self, parent, simnet, id=wx.ID_ANY, size=wx.DefaultSize):
+    def __init__(self, parent, network, monitors, id=wx.ID_ANY, size=wx.DefaultSize):
         super(RunSimulationPanel, self).__init__(parent, id, size=size, style=wx.SIMPLE_BORDER)
         
-        self.simnet = simnet
+        #self.simnet = simnet
+        self.network = network
+        self.monitors = monitors
 
         #self.SetBackgroundColour("RED") # layout identifier colour for visualisation purposes
         #print(self.GetLabel())
@@ -448,8 +450,20 @@ class RunSimulationPanel(wx.Panel):
         self.GetSizer().Layout()
 
         no_of_cycles = self.cycles_spin_control.GetValue()
-        print(f'No. of cycles: {no_of_cycles}')
-        self.simnet.run_network(no_of_cycles)
+        '''print(f'No. of cycles: {no_of_cycles}')
+        self.simnet.run_network(no_of_cycles)'''
+        self.run_network(no_of_cycles)
+        
+    def run_network(self, cycles):
+        #print(f'No of cycles: {cycles}')
+        for _ in range(cycles):
+            if self.network.execute_network():
+                self.monitors.record_signals()
+            else:
+                print("Error! Network oscillating.")
+                return False
+        self.monitors.display_signals()
+        return True
 
 
     def on_quit_button(self, event):
