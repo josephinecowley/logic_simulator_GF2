@@ -23,7 +23,6 @@ from network import Network
 from monitors import Monitors
 from scanner import Scanner
 from parse import Parser
-from userint import UserInterface
 
 
 class MyGLCanvas(wxcanvas.GLCanvas):
@@ -277,8 +276,6 @@ class Gui(wx.Frame):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(1000, 700))
 
-        self.simnet = UserInterface(names, devices, network, monitors)
-
         # Configure the file menu
         fileMenu = wx.Menu()
         menuBar = wx.MenuBar()
@@ -330,8 +327,7 @@ class Gui(wx.Frame):
 class RunSimulationPanel(wx.Panel):
     def __init__(self, parent, signal_traces_panel, names, devices, network, monitors, id=wx.ID_ANY, size=wx.DefaultSize):
         super(RunSimulationPanel, self).__init__(parent, id, size=size, style=wx.SIMPLE_BORDER)
-        
-        #self.simnet = simnet
+
         self.signal_traces_panel = signal_traces_panel
         self.names = names
         self.devices = devices
@@ -361,7 +357,7 @@ class RunSimulationPanel(wx.Panel):
         self.left_buttons_panel.SetSizer(left_buttons_panel_hbox)
         vbox.Add(self.left_buttons_panel)
         
-        # Create number of cycles text to cycles panel
+        # Create and add number of cycles text to cycles panel
         str = "No. Cycles"
         text = wx.StaticText(self.cycles_panel, wx.ID_ANY, str, style=wx.ALIGN_LEFT)
         font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
@@ -514,7 +510,7 @@ class RunSimulationPanel(wx.Panel):
         dlg.Destroy()
 
 class SignalTrace(wx.ScrolledWindow):
-    def __init__(self, parent, id=wx.ID_ANY, size=wx.DefaultSize):
+    def __init__(self, parent, names, devices, network, monitors, id=wx.ID_ANY, size=wx.DefaultSize):
         super(SignalTrace, self).__init__(parent, id, size=size)
 
         size = self.GetClientSize()
@@ -538,6 +534,11 @@ class SignalTracesPanel(wx.Panel):
     def __init__(self, parent, names, devices, network, monitors):
         super(SignalTracesPanel, self).__init__(parent, size=wx.DefaultSize, style=wx.SUNKEN_BORDER)
 
+        self.names = names
+        self.devices = devices
+        self.network = network
+        self.monitors = monitors
+
         # Configure sizers for layout of SwitchesPanel panel
         vbox = wx.BoxSizer(wx.VERTICAL)
         hbox = wx.BoxSizer(wx.HORIZONTAL)
@@ -560,13 +561,20 @@ class SignalTracesPanel(wx.Panel):
         add_new_monitor_panel_CENTRE_hbox = wx.BoxSizer(wx.HORIZONTAL)
         self.add_new_monitor_panel_CENTRE.SetSizer(add_new_monitor_panel_CENTRE_hbox)
 
+        # Create and add "Add new monitor" text to centre of add new monitor panel
         str = "Add new monitor"
         text = wx.StaticText(self.add_new_monitor_panel_CENTRE, wx.ID_ANY, str)
         font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         text.SetFont(font)
         add_new_monitor_panel_CENTRE_hbox.Add(text, 0, flag=wx.ALIGN_CENTER)
 
-        self.monitor_output_list = ["deviceA", "deviceB", "switchC", "dtypeD", "deviceE"]
+        # Get the ids and user-defined names of all monitored and (as-of-yet) unmonitored devices
+        monitored_devices_names = monitors.get_signal_names()[0]
+        monitored_devices_ids = names.lookup(monitored_devices_names)
+        unmonitored_devices_names = monitors.get_signal_names()[1]
+        unmonitored_devices_ids = names.lookup(unmonitored_devices_names)
+
+        self.monitor_output_list = unmonitored_devices_names
         self.combo_box = wx.ComboBox(self.add_new_monitor_panel_CENTRE, 500, "Select output", (90, 50),
                          (160, -1), self.monitor_output_list,
                          wx.CB_DROPDOWN
@@ -636,7 +644,6 @@ class SwitchesPanel(wx.Panel):
         self.fgs = wx.FlexGridSizer(cols=1, rows=self.num_of_switches+10, vgap=4, hgap=4)
 
         for switch in switch_names:
-        #for switch_num in range(1, self.num_of_switches + 1):
             switch_toggle_button = wx.ToggleButton(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"{switch}") # create switch toggle button object with appropriate label
             self.Bind(wx.EVT_TOGGLEBUTTON, self.on_switch_toggle_button, switch_toggle_button) # bind switch toggle button to its event
             self.fgs.Add(switch_toggle_button, 1, flag=wx.ALL, border=10) # add switch toggle buttons to ScrolledPanel
