@@ -77,6 +77,12 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
 
+        # Initialise trace objects
+        self.traces = monitors.get_signals_for_GUI()
+        self.y_spacing = 100
+
+        self.devices = devices
+
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
         size = self.GetClientSize()
@@ -92,6 +98,56 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glTranslated(self.pan_x, self.pan_y, 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
 
+    def draw_canvas(self):
+        """Iterates through each trace and draws it on the canvas with an offset"""
+        y_offset = 0
+
+        for trace in self.traces:
+            signal = trace[1]
+            label = trace[0]
+            self._draw_trace(signal, 0, y_offset, label, (0.0, 0.0, 1.0))
+            y_offset += self.y_spacing
+
+    def _draw_trace(self, signal, x_pos, y_pos, label, color = (0.0, 0.0, 1.0)):
+        """Draws trace with axes and ticks"""
+
+        # draw trace
+        GL.glColor3f(*color)
+        GL.glBegin(GL.GL_LINE_STRIP)
+        for i in range(len(signal)):
+            x = (i * 20) + x_pos
+            x_next = (i * 20) + x_pos + 20
+            if signal[i] == 0:
+                y = y_pos
+            else:
+                y = y_pos + 25
+            GL.glVertex2f(x, y)
+            GL.glVertex2f(x_next, y)
+        GL.glEnd()
+
+        # draw axis
+        y_pos -= 10
+        GL.glColor3f(0.0, 0.0, 0.0)  # black
+        GL.glBegin(GL.GL_LINES)
+        GL.glVertex2f(x_pos, y_pos)
+        GL.glVertex2f(x_pos, y_pos + 40)
+        GL.glVertex2f(x_pos, y_pos)
+        GL.glVertex2f(x_pos + (len(signal) * 20), y_pos)
+        GL.glEnd()
+
+        # draw axis ticks
+        for i in range(len(signal) + 1):
+            x = (i * 20) + x_pos
+            GL.glColor3f(0.0, 0.0, 0.0)  # black
+            GL.glBegin(GL.GL_LINES)
+            GL.glVertex2f(x_pos, y_pos)
+            GL.glVertex2f(x_pos, y_pos - 4)
+            GL.glEnd()
+            self.render_text(str(i), x - 5, y_pos - 15)
+
+        x_pos -= int(40 / 3 * len(label))
+        self.render_text(label, x_pos, y_pos + 18)
+
     def render(self, text):
         """Handle all drawing operations."""
         self.SetCurrent(self.context)
@@ -106,19 +162,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # Draw specified text at position (10, 10)
         self.render_text(text, 10, 10)
 
-        # Draw a sample signal trace
-        GL.glColor3f(0.0, 0.0, 1.0)  # signal trace is blue
-        GL.glBegin(GL.GL_LINE_STRIP)
-        for i in range(10):
-            x = (i * 20) + 10
-            x_next = (i * 20) + 30
-            if i % 2 == 0:
-                y = 75
-            else:
-                y = 100
-            GL.glVertex2f(x, y)
-            GL.glVertex2f(x_next, y)
-        GL.glEnd()
+        # Draw signal traces
+        self.draw_canvas()
 
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
@@ -244,21 +289,6 @@ class Gui(wx.Frame):
         menuBar.Append(fileMenu, "&File")
         self.SetMenuBar(menuBar)
 
-        # Canvas for drawing signals
-        self.canvas = MyGLCanvas(self, devices, monitors)
-
-        # Configure the widgets
-        self.text = wx.StaticText(self, wx.ID_ANY, "Cycles")
-        self.spin = wx.SpinCtrl(self, wx.ID_ANY, "10")
-        self.run_button = wx.Button(self, wx.ID_ANY, "Run")
-        self.text_box = wx.TextCtrl(self, wx.ID_ANY, "",
-                                    style=wx.TE_PROCESS_ENTER)
-
-        # Bind events to widgets
-        self.Bind(wx.EVT_MENU, self.on_menu)
-        self.spin.Bind(wx.EVT_SPINCTRL, self.on_spin)
-        self.run_button.Bind(wx.EVT_BUTTON, self.on_run_button)
-        self.text_box.Bind(wx.EVT_TEXT_ENTER, self.on_text_box)
 
         '''# Configure sizers for layout
         main_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -292,7 +322,7 @@ class Gui(wx.Frame):
         hbox.Add(switches_panel, 1, wx.EXPAND, 0)
 
         # Instantiate SignalTracesPanel widget and add to Frame
-        signal_traces_panel = SignalTracesPanel(data_panel, names, devices)
+        signal_traces_panel = SignalTracesPanel(data_panel, names, devices, monitors)
         hbox.Add(signal_traces_panel, 3, wx.EXPAND, 0)
 
         # Instantiate RunSimulationPanel widget and add to Frame
@@ -510,7 +540,7 @@ class SignalTrace(wx.ScrolledWindow):
 
 
 class SignalTracesPanel(wx.Panel):
-    def __init__(self, parent, names, devices):
+    def __init__(self, parent, names, devices, monitors):
         super(SignalTracesPanel, self).__init__(parent, size=wx.DefaultSize, style=wx.SUNKEN_BORDER)
 
         # Configure sizers for layout of SwitchesPanel panel
@@ -562,20 +592,23 @@ class SignalTracesPanel(wx.Panel):
 
         add_new_monitor_panel_hbox.Add(self.add_new_monitor_panel_RIGHT, 1, flag=wx.EXPAND)
 
-        # Instantiate ScrolledPanel
+        '''# Instantiate ScrolledPanel
         self.signal_traces_scrolled_panel = wxscrolledpanel.ScrolledPanel(self.signal_traces_panel, name="signal traces scrolled panel")
 
-        # Get the ids and user-defined names of all SWITCH-type devices
-        gate_ids = devices.find_devices(device_kind=devices.AND)
-        gate_names = [names.get_name_string(i) for i in gate_ids]
+        # Get the ids, user-defined names and corresponding type of all AND, OR, NAND, NOR, XOR gates
+        gate_ids = []
+        for gate_type in devices.gate_types:
+            gate_ids.extend(devices.find_devices(device_kind=gate_type))
+        gate_names_and_type = [(names.get_name_string(i), names.get_name_string(devices.get_device(i).device_kind)) for i in gate_ids]
+
 
         # Configure sizer of ScrolledPanel
         signal_trace_size = (500, 200)
-        self.num_of_signal_traces = len(gate_names)
+        self.num_of_signal_traces = len(gate_names_and_type)
         fgs = wx.FlexGridSizer(cols=3, rows=self.num_of_signal_traces, vgap=4, hgap=50)
         
-        for gate in gate_names:
-            str = f"{gate}"
+        for gate_name, gate_type in gate_names_and_type:
+            str = f"{gate_name}, {gate_type}"
             text = wx.StaticText(self.signal_traces_scrolled_panel, wx.ID_ANY, str)
             font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
             text.SetFont(font)
@@ -592,12 +625,15 @@ class SignalTracesPanel(wx.Panel):
             fgs.Add(signal_trace, 0, flag=wx.EXPAND, border=10) # add signal trace plot to ScrolledPanel
             fgs.Add(delete_button, 0, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
-        # Set sizer of ScrolledPanel
+        # Set sizer of Signal Traces ScrolledPanel
         self.signal_traces_scrolled_panel.SetSizer(fgs)
         self.signal_traces_scrolled_panel.SetAutoLayout(1)
         self.signal_traces_scrolled_panel.SetupScrolling(scroll_x=True, scroll_y=True, rate_x=20, rate_y=20, scrollToTop=True, scrollIntoView=True)
 
-        signal_traces_panel_vbox.Add(self.signal_traces_scrolled_panel, 1, wx.EXPAND)
+        signal_traces_panel_vbox.Add(self.signal_traces_scrolled_panel, 1, wx.EXPAND)'''
+        # Canvas for drawing signals
+        self.canvas = MyGLCanvas(self.signal_traces_panel, devices, monitors)
+        signal_traces_panel_vbox.Add(self.canvas, 1, wx.EXPAND)
 
         vbox.Add(self.signal_traces_panel, 4, flag=wx.EXPAND)
         vbox.Add(self.add_new_monitor_panel, 1, flag=wx.EXPAND)
