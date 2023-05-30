@@ -234,7 +234,7 @@ class Gui(wx.Frame):
 
     def __init__(self, title, path, names, devices, network, monitors):
         """Initialise widgets and layout."""
-        super().__init__(parent=None, title=title, size=(800, 600))
+        super().__init__(parent=None, title=title, size=(1000, 700))
 
         # Configure the file menu
         fileMenu = wx.Menu()
