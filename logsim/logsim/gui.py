@@ -453,8 +453,6 @@ class RunSimulationPanel(wx.Panel):
         self.GetSizer().Layout()
 
         no_of_cycles = self.cycles_spin_control.GetValue()
-        '''print(f'No. of cycles: {no_of_cycles}')
-        self.simnet.run_network(no_of_cycles)'''
         self.run_network(no_of_cycles)
         self.update_canvas()
         
@@ -589,45 +587,6 @@ class SignalTracesPanel(wx.Panel):
 
         add_new_monitor_panel_hbox.Add(self.add_new_monitor_panel_RIGHT, 1, flag=wx.EXPAND)
 
-        '''# Instantiate ScrolledPanel
-        self.signal_traces_scrolled_panel = wxscrolledpanel.ScrolledPanel(self.signal_traces_panel, name="signal traces scrolled panel")
-
-        # Get the ids, user-defined names and corresponding type of all AND, OR, NAND, NOR, XOR gates
-        gate_ids = []
-        for gate_type in devices.gate_types:
-            gate_ids.extend(devices.find_devices(device_kind=gate_type))
-        gate_names_and_type = [(names.get_name_string(i), names.get_name_string(devices.get_device(i).device_kind)) for i in gate_ids]
-
-
-        # Configure sizer of ScrolledPanel
-        signal_trace_size = (500, 200)
-        self.num_of_signal_traces = len(gate_names_and_type)
-        fgs = wx.FlexGridSizer(cols=3, rows=self.num_of_signal_traces, vgap=4, hgap=50)
-        
-        for gate_name, gate_type in gate_names_and_type:
-            str = f"{gate_name}, {gate_type}"
-            text = wx.StaticText(self.signal_traces_scrolled_panel, wx.ID_ANY, str)
-            font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
-            text.SetFont(font)
-
-            signal_trace = SignalTrace(self.signal_traces_scrolled_panel, wx.ID_ANY, size=signal_trace_size) # create signal trace scrolled window
-            #signal_trace_canvas = MyGLCanvas(signal_trace, wx.ID_ANY, wx.DefaultPosition,  wx.Size(*signal_trace_size)) # draw canvas onto signal trace scrolled window
-
-            delete_button = wxaquabutton.AquaButton(self.signal_traces_scrolled_panel, wx.ID_ANY, bitmap=None, label="DELETE")
-            delete_button.SetBackgroundColor(wx.Colour("BLUE"))
-            delete_button.SetHoverColor(wx.Colour("RED"))
-            delete_button.SetFocusColour(wx.Colour("BLUE"))
-
-            fgs.Add(text, 0, flag=wx.ALIGN_CENTER|wx.LEFT, border=10)
-            fgs.Add(signal_trace, 0, flag=wx.EXPAND, border=10) # add signal trace plot to ScrolledPanel
-            fgs.Add(delete_button, 0, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
-
-        # Set sizer of Signal Traces ScrolledPanel
-        self.signal_traces_scrolled_panel.SetSizer(fgs)
-        self.signal_traces_scrolled_panel.SetAutoLayout(1)
-        self.signal_traces_scrolled_panel.SetupScrolling(scroll_x=True, scroll_y=True, rate_x=20, rate_y=20, scrollToTop=True, scrollIntoView=True)
-
-        signal_traces_panel_vbox.Add(self.signal_traces_scrolled_panel, 1, wx.EXPAND)'''
         # Canvas for drawing signals
         self.canvas = MyGLCanvas(self.signal_traces_panel, devices, monitors)
         signal_traces_panel_vbox.Add(self.canvas, 1, wx.EXPAND)
