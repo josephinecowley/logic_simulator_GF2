@@ -695,10 +695,7 @@ class SwitchesPanel(wx.Panel):
         self.left_panel = wx.Panel(self.switches_panel)
         left_panel_vbox = wx.BoxSizer(wx.VERTICAL)
         self.left_panel.SetSizer(left_panel_vbox)
-        self.add_new_switch_button = wx.Button(self.left_panel, wx.ID_ANY, "add new switch")
-        self.add_new_switch_button.SetToolTip("Add a new switch")
-        self.Bind(wx.EVT_BUTTON, self.on_add_new_switch_button, self.add_new_switch_button)
-        left_panel_vbox.Add(self.add_new_switch_button, 1, flag=wx.EXPAND)
+        #left_panel_vbox.Add(self.add_new_switch_button, 1, flag=wx.EXPAND)
         hbox.Add(self.left_panel, 1, wx.EXPAND)
 
         # Add the ScrolledPanel widget to SwitchesPanel panel
@@ -708,6 +705,26 @@ class SwitchesPanel(wx.Panel):
         self.right_panel = wx.Panel(self.switches_panel)
         #right_panel.SetBackgroundColour("BLUE") # layout identifier colour for visualisation purposes
         hbox.Add(self.right_panel, 1, wx.EXPAND)
+
+        self.add_switch_panel = wx.Panel(self)
+        add_switch_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
+        self.add_switch_panel.SetSizer(add_switch_panel_hbox)
+
+        self.add_switch_panel_left = wx.Panel(self.add_switch_panel)
+        add_switch_panel_hbox.Add(self.add_switch_panel_left, 1, wx.EXPAND)
+
+        self.add_switch_panel_centre = wx.Panel(self.add_switch_panel)
+        add_switch_panel_centre_vbox = wx.BoxSizer(wx.VERTICAL)
+        self.add_new_switch_button = wx.Button(self.add_switch_panel_centre, wx.ID_ANY, "Add new switch")
+        self.add_new_switch_button.SetToolTip("Add a new switch")
+        self.Bind(wx.EVT_BUTTON, self.on_add_new_switch_button, self.add_new_switch_button)
+        add_switch_panel_centre_vbox.Add(self.add_new_switch_button, 1, flag=wx.CENTER|wx.EXPAND)
+        add_switch_panel_hbox.Add(self.add_switch_panel_centre, 2, wx.EXPAND)
+
+        self.add_switch_panel_right = wx.Panel(self.add_switch_panel)
+        add_switch_panel_hbox.Add(self.add_switch_panel_right, 1, wx.EXPAND)
+
+        vbox.Add(self.add_switch_panel, 1, wx.EXPAND)
 
         # Set sizer of SwitchesPanel
         self.SetSizer(vbox)
