@@ -307,17 +307,21 @@ class Parser:
 
         # If symbol type is not keyword
         if not (self.symbol.type == self.scanner.KEYWORD):
+
             # If symbol type is name
             if not (self.symbol.type == self.scanner.NAME):
+
                 # If symbol type is open brace '{'
                 if self.symbol.type == self.scanner.BRACE_OPEN:
                     # Case 3: { ...
                     self.display_error(self.symbol, missing_error_type)
                     self.symbol = self.scanner.get_symbol()
                     return
+
             # If symbol type is not name
             else:
                 self.symbol = self.scanner.get_symbol()
+
                 # If symbol type is not open brace '{'
                 if not (self.symbol.type == self.scanner.BRACE_OPEN):
                     # Cannot differentiate easily between Case 4 and Case 6 thus will proceed to next stopping symbol
@@ -328,6 +332,7 @@ class Parser:
                         self.symbol, self.NO_BRACE_OPEN, proceed=False)
                     self.symbol = self.scanner.get_symbol()
                     return
+
                 # If symbol type is open brace '{'
                 else:
                     # Case 2: D { ...
@@ -335,21 +340,25 @@ class Parser:
                         self.symbol, missing_error_type)
                     self.symbol = self.scanner.get_symbol()
                     return
+
         # If symbol type is keyword
         else:
             # If symbol id is correct
             if self.symbol.id == KEYWORD_ID:
                 self.symbol = self.scanner.get_symbol()
+
                 # If symbol type is not open brace '{'
                 if not (self.symbol.type == self.scanner.BRACE_OPEN):
                     # Case 5. KEYWORD ...
                     self.display_error(self.symbol, self.NO_BRACE_OPEN)
                     return
+
                 # If symbol type is open brace '{'
                 else:
                     # Case 1. KEYWORD{ ...
                     self.symbol = self.scanner.get_symbol()
                     return
+
             # If symbol id is incorrect
             else:
                 # Case 7: Wrong keyword given (e.g. END is called after device_list).
@@ -598,16 +607,19 @@ class Parser:
             # Check that the gate is followed by an open bracket symbol
             if self.symbol.type == self.scanner.BRACKET_OPEN:
                 self.symbol = self.scanner.get_symbol()
+
                 # Check that number of inputs is an integer
                 if self.symbol.type == self.scanner.NUMBER:
                     number_of_cycles = int(self.names.get_name_string(
                         self.symbol.id))
+
                     # Check that input number is negative (this is a semantic check!)
                     if number_of_cycles > 0:
                         # Check that the next symbol is a close bracket
                         self.symbol = self.scanner.get_symbol()
                         if self.symbol.type == self.scanner.BRACKET_CLOSE:
                             self.symbol = self.scanner.get_symbol()
+
                             # Return device kind and the number of cycles as device property
                             return device_kind, number_of_cycles
                         else:
@@ -651,10 +663,12 @@ class Parser:
         if self.symbol.type != self.scanner.SEMICOLON:
             self.display_error(
                 self.symbol, self.NO_SEMICOLON, proceed=False)
+
             # Check if semicolon was missing and now symbol is at the close brace '{' symbol
             if self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.symbol = self.scanner.get_symbol()
                 return
+
             # Check if semicolon and close brace '{' was missing and now symbol is at the next keyword
             elif self.symbol.type == self.scanner.KEYWORD:
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
@@ -663,30 +677,38 @@ class Parser:
         # Repeat checking connections in list until the close brace "}"
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
             self.symbol = self.scanner.get_symbol()
+
             # Incase a KEYWORD is entered straight after a ';', assume '{' was missed
             if (self.symbol.type == self.scanner.KEYWORD):
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
                 return
+
             # Incase now a brace, leave while loop
             if self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.symbol = self.scanner.get_symbol()
                 return
+
+            # Parse a connection
             self.connection()
+
             # If semicolon is missing, but new NAME type symbol is entered, call error and parse to next stopping symbol
             if self.symbol.type == self.scanner.NAME:
                 self.display_error(self.symbol, self.NO_SEMICOLON,
                                    proceed=False)
+
                 # If stopping symbol reached is a semicolon, need to pass, else if brace, need to return
                 if self.symbol.type == self.scanner.BRACE_CLOSE:
                     self.symbol = self.scanner.get_symbol()
                     return
                 elif self.symbol.type == self.scanner.SEMICOLON:
                     pass
+
             # If semicolon is missing, and symbol is now a brace
             elif self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.display_error(self.symbol, self.NO_SEMICOLON)
                 self.symbol = self.scanner.get_symbol()
                 return
+
             # If semicolon missing and unknown symbol (including EOF)
             elif self.symbol.type != self.scanner.SEMICOLON:
                 self.display_error(self.symbol, self.NO_SEMICOLON)
@@ -702,10 +724,12 @@ class Parser:
             return
         else:
             [input_device_id, input_port_id] = self.input()
+
             # Incase we have had to error handle and recover, such that the symbol is now a ';'
             while self.symbol.type == self.scanner.SEMICOLON:
                 self.symbol = self.scanner.get_symbol()
                 [input_device_id, input_port_id] = self.input()
+
             # Check ouput connection is followed by an equals sign "="
             if self.symbol.type == self.scanner.EQUALS:
                 self.symbol = self.scanner.get_symbol()
@@ -738,9 +762,11 @@ class Parser:
         if self.symbol.type == self.scanner.NAME:
             output_device_ID = self.symbol.id
             self.symbol = self.scanner.get_symbol()
+
             # Check if gate is followed by a full stop (it has more than one output)
             if self.symbol.type == self.scanner.FULLSTOP:
                 self.symbol = self.scanner.get_symbol()
+
                 # Check that output suffix is Q or QBAR
                 if self.symbol.id in valid_output_id_list:
                     output_port_ID = self.symbol.id
@@ -750,6 +776,7 @@ class Parser:
                     self.display_error(self.symbol, self.NO_Q_OR_QBAR,
                                        proceed=False)
                     return None, None
+
             # If this device only has one output
             else:
                 return output_device_ID, None
@@ -771,9 +798,11 @@ class Parser:
         if self.symbol.type == self.scanner.NAME:
             input_device_ID = self.symbol.id
             self.symbol = self.scanner.get_symbol()
+
             # Check that the input is followed by a fullstop
             if self.symbol.type == self.scanner.FULLSTOP:
                 self.symbol = self.scanner.get_symbol()
+
                 # Check that name is a valid input suffix
                 if self.symbol.id in valid_input_suffix_id_list:
                     input_port_ID = self.symbol.id
@@ -815,10 +844,12 @@ class Parser:
         if self.symbol.type != self.scanner.SEMICOLON:
             self.display_error(
                 self.symbol, self.NO_SEMICOLON, proceed=False)
+
             # Check if semicolon was missing and now symbol is at the close brace '{' symbol
             if self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.symbol = self.scanner.get_symbol()
                 return
+
             # Check if semicolon and close brace '{' was missing and now symbol is at the next keyword
             elif self.symbol.type == self.scanner.KEYWORD:
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
@@ -827,32 +858,41 @@ class Parser:
         # Repeat checking monitors in list until the close brace "}"
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
             self.symbol = self.scanner.get_symbol()
+
             # Incase a KEYWORD is entered straight after a ';', assume '}' was missed and go on to END function
             if (self.symbol.type == self.scanner.KEYWORD):
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
                 return
+
             # Incase now a brace, leave while loop
             elif self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.symbol = self.scanner.get_symbol()
                 return
+
+            # Return ids for assigning monitor functionality
             [monitor_device_id, monitor_port_id] = self.output()
+
             # Assign the monitor
             self.assign_monitor(monitor_device_id, monitor_port_id)
+
             # If semicolon is missing, but new NAME type symbol is entered, call error and parse to next stopping symbol
             if self.symbol.type == self.scanner.NAME:
                 self.display_error(self.symbol, self.NO_SEMICOLON,
                                    proceed=False)
+
                 # If stopping symbol reached is a semicolon, need to pass, else if brace, need to return
                 if self.symbol.type == self.scanner.BRACE_CLOSE:
                     self.symbol = self.scanner.get_symbol()
                     return
                 elif self.symbol.type == self.scanner.SEMICOLON:
                     pass
+
             # If semicolon is missing, and symbol is now a brace
             elif self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.display_error(self.symbol, self.NO_SEMICOLON)
                 self.symbol = self.scanner.get_symbol()
                 return
+
             # If semicolon missing and unknown symbol (including EOF)
             elif self.symbol.type != self.scanner.SEMICOLON:
                 self.display_error(self.symbol, self.NO_SEMICOLON)
@@ -883,15 +923,19 @@ class Parser:
         elif not (self.symbol.id == END_ID):
             self.display_error(self.symbol, self.NO_END_KEYWORD)
             self.symbol = self.scanner.get_symbol()
+
             # If after incorrect keyword END there is nothing, pass
             if self.symbol.type == self.scanner.EOF:
                 return
+
             while ((self.symbol.id != END_ID) and (self.symbol.type != self.scanner.EOF)):
                 self.symbol = self.scanner.get_symbol()
+
             # If EOF is reached and no keyword END is encountered
             if self.symbol.type == self.scanner.EOF:
                 self.display_error(self.symbol, self.TERMINATE)
                 return
+
         # If symbol is keyword END
         else:
             return
