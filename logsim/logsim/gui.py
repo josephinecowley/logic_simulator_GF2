@@ -236,8 +236,6 @@ class Gui(wx.Frame):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(1000, 700))
 
-        breakpoint()
-
         # Configure the file menu
         fileMenu = wx.Menu()
         menuBar = wx.MenuBar()
@@ -290,7 +288,7 @@ class Gui(wx.Frame):
         data_panel.SetSizer(hbox)
 
         # Instantiate SwitchesPanel widget and add to Frame
-        switches_panel = SwitchesPanel(data_panel)
+        switches_panel = SwitchesPanel(data_panel, names, devices)
         hbox.Add(switches_panel, 1, wx.EXPAND, 0)
 
         # Instantiate SignalTracesPanel widget and add to Frame
@@ -605,7 +603,7 @@ class SignalTracesPanel(wx.Panel):
 
 
 class SwitchesPanel(wx.Panel):
-    def __init__(self, parent):
+    def __init__(self, parent, names, devices):
         super(SwitchesPanel, self).__init__(parent, size=(300, 200))
 
         # Configure sizers for layout of SwitchesPanel panel
@@ -631,14 +629,20 @@ class SwitchesPanel(wx.Panel):
         # Instantiate ScrolledPanel
         self.switch_buttons_scrolled_panel = wxscrolledpanel.ScrolledPanel(self.switches_panel, name="switch buttons scrolled panel")
 
+        # Get the ids and user-defined names of all SWITCH-type devices
+        switch_ids = devices.find_devices(device_kind=devices.SWITCH)
+        switch_names = [names.get_name_string(i) for i in switch_ids]
+        #breakpoint()
+
         # Configure sizer of ScrolledPanel
-        self.num_of_switches = 30
+        self.num_of_switches = len(switch_names)
         self.fgs = wx.FlexGridSizer(cols=1, rows=self.num_of_switches+10, vgap=4, hgap=4)
 
-        for switch_num in range(1, self.num_of_switches + 1):
-            switch = wx.ToggleButton(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"switch {switch_num}") # create switch toggle button object with appropriate label
-            self.Bind(wx.EVT_TOGGLEBUTTON, self.on_switch_toggle_button, switch) # bind switch toggle button to its event
-            self.fgs.Add(switch, 1, flag=wx.ALL, border=10) # add switch toggle buttons to ScrolledPanel
+        for switch in switch_names:
+        #for switch_num in range(1, self.num_of_switches + 1):
+            switch_toggle_button = wx.ToggleButton(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"{switch}") # create switch toggle button object with appropriate label
+            self.Bind(wx.EVT_TOGGLEBUTTON, self.on_switch_toggle_button, switch_toggle_button) # bind switch toggle button to its event
+            self.fgs.Add(switch_toggle_button, 1, flag=wx.ALL, border=10) # add switch toggle buttons to ScrolledPanel
 
         # Set sizer of ScrolledPanel
         self.switch_buttons_scrolled_panel.SetSizer(self.fgs)
@@ -698,6 +702,8 @@ class LogicSimApp(wx.App):
         monitors = Monitors(names, devices, network)
         scanner = Scanner(file_path, names)
         parser = Parser(names, devices, network, monitors, scanner)
+        parser.parse_network()
+        #breakpoint()
         #print(parser.parse_network())
         self.frame = Gui("GF2 Team 7 Logic Simulator GUI",
                          file_path,
