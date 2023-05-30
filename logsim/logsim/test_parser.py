@@ -748,7 +748,7 @@ def test_parser_input_correct_parsing_of_input(parser_fixture, create_testing_fi
     """Test parsing of single correct input"""
     scanner = create_testing_file_to_scan(
         """
-    dtype1.DATA 
+    dtype1.DATA
     """, scan_through_all=False)
 
     parser = parser_fixture(scanner)
@@ -781,7 +781,7 @@ def test_parser_output_correct_parsing_of_output(parser_fixture, create_testing_
     dtype1.ni
     """, "  Line 2: Syntax Error: Expected a valid input suffix\n")
 ])
-def test_parser_input_erroneous_parsing_of_connection_line(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+def test_parser_erroneous_input_parsing(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
     """Test parsing of device list invalid name error"""
 
     scanner = create_testing_file_to_scan(
@@ -805,7 +805,7 @@ def test_parser_input_erroneous_parsing_of_connection_line(parser_fixture, creat
     dtype1.qbar
     """, "  Line 2: Syntax Error: Expected a Q or QBAR after the full stop\n")
 ])
-def test_parser_output_erroneous_parsing_of_connection_line(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+def test_parser_erroneous_output_parsing(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
     """Test parsing of device list invalid name error"""
 
     scanner = create_testing_file_to_scan(
@@ -819,6 +819,112 @@ def test_parser_output_erroneous_parsing_of_connection_line(parser_fixture, crea
     printed_message = captured.out.splitlines(True)[1]
 
     assert printed_message == expected
+
+
+def test_parser_correct_parsing_of_connection_line(parser_fixture, create_testing_file_to_scan):
+    """Test parsing of single connection line"""
+    scanner = create_testing_file_to_scan(
+        """
+    dtype1.DATA = data;
+    """, scan_through_all=False)
+
+    parser = parser_fixture(scanner)
+    parser.symbol = parser.scanner.get_symbol()
+
+    assert parser.connection() is None
+    assert parser.network.check_network() == True
+
+
+@pytest.mark.parametrize("example, expected", [
+    ("""
+    dtype1.SET set;
+    """, "  Line 2: Syntax Error: Expected an '=' symbol\n")
+])
+def test_parser_incorrect_connection_line_parsing(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+    """Test parsing of incorrect connection line"""
+
+    scanner = create_testing_file_to_scan(
+        example, scan_through_all=False)
+
+    parser = parser_fixture(scanner)
+    parser.symbol = parser.scanner.get_symbol()
+
+    parser.connection()
+    captured = capfd.readouterr()
+    printed_message = captured.out.splitlines(True)[1]
+
+    assert printed_message == expected
+
+
+def test_parser_correct_parsing_of_connection_list(parser_fixture, create_testing_file_to_scan):
+    """Test parsing of single connection list"""
+    scanner = create_testing_file_to_scan(
+        """
+    CONNECTIONS {
+    dtype1.DATA = data;
+    dtype1.SET = set;
+    dtype1.CLEAR = set;
+    dtype1.CLK = clock;
+    }
+    """, scan_through_all=False)
+
+    parser = parser_fixture(scanner)
+    parser.symbol = parser.scanner.get_symbol()
+
+    assert parser.connection_list() is None
+    assert parser.network.check_network() == True
+
+
+@pytest.mark.parametrize("example, expected", [
+    ("""
+    CONNECTIONS {
+    dtype1.DATA = data
+    dtype1.SET = set;
+    dtype1.CLEAR = set;
+    dtype1.CLK = clock;
+    }
+    """, "  Line 13: Syntax Error: Expected a semicolon\n"),
+    ("""
+    CONNECTIONS {
+    dtype1.DATA = data;
+
+    MONITORS
+    """, "  Line 14: Syntax Error: Expected a '}' symbol\n"),
+    ("""
+    CONNECTIONS {
+    dtype1.DATA = data;
+    dtype1.SET = set;
+    dtype1.CLEAR = set;
+    dtype1.CLK = clock
+    }
+    """, "  Line 16: Syntax Error: Expected a semicolon\n")
+])
+def test_parser_incorrect_connection_list_parsing(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+    """Test parsing of incorrect connection list"""
+
+    scanner = create_testing_file_to_scan(
+        """
+    DEVICES{
+    data = SWITCH(0);
+    dtype1 = DTYPE;
+    dtype2 = DTYPE;
+    dtype3 = DTYPE;
+    dtype4 = DTYPE;
+    clock = CLOCK(5);
+    set = SWITCH(0);
+    }""" +
+        example, scan_through_all=False)
+
+    parser = parser_fixture(scanner)
+    parser.symbol = parser.scanner.get_symbol()
+
+    parser.device_list()
+    parser.connection_list()
+    captured = capfd.readouterr()
+    printed_message = captured.out.splitlines(True)[1]
+
+    assert printed_message == expected
+    assert parser.network.check_network() == False
 
 
 def test_delete_testing_file():
