@@ -292,7 +292,7 @@ class Gui(wx.Frame):
         hbox.Add(switches_panel, 1, wx.EXPAND, 0)
 
         # Instantiate SignalTracesPanel widget and add to Frame
-        signal_traces_panel = SignalTracesPanel(data_panel)
+        signal_traces_panel = SignalTracesPanel(data_panel, names, devices)
         hbox.Add(signal_traces_panel, 3, wx.EXPAND, 0)
 
         # Instantiate RunSimulationPanel widget and add to Frame
@@ -510,7 +510,7 @@ class SignalTrace(wx.ScrolledWindow):
 
 
 class SignalTracesPanel(wx.Panel):
-    def __init__(self, parent):
+    def __init__(self, parent, names, devices):
         super(SignalTracesPanel, self).__init__(parent, size=wx.DefaultSize, style=wx.SUNKEN_BORDER)
 
         # Configure sizers for layout of SwitchesPanel panel
@@ -565,13 +565,17 @@ class SignalTracesPanel(wx.Panel):
         # Instantiate ScrolledPanel
         self.signal_traces_scrolled_panel = wxscrolledpanel.ScrolledPanel(self.signal_traces_panel, name="signal traces scrolled panel")
 
+        # Get the ids and user-defined names of all SWITCH-type devices
+        gate_ids = devices.find_devices(device_kind=devices.AND)
+        gate_names = [names.get_name_string(i) for i in gate_ids]
+
         # Configure sizer of ScrolledPanel
         signal_trace_size = (500, 200)
-        self.num_of_signal_traces = 7
+        self.num_of_signal_traces = len(gate_names)
         fgs = wx.FlexGridSizer(cols=3, rows=self.num_of_signal_traces, vgap=4, hgap=50)
         
-        for signal_trace_num in range(1, self.num_of_signal_traces + 1):
-            str = f"device {signal_trace_num}"
+        for gate in gate_names:
+            str = f"{gate}"
             text = wx.StaticText(self.signal_traces_scrolled_panel, wx.ID_ANY, str)
             font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
             text.SetFont(font)
@@ -632,7 +636,6 @@ class SwitchesPanel(wx.Panel):
         # Get the ids and user-defined names of all SWITCH-type devices
         switch_ids = devices.find_devices(device_kind=devices.SWITCH)
         switch_names = [names.get_name_string(i) for i in switch_ids]
-        #breakpoint()
 
         # Configure sizer of ScrolledPanel
         self.num_of_switches = len(switch_names)
