@@ -647,6 +647,11 @@ class SignalTracesPanel(wx.Panel):
 class SwitchesPanel(wx.Panel):
     def __init__(self, parent, simulation_panel, names, devices, network, monitors):
         super(SwitchesPanel, self).__init__(parent, size=(300, 200))
+
+        self.names = names
+        self.devices = devices
+        self.network = network
+        self.monitors = monitors
         
         self.simulation_panel = simulation_panel
 
@@ -682,7 +687,10 @@ class SwitchesPanel(wx.Panel):
         self.fgs = wx.FlexGridSizer(cols=1, rows=self.num_of_switches, vgap=4, hgap=4)
 
         for switch in switch_names:
+            switch_id = self.names.query(switch)
+            initial_switch_state = devices.get_device(switch_id).switch_state 
             switch_toggle_button = wx.ToggleButton(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"{switch}") # create switch toggle button object with appropriate label
+            switch_toggle_button.SetValue(bool(initial_switch_state))
             self.Bind(wx.EVT_TOGGLEBUTTON, self.on_switch_toggle_button, switch_toggle_button) # bind switch toggle button to its event
             self.fgs.Add(switch_toggle_button, 1, flag=wx.ALL, border=10) # add switch toggle buttons to ScrolledPanel
 
@@ -733,6 +741,9 @@ class SwitchesPanel(wx.Panel):
         """Handle the event when the user clicks the toggle button for a switch."""
         switch_selected = event.GetEventObject()
         print(f'{switch_selected.GetLabel()} has been pressed.')
+        switch_id = self.names.query(switch_selected.GetLabel())
+        switch_state = switch_selected.GetValue()
+        print(switch_state)
 
     def on_add_new_switch_button(self, event):
         print("Add new switch button pressed")
