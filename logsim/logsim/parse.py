@@ -42,7 +42,8 @@ class Parser:
     display_error(self, symbol, error_type, proceed=True, stopping_symbol_types=[6]): Display the error message and where it occured.
     Calls the error handling method to resume from the next available point.
 
-    error_recovery(self, error_type, proceed=True, stopping_symbol_types=[6]): Recover from an error by resuming parsing at an appropriate point specified by the stopping_symbol.
+    error_recovery(self, error_type, proceed=True, stopping_symbol_types=[6]): Recover from an error by resuming parsing at an appropriate 
+    point specified by the stopping_symbol.
 
     initial_error_checks(self, KEYWORD_ID, missing_error_type): Check initial symbols for common errors. This function tests for 6 cases:
 
@@ -55,6 +56,7 @@ class Parser:
         4. Missing both the first keyword and open brace: ...
         5. First keyword is correct, but missing open brace: { ...
         6. First keyword is spelt wrong, and missing an open brace { ...
+        7. Wrong keyword (i.e user has got order of lists wrong): WRONG_KEYWORD
 
     device_list(self): Parse device list.
 
@@ -71,6 +73,8 @@ class Parser:
     input(self): Parse a single device input.
 
     monitor_list(self): Parse monitor list.
+
+    assign_monitor(self): Assign a single monitor to the given output port.
 
     end(self): Parse an END keyword and check there are no symbols afterwards.
 
@@ -107,17 +111,18 @@ class Parser:
         self.error_count = 0
 
         # List of syntax errors
-        self.syntax_errors = [self.NO_DEVICES_KEYWORD, self.NO_CONNECTIONS_KEYWORD, self.NO_MONITORS_KEYWORD, self.NO_END_KEYWORD, self.NO_BRACE_OPEN, self.NO_BRACE_CLOSE,
-                              self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_BRACKET_OPEN, self.NO_BRACKET_CLOSE, self.NO_NUMBER, self.INPUT_OUT_OF_RANGE, self.CLK_OUT_OF_RANGE, self.SWITCH_OUT_OF_RANGE,
-                              self.UNDEFINED_NAME, self.NO_FULLSTOP, self.NO_SEMICOLON, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE, self.FLOATING_INPUT, self.TERMINATE, self.WRONG_ORDER] = self.names.unique_error_codes(25)
+        self.syntax_errors = [self.NO_DEVICES_KEYWORD, self.NO_CONNECTIONS_KEYWORD, self.NO_MONITORS_KEYWORD, self.NO_END_KEYWORD, self.NO_BRACE_OPEN,
+                              self.NO_BRACE_CLOSE, self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_BRACKET_OPEN, self.NO_BRACKET_CLOSE,
+                              self.NO_NUMBER, self.INPUT_OUT_OF_RANGE, self.CLK_OUT_OF_RANGE, self.SWITCH_OUT_OF_RANGE, self.UNDEFINED_NAME,
+                              self.NO_FULLSTOP, self.NO_SEMICOLON, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE,
+                              self.FLOATING_INPUT, self.TERMINATE, self.WRONG_ORDER] = self.names.unique_error_codes(25)
 
     # Stopping symbols automatically assigned to semi-colons, braces and keywords
     def display_error(self,  symbol, error_type,  syntax_error=True, proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
-        """Display the error message and where it occured
+        """Display the error message and where it occured.
 
         Calls the error handling method to resume from the next available point."""
 
-        # Exception handling JC! need to add exception handling for syntax error if this goes ahead
         if not isinstance(error_type, int):
             raise TypeError(
                 "Expected error_type to be an integer type argument")
@@ -234,15 +239,19 @@ class Parser:
         else:
             raise ValueError("Expected a valid error code")
 
-        # Display error line and visual marker
+        # If at the end of file, don't display line and marker and return
         if symbol.type == self.scanner.EOF:
             return
+
+        # Display error line and visual marker
         self.scanner.display_line_and_marker(symbol)
+
         # Call error recovery function to resume parsing at appropriate point
         self.error_recovery(error_type, syntax_error,
                             proceed, stopping_symbol_types)
         return
 
+    # Stopping symbols automatically assigned to semi-colons, braces and keywords
     def error_recovery(self, error_type, syntax_error=True, proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
         """Recover from an error by resuming parsing at an appropriate point."""
 
@@ -266,8 +275,9 @@ class Parser:
             raise ValueError(
                 "Expected stopping symbol to be within range of given symbols")
 
-        # Check if we have already built in error handling (have done so for obvious semantic errors, e.g. missing KEYWORD)
+        # Recover from error
         if syntax_error:
+            # If syntax error, need to take into account proceed
             if proceed == True:
                 return
             # Check if we need to skip symbols to recover parsing
@@ -281,6 +291,7 @@ class Parser:
                     self.display_error(self.symbol, self.TERMINATE)
                     return
         else:
+            # If semantic error, ignore proceed parameter and return
             return
 
     def initial_error_checks(self, KEYWORD_ID, missing_error_type):
@@ -296,44 +307,55 @@ class Parser:
         5. First keyword is correct, but missing open brace: { ...
         6. First keyword is spelt wrong, and missing an open brace KYWORD ...
         7. Wrong keyword (i.e user has got order of lists wrong): WRONG_KEYWORD
+
         """
-        # If not keyword
+
+        # If symbol type is not keyword
         if not (self.symbol.type == self.scanner.KEYWORD):
-            # If first symbol is a NAME type
+            # If symbol type is name
             if not (self.symbol.type == self.scanner.NAME):
-                # If open brace '{'
+                # If symbol type is open brace '{'
                 if self.symbol.type == self.scanner.BRACE_OPEN:
                     # Case 3: { ...
                     self.display_error(self.symbol, missing_error_type)
                     self.symbol = self.scanner.get_symbol()
+                    return
+            # If symbol type is not name
             else:
                 self.symbol = self.scanner.get_symbol()
-                # If open brace '{'
+                # If symbol type is not open brace '{'
                 if not (self.symbol.type == self.scanner.BRACE_OPEN):
+                    # Cannot differentiate easily between Case 4 and Case 6 thus will proceed to next stopping symbol
                     # Case 4: ...
                     # and Case 6: D ...
                     self.display_error(self.symbol, missing_error_type)
                     self.display_error(
                         self.symbol, self.NO_BRACE_OPEN, proceed=False)
                     self.symbol = self.scanner.get_symbol()
+                    return
+                # If symbol type is open brace '{'
                 else:
                     # Case 2: D { ...
                     self.display_error(
                         self.symbol, missing_error_type)
                     self.symbol = self.scanner.get_symbol()
-        # If keyword is present
+                    return
+        # If symbol type is keyword
         else:
-            # If keyword is the correct one
+            # If symbol id is correct
             if self.symbol.id == KEYWORD_ID:
                 self.symbol = self.scanner.get_symbol()
-                # If open brace '{'
+                # If symbol type is not open brace '{'
                 if not (self.symbol.type == self.scanner.BRACE_OPEN):
                     # Case 5. KEYWORD ...
                     self.display_error(self.symbol, self.NO_BRACE_OPEN)
+                    return
+                # If symbol type is open brace '{'
                 else:
                     # Case 1. KEYWORD{ ...
                     self.symbol = self.scanner.get_symbol()
-            # If wrong keyword given
+                    return
+            # If symbol id is incorrect
             else:
                 # Case 7: Wrong keyword given (e.g. END is called after device_list).
                 # We will treat this as a special case and terminate the program early by skipping to the end.
@@ -341,6 +363,7 @@ class Parser:
                     self.symbol, self.WRONG_ORDER)
                 self.display_error(self.symbol, self.TERMINATE,
                                    proceed=False, stopping_symbol_types=[11])
+                return
 
     def device_list(self):
         """Parse device list."""
@@ -761,7 +784,7 @@ class Parser:
                 return
 
     def assign_monitor(self, monitor_device_id, monitor_port_id):
-        """Assign a single monitor to the given output port"""
+        """Assign a single monitor to the given output port."""
 
         # If there are no errors, make a monitor
         if self.error_count == 0:
