@@ -73,7 +73,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
 
         # Initialise trace objects
-        self.traces = []
+        self.traces = monitors.get_signals_for_GUI()
         self.y_spacing = 50
 
     def init_gl(self):
@@ -91,35 +91,18 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glTranslated(self.pan_x, self.pan_y, 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
 
-    def get_trace_dict(self, signal: list, x_pos: int, y_pos: int, label: str, color: tuple = (0.0, 0.0, 1.0)):
-        """Puts trace arguments into a dictionary and appends this to self.traces list
-        signal (list): list of 1s and 0s that define trace
-        x_pos: relative x position
-        y_pos: relative y position"""
-
-        trace = {
-            'signal': signal,
-            'x_pos': x_pos,
-            'y_pos': y_pos,
-            'label': label,
-            'color': color
-        }
-        self.traces.append(trace)
-
     def draw_canvas(self):
         """Iterates through each trace and draws adds it to the canvas with an offset"""
         y_offset = 0
+
         for trace in self.traces:
-            self._draw_trace(trace, y_offset)
+            signal = trace[1]
+            label = trace[0]
+            self._draw_trace(signal, 0, y_offset, label, )
             y_offset += self.y_spacing
 
-    def _draw_trace(self, trace, y_offset):
+    def _draw_trace(self, signal, x_pos, y_pos, label, color = (0.0, 0.0, 1.0)):
         """Draws trace with axes and ticks"""
-        signal = trace['signal']
-        x_pos = trace['x_pos']
-        y_pos = trace['y_pos'] + y_offset
-        label = trace['label']
-        color = trace['color']
 
         # draw trace
         GL.glColor3f(*color)
