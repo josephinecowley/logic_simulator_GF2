@@ -255,7 +255,6 @@ class Parser:
     def error_recovery(self, error_type, syntax_error=True, proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
         """Recover from an error by resuming parsing at an appropriate point."""
 
-        # Exception handling JC! need to add exception handling for syntax error if this goes ahead
         if not isinstance(error_type, int):
             raise TypeError(
                 "Expected error_type to be an integer type argument")
@@ -367,6 +366,7 @@ class Parser:
 
     def device_list(self):
         """Parse device list."""
+
         DEVICES_ID = self.names.lookup(["DEVICES"])[0]
         # Common initial error handling
         self.initial_error_checks(DEVICES_ID, self.NO_DEVICES_KEYWORD)
@@ -387,7 +387,6 @@ class Parser:
             elif self.symbol.type == self.scanner.KEYWORD:
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
                 return
-        # JC! need to add case for when after first correct device line there is a close brace!
         # Check all devices in list, which are all separated by a ';'
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
             self.symbol = self.scanner.get_symbol()
@@ -453,6 +452,7 @@ class Parser:
         """Check if device is valid.
 
         Return both device kind (eg AND gate) and the device property (eg number of inputs)."""
+
         [AND_ID, NAND_ID, OR_ID, NOR_ID, XOR_ID, DTYPE_ID, SWITCH_ID, CLK_ID] = self.names.lookup(
             ["AND", "NAND", "OR", "NOR", "XOR", "DTYPE",  "SWITCH", "CLOCK"])
         one_to_sixteen = list(range(1, 17))
@@ -577,6 +577,7 @@ class Parser:
 
     def connection_list(self):
         """Parse connection list."""
+
         CONNECTIONS_ID = self.names.lookup(["CONNECTIONS"])[0]
         # Common initial error handling
         self.initial_error_checks(CONNECTIONS_ID, self.NO_CONNECTIONS_KEYWORD)
@@ -633,11 +634,11 @@ class Parser:
         """Parse a connection.
 
         If there are no errors, make the connection."""
+
         # If after the semicolon we have a } , assume we can move onto the monitor_list without making a connection
         if self.symbol.type == self.scanner.BRACE_CLOSE:
             return
         else:
-            # JC! to change the output = input to input = output
             [input_device_id, input_port_id] = self.input()
             # Incase we have had to error handle and recover, such that the symbol is now a ';'
             while self.symbol.type == self.scanner.SEMICOLON:
@@ -664,6 +665,7 @@ class Parser:
         Return the output device_ID and the corresponding output_port_ID.
 
         Return None, None if error occurs."""
+
         valid_output_id_list = self.names.lookup(["Q", "QBAR"])
         # If after the semicolon we have a '}' , assume we can move onto the monitor_list
         if self.symbol.type == self.scanner.BRACE_CLOSE:
@@ -697,6 +699,7 @@ class Parser:
         Return the input device_ID and the corresponding input_port_ID.
 
         Return None, None if error occurs."""
+
         valid_input_suffix_id_list = self.names.lookup(["I1", "I2", "I3", "I4", "I5", "I6", "I7", "I8", "I9",
                                                         "I10", "I11", "I12", "I13", "I14", "I15", "I16", "DATA", "CLK", "SET", "CLEAR"])
         # Check that the input is valid syntax
@@ -726,6 +729,7 @@ class Parser:
 
     def monitor_list(self):
         """Parse monitor list."""
+
         MONITORS_ID = self.names.lookup(["MONITORS"])[0]
         # Common initial error handling
         self.initial_error_checks(MONITORS_ID, self.NO_MONITORS_KEYWORD)
@@ -744,7 +748,6 @@ class Parser:
             if self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.symbol = self.scanner.get_symbol()
                 return
-              # JC!  add this fix above to device list and connections list
             # Check if semicolon and close brace '{' was missing and now symbol is at the next keyword
             elif self.symbol.type == self.scanner.KEYWORD:
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
@@ -795,6 +798,7 @@ class Parser:
 
     def end(self):
         """Parse an END keyword and check there are no symbols afterwards."""
+
         # Check that the final symbol is the keyword END
         END_ID = self.names.lookup(["END"])[0]
         # If nothing after monitors class, assume missing, display error and end program
@@ -826,6 +830,7 @@ class Parser:
         if self.symbol.type == self.scanner.EOF:
             self.display_error(self.symbol, self.EMPTY_FILE)
         else:
+
             # Parse device list
             self.device_list()
 
@@ -886,7 +891,7 @@ def main():
     monitors = Monitors(names, devices, network)
     scanner = Scanner(file_path, names)
     parser = Parser(names, devices, network, monitors, scanner)
-    print(parser.parse_network())
+    parser.parse_network()
 
 
 if __name__ == "__main__":
