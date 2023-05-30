@@ -679,7 +679,7 @@ class SwitchesPanel(wx.Panel):
 
         # Configure sizer of ScrolledPanel
         self.num_of_switches = len(switch_names)
-        self.fgs = wx.FlexGridSizer(cols=1, rows=self.num_of_switches+10, vgap=4, hgap=4)
+        self.fgs = wx.FlexGridSizer(cols=1, rows=self.num_of_switches, vgap=4, hgap=4)
 
         for switch in switch_names:
             switch_toggle_button = wx.ToggleButton(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"{switch}") # create switch toggle button object with appropriate label
@@ -721,13 +721,9 @@ class SwitchesPanel(wx.Panel):
         print("Add new switch button pressed")
         self.num_of_switches += 1
         new_switch = wx.ToggleButton(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"switch {self.num_of_switches}")
-        #self.fgs = wx.FlexGridSizer(cols=1, rows=self.num_of_switches+1, vgap=4, hgap=4)
+        self.fgs.SetRows(self.num_of_switches + 1)
         self.Bind(wx.EVT_TOGGLEBUTTON, self.on_switch_toggle_button, new_switch)
         self.fgs.Add(new_switch, 1, flag=wx.ALL, border=10)
-        self.simulation_panel.centre_panel.SetBackgroundColour("GREEN")
-        self.simulation_panel.Refresh()
-        #self.switch_buttons_scrolled_panel.Update()
-        #self.simulation_panel.centre_panel.SetBackgroundColour("GREEN")
         self.switch_buttons_scrolled_panel.Refresh()
         self.switches_panel.Layout()
 
