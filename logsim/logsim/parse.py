@@ -339,6 +339,15 @@ class Parser:
         if self.symbol.type != self.scanner.SEMICOLON:
             self.display_error(
                 self.symbol, self.NO_SEMICOLON, proceed=False)
+            # Check if semicolon was missing and now symbol is at the close brace '{' symbol
+            if self.symbol.type == self.scanner.BRACE_CLOSE:
+                self.symbol = self.scanner.get_symbol()
+                return
+            # Check if semicolon and close brace '{' was missing and now symbol is at the next keyword
+            elif self.symbol.type == self.scanner.KEYWORD:
+                self.display_error(self.symbol, self.NO_BRACE_CLOSE)
+                return
+        # JC! need to add case for when after first correct device line there is a close brace!
         # Check all devices in list, which are all separated by a ';'
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
             self.symbol = self.scanner.get_symbol()
@@ -774,28 +783,38 @@ class Parser:
             # Parse device list
             self.device_list()
 
-            # Parse connection list
-            self.connection_list()
+            # If nothing after device list
+            if self.symbol.type == self.scanner.EOF:
+                self.display_error(self.symbol, self.EMPTY_FILE)
+            else:
 
-            # Check all inputs in network are connected to an output
-            if self.error_count == 0:
-                if not self.network.check_network():
-                    self.display_error(
-                        self.symbol, self.FLOATING_INPUT, syntax_error=False)
+                # Parse connection list
+                self.connection_list()
 
-            # Parse monitor list
-            self.monitor_list()
+                # Check all inputs in network are connected to an output
+                if self.error_count == 0:
+                    if not self.network.check_network():
+                        self.display_error(
+                            self.symbol, self.FLOATING_INPUT, syntax_error=False)
 
-            # Record the signal traces
-            for i in range(50):
-                self.network.execute_network()
-                self.monitors.record_signals()
+                # If nothing after connections list
+                if self.symbol.type == self.scanner.EOF:
+                    self.display_error(self.symbol, self.EMPTY_FILE)
+                else:
 
-            # Display the signals
-            self.monitors.display_signals()
+                    # Parse monitor list
+                    self.monitor_list()
 
-            # Check for END keyword
-            self.end()
+                    # Record the signal traces
+                    for i in range(50):
+                        self.network.execute_network()
+                        self.monitors.record_signals()
+
+                    # Display the signals
+                    self.monitors.display_signals()
+
+                    # Check for END keyword
+                    self.end()
 
             # Check if there are errors, and return True if error count is zero, otherwise return falsex
             if self.error_count == 0:
