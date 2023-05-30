@@ -305,7 +305,7 @@ class Gui(wx.Frame):
         hbox.Add(signal_traces_panel, 3, wx.EXPAND, 0)
 
         # Instantiate RunSimulationPanel widget and add to Frame
-        simulation_panel = RunSimulationPanel(self)
+        simulation_panel = RunSimulationPanel(self, self.simnet)
         vbox.Add(simulation_panel, 1, wx.EXPAND)
 
         # Instantiate SwitchesPanel widget and add to Frame
@@ -323,30 +323,15 @@ class Gui(wx.Frame):
         if Id == wx.ID_EXIT:
             self.Close(True)
         if Id == wx.ID_ABOUT:
-            wx.MessageBox("Logic Simulator\nCreated by Mojisola Agboola\n2017",
+            wx.MessageBox("Logic Simulator\nCreated by Josephine Cowley (jhmdc2), Tom Hill (th621), Khalid Omar (ko366)\n2023",
                           "About Logsim", wx.ICON_INFORMATION | wx.OK)
-
-    def on_spin(self, event):
-        """Handle the event when the user changes the spin control value."""
-        spin_value = self.spin.GetValue()
-        text = "".join(["New spin control value: ", str(spin_value)])
-        self.canvas.render(text)
-
-    def on_run_button(self, event):
-        """Handle the event when the user clicks the run button."""
-        text = "Run button pressed."
-        self.canvas.render(text)
-
-    def on_text_box(self, event):
-        """Handle the event when the user enters text."""
-        text_box_value = self.text_box.GetValue()
-        text = "".join(["New text box value: ", text_box_value])
-        self.canvas.render(text)
 
 
 class RunSimulationPanel(wx.Panel):
-    def __init__(self, parent, id=wx.ID_ANY, size=wx.DefaultSize):
+    def __init__(self, parent, simnet, id=wx.ID_ANY, size=wx.DefaultSize):
         super(RunSimulationPanel, self).__init__(parent, id, size=size, style=wx.SIMPLE_BORDER)
+        
+        self.simnet = simnet
 
         #self.SetBackgroundColour("RED") # layout identifier colour for visualisation purposes
         #print(self.GetLabel())
@@ -462,6 +447,11 @@ class RunSimulationPanel(wx.Panel):
         run_button_pressed.SetToolTip("Continue running the simulation")
         self.GetSizer().Layout()
 
+        no_of_cycles = self.cycles_spin_control.GetValue()
+        print(f'No. of cycles: {no_of_cycles}')
+        self.simnet.run_network(no_of_cycles)
+
+
     def on_quit_button(self, event):
         """Handle the event when the user clicks the quit button."""
         quit_button_pressed = event.GetEventObject()
@@ -471,7 +461,8 @@ class RunSimulationPanel(wx.Panel):
 
     def on_spin(self, event):
         #self.spin_text.SetValue(str(event.GetPosition()))
-        print(self.cycles_spin_control.GetValue())
+        #print(self.cycles_spin_control.GetValue())
+        pass
 
     def on_upload_button(self, event):
         """Handle the event when the user clicks the upload button."""
