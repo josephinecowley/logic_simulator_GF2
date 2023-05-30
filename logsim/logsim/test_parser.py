@@ -1082,8 +1082,69 @@ def test_parser_incorrect_keyword_END(parser_fixture, create_testing_file_to_sca
 def test_parser_correct_file(scanner_fixture, names_fixture, parser_fixture, file_path, expected):
     """Test complete parsing of whole correct file"""
 
+    # If errors are arising - check that example files are free of errors
+
     scanner = Scanner(file_path, names_fixture)
     parser = parser_fixture(scanner)
+
+    assert parser.parse_network() == expected
+
+
+# NEED KHALIDS HELP
+# ample, expected", [
+#     ("", "  Line 1: Syntax Error: Cannot parse an empty file\n")
+# ])
+# def test_parser_empty_file(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+#     """Test parsing of empty file"""
+
+#     scanner = create_testing_file_to_scan(
+#         example, scan_through_all=False)
+
+#     parser = parser_fixture(scanner)
+#     parser.symbol = parser.scanner.get_symbol()
+
+#     captured = capfd.readouterr()
+#     printed_message = captured.out.splitlines(True)[1]
+
+#     assert printed_message == expected
+
+
+@pytest.mark.parametrize("example, expected", [
+    ("""
+    DVICES{
+        and = AND(1);
+        switch = SWITCH(1);
+    }
+    CONNECTIONS{
+        and.I1 = switch;
+    }
+    MONITORS{
+        and.I1;
+    }
+    END
+    """, False),
+    ("""
+    DEVICES{
+        and = AND(1);
+        switch = SWITCH(1)
+    }
+    CONNECTIONS{
+        and.I1 = switch;
+    }
+    MONITORS{
+        and.I1;
+    }
+    END
+    """, False)
+])
+def test_parser_incorrect_file(parser_fixture, create_testing_file_to_scan, example, expected):
+    """Test parsing of file with errors"""
+
+    scanner = create_testing_file_to_scan(
+        example, scan_through_all=False)
+
+    parser = parser_fixture(scanner)
+    parser.symbol = parser.scanner.get_symbol()
 
     assert parser.parse_network() == expected
 
