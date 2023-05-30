@@ -638,8 +638,8 @@ class SwitchesPanel(wx.Panel):
         self.switch_buttons_scrolled_panel = wxscrolledpanel.ScrolledPanel(self.switches_panel, name="switch buttons scrolled panel")
 
         # Configure sizer of switch buttons scrolled panel
-        self.num_of_switches = len([switch for switch in ...])
-        fgs = wx.FlexGridSizer(cols=1, rows=self.num_of_switches, vgap=4, hgap=4)
+        self.num_of_switches = 30
+        self.fgs = wx.FlexGridSizer(cols=1, rows=self.num_of_switches+10, vgap=4, hgap=4)
 
         for switch_num in range(1, self.num_of_switches + 1):
             switch = wx.ToggleButton(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"switch {switch_num}") # create switch toggle button object with appropriate label
@@ -681,8 +681,13 @@ class LogicSimApp(wx.App):
         scanner = Scanner(file_path, names)
         parser = Parser(names, devices, network, monitors, scanner)
         print(parser.parse_network())
-        breakpoint()
-        self.frame = Gui("GF2 Team 7 Logic Simulator GUI")
+        #breakpoint()
+        self.frame = Gui("GF2 Team 7 Logic Simulator GUI",
+                         file_path,
+                         names,
+                         devices,
+                         network,
+                         monitors)
         self.frame.Show()
 
         return True
