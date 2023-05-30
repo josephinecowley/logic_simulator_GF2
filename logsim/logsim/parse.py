@@ -109,7 +109,7 @@ class Parser:
         # List of syntax errors
         self.syntax_errors = [self.NO_DEVICES_KEYWORD, self.NO_CONNECTIONS_KEYWORD, self.NO_MONITORS_KEYWORD, self.NO_END_KEYWORD, self.NO_BRACE_OPEN, self.NO_BRACE_CLOSE,
                               self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_BRACKET_OPEN, self.NO_BRACKET_CLOSE, self.NO_NUMBER, self.INPUT_OUT_OF_RANGE, self.CLK_OUT_OF_RANGE, self.SWITCH_OUT_OF_RANGE,
-                              self.UNDEFINED_NAME, self.NO_FULLSTOP, self.NO_SEMICOLON, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE, self.FLOATING_INPUT, self.TERMINATE] = self.names.unique_error_codes(24)
+                              self.UNDEFINED_NAME, self.NO_FULLSTOP, self.NO_SEMICOLON, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE, self.FLOATING_INPUT, self.TERMINATE, self.WRONG_ORDER] = self.names.unique_error_codes(25)
 
     # Stopping symbols automatically assigned to semi-colons, braces and keywords
     def display_error(self,  symbol, error_type,  syntax_error=True, proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
@@ -228,6 +228,9 @@ class Parser:
         elif error_type == self.monitors.MONITOR_PRESENT:
             print(
                 "Semantic Error: Cannot assign more than one monitor to a single device output port", end="\n \n")
+        elif error_type == self.WRONG_ORDER:
+            print(
+                "Syntax Error: Wrong keyword entered, ensure order of lists is: DEVICES, CONNECTIONS, MONITORS, END", end="\n \n")
         else:
             raise ValueError("Expected a valid error code")
 
@@ -292,9 +295,10 @@ class Parser:
         4. Missing both the first keyword and open brace: ...
         5. First keyword is correct, but missing open brace: { ...
         6. First keyword is spelt wrong, and missing an open brace KYWORD ...
+        7. Wrong keyword (i.e user has got order of lists wrong): WRONG_KEYWORD
         """
-        # If keyword is wrong
-        if not (self.symbol.type == self.scanner.KEYWORD and self.symbol.id == KEYWORD_ID):
+        # If not keyword
+        if not (self.symbol.type == self.scanner.KEYWORD):
             # If first symbol is a NAME type
             if not (self.symbol.type == self.scanner.NAME):
                 # If open brace '{'
@@ -319,20 +323,33 @@ class Parser:
                     self.symbol = self.scanner.get_symbol()
         # If keyword is present
         else:
-            self.symbol = self.scanner.get_symbol()
-            # If open brace '{'
-            if not (self.symbol.type == self.scanner.BRACE_OPEN):
-                # Case 5. KEYWORD ...
-                self.display_error(self.symbol, self.NO_BRACE_OPEN)
-            else:
-                # Case 1. KEYWORD{ ...
+            # If keyword is the correct one
+            if self.symbol.id == KEYWORD_ID:
                 self.symbol = self.scanner.get_symbol()
+                # If open brace '{'
+                if not (self.symbol.type == self.scanner.BRACE_OPEN):
+                    # Case 5. KEYWORD ...
+                    self.display_error(self.symbol, self.NO_BRACE_OPEN)
+                else:
+                    # Case 1. KEYWORD{ ...
+                    self.symbol = self.scanner.get_symbol()
+            # If wrong keyword given
+            else:
+                # Case 7: Wrong keyword given (e.g. END is called after device_list).
+                # We will treat this as a special case and terminate the program early by skipping to the end.
+                self.display_error(
+                    self.symbol, self.WRONG_ORDER)
+                self.display_error(self.symbol, self.TERMINATE,
+                                   proceed=False, stopping_symbol_types=[11])
 
     def device_list(self):
         """Parse device list."""
         DEVICES_ID = self.names.lookup(["DEVICES"])[0]
         # Common initial error handling
         self.initial_error_checks(DEVICES_ID, self.NO_DEVICES_KEYWORD)
+        # If catastrophic error occors, and symbol type is now EOF
+        if self.symbol.type == self.scanner.EOF:
+            return
         # Parse device
         self.device()
         # Check if semicolon is missing but next symbol is a NAME type
@@ -540,6 +557,9 @@ class Parser:
         CONNECTIONS_ID = self.names.lookup(["CONNECTIONS"])[0]
         # Common initial error handling
         self.initial_error_checks(CONNECTIONS_ID, self.NO_CONNECTIONS_KEYWORD)
+        # If catastrophic error occors, and symbol type is now EOF
+        if self.symbol.type == self.scanner.EOF:
+            return
         # Parse a connection
         self.connection()
         # Check if semicolon is missing but next symbol is a NAME type
@@ -686,6 +706,9 @@ class Parser:
         MONITORS_ID = self.names.lookup(["MONITORS"])[0]
         # Common initial error handling
         self.initial_error_checks(MONITORS_ID, self.NO_MONITORS_KEYWORD)
+        # If catastrophic error occors, and symbol type is now EOF
+        if self.symbol.type == self.scanner.EOF:
+            return
         # Parse a monitor
         [monitor_device_id, monitor_port_id] = self.output()
         # Assign the monitor
