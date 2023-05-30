@@ -282,6 +282,7 @@ class Parser:
         else:
             while ((self.symbol.type not in stopping_symbol_types) and (self.symbol.type != self.scanner.EOF)):
                 self.symbol = self.scanner.get_symbol()
+
             # Stop when stopping symbol is encountered
             if self.symbol.type in stopping_symbol_types:
                 return
