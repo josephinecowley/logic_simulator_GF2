@@ -229,7 +229,7 @@ def test_parser_initialisation(scanner_fixture, parser_fixture):
 
     assert parser.error_count == 0
     # Check unique error coes are appended onto existing syntax_errors of which there are 15 from devices, network and monitors initialisation
-    assert parser.syntax_errors == range(15, 39)
+    assert parser.syntax_errors == range(15, 40)
 
 
 def test_parser_display_error_instance_handling(scanner_fixture, parser_fixture):
@@ -1090,23 +1090,25 @@ def test_parser_correct_file(scanner_fixture, names_fixture, parser_fixture, fil
     assert parser.parse_network() == expected
 
 
-# NEED KHALIDS HELP
-# ample, expected", [
-#     ("", "  Line 1: Syntax Error: Cannot parse an empty file\n")
-# ])
-# def test_parser_empty_file(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
-#     """Test parsing of empty file"""
+@pytest.mark.parametrize("example, expected", [
+    ("""""", "  Line 1: Syntax Error: Cannot parse an empty file\n")
+])
+def test_parser_empty_file(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+    """Test parsing of empty file"""
 
-#     scanner = create_testing_file_to_scan(
-#         example, scan_through_all=False)
+    scanner = create_testing_file_to_scan(
+        example, scan_through_all=False)
 
-#     parser = parser_fixture(scanner)
-#     parser.symbol = parser.scanner.get_symbol()
+    parser = parser_fixture(scanner)
+    parser.symbol = parser.scanner.get_symbol()
 
-#     captured = capfd.readouterr()
-#     printed_message = captured.out.splitlines(True)[1]
+    parser.parse_network()
 
-#     assert printed_message == expected
+    captured = capfd.readouterr()
+    # reakpoint()
+    printed_message = captured.out.splitlines(True)[1]
+
+    assert printed_message == expected
 
 
 @pytest.mark.parametrize("example, expected", [
