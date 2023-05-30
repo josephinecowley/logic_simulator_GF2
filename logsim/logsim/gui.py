@@ -74,7 +74,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         # Initialise trace objects
         self.traces = monitors.get_signals_for_GUI()
-        self.y_spacing = 50
+        self.y_spacing = 100
 
         self.devices = devices
 
@@ -94,13 +94,13 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glScaled(self.zoom, self.zoom, self.zoom)
 
     def draw_canvas(self):
-        """Iterates through each trace and draws adds it to the canvas with an offset"""
+        """Iterates through each trace and draws it on the canvas with an offset"""
         y_offset = 0
 
         for trace in self.traces:
             signal = trace[1]
             label = trace[0]
-            self._draw_trace(signal, 0, y_offset, label, )
+            self._draw_trace(signal, 0, y_offset, label, (0.0, 0.0, 1.0))
             y_offset += self.y_spacing
 
     def _draw_trace(self, signal, x_pos, y_pos, label, color = (0.0, 0.0, 1.0)):
@@ -112,7 +112,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         for i in range(len(signal)):
             x = (i * 20) + x_pos
             x_next = (i * 20) + x_pos + 20
-            if signal[i] in [self.devices.LOW, self.devices.FALLING, self.devices.BLANK]:
+            if signal[i] == 0:
                 y = y_pos
             else:
                 y = y_pos + 25
@@ -157,19 +157,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # Draw specified text at position (10, 10)
         self.render_text(text, 10, 10)
 
-        # Draw a sample signal trace
-        GL.glColor3f(0.0, 0.0, 1.0)  # signal trace is blue
-        GL.glBegin(GL.GL_LINE_STRIP)
-        for i in range(10):
-            x = (i * 20) + 10
-            x_next = (i * 20) + 30
-            if i % 2 == 0:
-                y = 75
-            else:
-                y = 100
-            GL.glVertex2f(x, y)
-            GL.glVertex2f(x_next, y)
-        GL.glEnd()
+        # Draw signal traces
+        self.draw_canvas()
 
         # We have been drawing to the back buffer, flush the graphics pipeline
         # and swap the back buffer to the front
@@ -297,6 +286,7 @@ class Gui(wx.Frame):
 
         # Canvas for drawing signals
         self.canvas = MyGLCanvas(self, devices, monitors)
+        self.canvas.draw_canvas()
 
         # Configure the widgets
         self.text = wx.StaticText(self, wx.ID_ANY, "Cycles")
@@ -352,7 +342,16 @@ class Gui(wx.Frame):
         text = "".join(["New text box value: ", text_box_value])
         self.canvas.render(text)
 
+file_path = 'example1_logic_description.txt'
+names = Names()
+devices = Devices(names)
+network = Network(names, devices)
+monitors = Monitors(names, devices, network)
+scanner = Scanner(file_path, names)
+parser = Parser(names, devices, network, monitors, scanner)
+parser.parse_network()
+
 app = wx.App()
-gui = Gui("Demo")
+gui = Gui("Demo", file_path, names, devices, network, monitors)
 gui.Show(True)
 app.MainLoop()
