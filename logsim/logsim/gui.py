@@ -100,12 +100,13 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     def draw_canvas(self):
         """Iterates through each trace and draws it on the canvas with an offset"""
-        y_offset = 0
+        x_offset = 60
+        y_offset = 100
 
-        for trace in self.traces:
+        for i, trace in enumerate(self.traces):
             signal = trace[1]
             label = trace[0]
-            self._draw_trace(signal, 0, y_offset, label, (0.0, 0.0, 1.0))
+            self._draw_trace(signal, x_offset, y_offset, label, (0.0, 0.0, 1.0))
             y_offset += self.y_spacing
 
     def _draw_trace(self, signal, x_pos, y_pos, label, color = (0.0, 0.0, 1.0)):
@@ -146,7 +147,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self.render_text(str(i), x - 5, y_pos - 15)
 
         x_pos -= int(40 / 3 * len(label))
-        self.render_text(label, x_pos, y_pos + 18)
+        self.render_text(label, x_pos + 60, y_pos + 18)
 
     def render(self, text):
         """Handle all drawing operations."""
@@ -734,7 +735,7 @@ class SwitchesPanel(wx.Panel):
 
 class LogicSimApp(wx.App):
     def OnInit(self):
-        file_path = "logsim\logsim\example2_logic_description.txt"
+        file_path = "example1_logic_description.txt"
         names = Names()
         devices = Devices(names)
         network = Network(names, devices)
