@@ -301,15 +301,15 @@ class Gui(wx.Frame):
         data_panel.SetSizer(hbox)
 
         # Instantiate SignalTracesPanel widget and add to Frame
-        signal_traces_panel = SignalTracesPanel(data_panel, names, devices, monitors)
+        signal_traces_panel = SignalTracesPanel(data_panel, names, devices, network, monitors)
         hbox.Add(signal_traces_panel, 3, wx.EXPAND, 0)
 
         # Instantiate RunSimulationPanel widget and add to Frame
-        simulation_panel = RunSimulationPanel(self, network, monitors)
+        simulation_panel = RunSimulationPanel(self, signal_traces_panel, names, devices, network, monitors)
         vbox.Add(simulation_panel, 1, wx.EXPAND)
 
         # Instantiate SwitchesPanel widget and add to Frame
-        switches_panel = SwitchesPanel(data_panel, simulation_panel, names, devices)
+        switches_panel = SwitchesPanel(data_panel, simulation_panel, names, devices, network, monitors)
         hbox.Add(switches_panel, 1, wx.EXPAND, 0)
 
 
@@ -328,10 +328,13 @@ class Gui(wx.Frame):
 
 
 class RunSimulationPanel(wx.Panel):
-    def __init__(self, parent, network, monitors, id=wx.ID_ANY, size=wx.DefaultSize):
+    def __init__(self, parent, signal_traces_panel, names, devices, network, monitors, id=wx.ID_ANY, size=wx.DefaultSize):
         super(RunSimulationPanel, self).__init__(parent, id, size=size, style=wx.SIMPLE_BORDER)
         
         #self.simnet = simnet
+        self.signal_traces_panel = signal_traces_panel
+        self.names = names
+        self.devices = devices
         self.network = network
         self.monitors = monitors
 
@@ -453,6 +456,7 @@ class RunSimulationPanel(wx.Panel):
         '''print(f'No. of cycles: {no_of_cycles}')
         self.simnet.run_network(no_of_cycles)'''
         self.run_network(no_of_cycles)
+        self.update_canvas()
         
     def run_network(self, cycles):
         #print(f'No of cycles: {cycles}')
@@ -464,7 +468,10 @@ class RunSimulationPanel(wx.Panel):
                 return False
         self.monitors.display_signals()
         return True
-
+    
+    def update_canvas(self):
+        self.signal_traces_panel.canvas = MyGLCanvas(self.signal_traces_panel, self.devices, self.monitors)
+        self.signal_traces_panel.Refresh()
 
     def on_quit_button(self, event):
         """Handle the event when the user clicks the quit button."""
@@ -530,7 +537,7 @@ class SignalTrace(wx.ScrolledWindow):
 
 
 class SignalTracesPanel(wx.Panel):
-    def __init__(self, parent, names, devices, monitors):
+    def __init__(self, parent, names, devices, network, monitors):
         super(SignalTracesPanel, self).__init__(parent, size=wx.DefaultSize, style=wx.SUNKEN_BORDER)
 
         # Configure sizers for layout of SwitchesPanel panel
@@ -633,7 +640,7 @@ class SignalTracesPanel(wx.Panel):
 
 
 class SwitchesPanel(wx.Panel):
-    def __init__(self, parent, simulation_panel, names, devices):
+    def __init__(self, parent, simulation_panel, names, devices, network, monitors):
         super(SwitchesPanel, self).__init__(parent, size=(300, 200))
         
         self.simulation_panel = simulation_panel
