@@ -464,7 +464,7 @@ class RunSimulationPanel(wx.Panel):
             self, message="Choose a file",
             defaultDir=os.getcwd(),
             defaultFile="",
-            wildcard=wildcard,
+            wildcard = "Text file (*.txt)|*.txt|",
             style=wx.FD_OPEN | wx.FD_MULTIPLE |
                   wx.FD_CHANGE_DIR | wx.FD_FILE_MUST_EXIST |
                   wx.FD_PREVIEW
@@ -577,7 +577,7 @@ class SignalTracesPanel(wx.Panel):
             text.SetFont(font)
 
             signal_trace = SignalTrace(self.signal_traces_scrolled_panel, wx.ID_ANY, size=signal_trace_size) # create signal trace scrolled window
-            signal_trace_canvas = MyGLCanvas(signal_trace, wx.ID_ANY, wx.DefaultPosition,  wx.Size(*signal_trace_size)) # draw canvas onto signal trace scrolled window
+            #signal_trace_canvas = MyGLCanvas(signal_trace, wx.ID_ANY, wx.DefaultPosition,  wx.Size(*signal_trace_size)) # draw canvas onto signal trace scrolled window
 
             delete_button = wxaquabutton.AquaButton(self.signal_traces_scrolled_panel, wx.ID_ANY, bitmap=None, label="DELETE")
             delete_button.SetBackgroundColor(wx.Colour("BLUE"))
