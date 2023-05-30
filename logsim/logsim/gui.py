@@ -236,6 +236,8 @@ class Gui(wx.Frame):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(1000, 700))
 
+        breakpoint()
+
         # Configure the file menu
         fileMenu = wx.Menu()
         menuBar = wx.MenuBar()
@@ -623,7 +625,6 @@ class SwitchesPanel(wx.Panel):
 
         # Create panel for switch toggle buttons
         self.switches_panel = wx.Panel(self)
-        #switches_panel.SetBackgroundColour(wx.Colour(255, 0, 0))
         vbox.Add(self.switches_panel, 7, wx.EXPAND)
         self.switches_panel.SetSizer(hbox)
 
@@ -648,11 +649,10 @@ class SwitchesPanel(wx.Panel):
         self.left_panel = wx.Panel(self.switches_panel)
         left_panel_vbox = wx.BoxSizer(wx.VERTICAL)
         self.left_panel.SetSizer(left_panel_vbox)
-        self.add_new_switch_button = wx.Button(self.left_panel, wx.ID_ANY, "add new switch")
+        '''self.add_new_switch_button = wx.Button(self.left_panel, wx.ID_ANY, "add new switch")
         self.add_new_switch_button.SetToolTip("Add a new switch")
         self.Bind(wx.EVT_BUTTON, self.on_add_new_switch_button, self.add_new_switch_button)
-        left_panel_vbox.Add(self.add_new_switch_button, 1, flag=wx.EXPAND)
-        #left_panel.SetBackgroundColour("GREEN") # layout identifier colour for visualisation purposes
+        left_panel_vbox.Add(self.add_new_switch_button, 1, flag=wx.EXPAND)'''
         hbox.Add(self.left_panel, 1, wx.EXPAND)
 
         # Add the ScrolledPanel widget to SwitchesPanel panel
@@ -698,8 +698,7 @@ class LogicSimApp(wx.App):
         monitors = Monitors(names, devices, network)
         scanner = Scanner(file_path, names)
         parser = Parser(names, devices, network, monitors, scanner)
-        print(parser.parse_network())
-        #breakpoint()
+        #print(parser.parse_network())
         self.frame = Gui("GF2 Team 7 Logic Simulator GUI",
                          file_path,
                          names,
