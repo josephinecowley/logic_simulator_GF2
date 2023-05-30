@@ -76,6 +76,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.traces = monitors.get_signals_for_GUI()
         self.y_spacing = 50
 
+        self.devices = devices
+
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
         size = self.GetClientSize()
@@ -110,7 +112,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         for i in range(len(signal)):
             x = (i * 20) + x_pos
             x_next = (i * 20) + x_pos + 20
-            if signal[i] == 0:
+            if signal[i] in [self.devices.LOW, self.devices.FALLING, self.devices.BLANK]:
                 y = y_pos
             else:
                 y = y_pos + 25
