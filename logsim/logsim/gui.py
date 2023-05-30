@@ -63,6 +63,12 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.init = False
         self.context = wxcanvas.GLContext(self)
 
+        self.devices = devices
+        self.monitors = monitors
+
+        '''print('From MyGLCanvas')
+        print(monitors.monitors_dictionary)'''
+
         # Initialise variables for panning
         self.pan_x = 0
         self.pan_y = 0
@@ -78,7 +84,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
 
         # Initialise trace objects
-        self.traces = monitors.get_signals_for_GUI()
+        self.traces = self.monitors.get_signals_for_GUI()
+        #print(f'FIRST: {self.traces}')
         self.y_spacing = 100
 
         self.devices = devices
@@ -101,6 +108,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
     def draw_canvas(self):
         """Iterates through each trace and draws it on the canvas with an offset"""
         y_offset = 0
+        #print(f'SECOND: {self.traces}')
 
         for trace in self.traces:
             signal = trace[1]
@@ -247,6 +255,16 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                 GL.glRasterPos2f(x_pos, y_pos)
             else:
                 GLUT.glutBitmapCharacter(font, ord(character))
+
+    def update_arguments(self, devices, monitors):
+        # Update the devices and monitors with new arguments
+        self.devices = devices
+        self.monitors = monitors
+        self.traces = self.monitors.get_signals_for_GUI()
+        #print(f'THIRD: {self.traces}')
+        
+        # Trigger a redraw
+        self.Refresh()
 
 
 class Gui(wx.Frame):
@@ -464,8 +482,7 @@ class RunSimulationPanel(wx.Panel):
         return True
     
     def update_canvas(self):
-        self.signal_traces_panel.canvas = MyGLCanvas(self.signal_traces_panel, self.devices, self.monitors)
-        self.signal_traces_panel.Refresh()
+        self.signal_traces_panel.canvas.update_arguments(self.devices, self.monitors)
 
     def on_quit_button(self, event):
         """Handle the event when the user clicks the quit button."""
@@ -475,8 +492,6 @@ class RunSimulationPanel(wx.Panel):
         quit_button_pressed.SetBackgroundColour(wx.Colour(148, 148, 148))
 
     def on_spin(self, event):
-        #self.spin_text.SetValue(str(event.GetPosition()))
-        #print(self.cycles_spin_control.GetValue())
         pass
 
     def on_upload_button(self, event):
@@ -569,11 +584,12 @@ class SignalTracesPanel(wx.Panel):
         add_new_monitor_panel_CENTRE_hbox.Add(text, 0, flag=wx.ALIGN_CENTER)
 
         # Get the ids and user-defined names of all monitored and (as-of-yet) unmonitored devices
-        monitored_devices_names = monitors.get_signal_names()[0]
-        monitored_devices_ids = names.lookup(monitored_devices_names)
-        unmonitored_devices_names = monitors.get_signal_names()[1]
-        unmonitored_devices_ids = names.lookup(unmonitored_devices_names)
+        monitored_devices_names = self.monitors.get_signal_names()[0]
+        monitored_devices_ids = self.names.lookup(monitored_devices_names)
+        unmonitored_devices_names = self.monitors.get_signal_names()[1]
+        unmonitored_devices_ids = self.names.lookup(unmonitored_devices_names)
 
+        self.selected_device = None
         self.monitor_output_list = unmonitored_devices_names
         self.combo_box = wx.ComboBox(self.add_new_monitor_panel_CENTRE, 500, "Select output", (90, 50),
                          (160, -1), self.monitor_output_list,
@@ -591,6 +607,7 @@ class SignalTracesPanel(wx.Panel):
         add_new_monitor_panel_RIGHT_hbox = wx.BoxSizer(wx.HORIZONTAL)
         self.add_new_monitor_panel_RIGHT.SetSizer(add_new_monitor_panel_RIGHT_hbox)
         self.add_new_monitor_button = wx.Button(self.add_new_monitor_panel_RIGHT, wx.ID_ANY, label="+")
+        self.Bind(wx.EVT_BUTTON, self.on_add_new_monitor_button, self.add_new_monitor_button)
         self.add_new_monitor_button.SetToolTip("Add a new monitor")
         add_new_monitor_panel_RIGHT_hbox.Add(self.add_new_monitor_button, 1, flag=wx.EXPAND)
 
@@ -610,6 +627,21 @@ class SignalTracesPanel(wx.Panel):
         combo_box = event.GetEventObject()
         self.selected_device = combo_box.GetValue()
         print(self.selected_device)
+
+    def on_add_new_monitor_button(self, event):
+        """Handle the event when the user clicks the add new monitor button."""
+        add_new_monitor_button_pressed = event.GetEventObject()
+        text = f"{add_new_monitor_button_pressed.GetLabel()} button pressed."
+        print(text)
+        print(self.selected_device)
+        if self.selected_device is not None:
+            selected_device_id = self.names.query(self.selected_device)
+            print(selected_device_id)
+            self.monitors.make_monitor(selected_device_id, None) # KO! what is output_id??
+        self.update_canvas()
+        
+    def update_canvas(self):
+        self.canvas.update_arguments(self.devices, self.monitors)
 
 
 class SwitchesPanel(wx.Panel):
