@@ -740,10 +740,10 @@ class SwitchesPanel(wx.Panel):
     def on_switch_toggle_button(self, event):
         """Handle the event when the user clicks the toggle button for a switch."""
         switch_selected = event.GetEventObject()
-        print(f'{switch_selected.GetLabel()} has been pressed.')
         switch_id = self.names.query(switch_selected.GetLabel())
         switch_state = switch_selected.GetValue()
-        print(switch_state)
+        if self.devices.set_switch(switch_id, int(switch_state)): # successfully switched the state of switch
+            pass
 
     def on_add_new_switch_button(self, event):
         print("Add new switch button pressed")
