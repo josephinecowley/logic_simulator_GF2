@@ -581,6 +581,7 @@ class SignalTracesPanel(wx.Panel):
                          #| wx.TE_PROCESS_ENTER
                          #| wx.CB_SORT
                          )
+        self.Bind(wx.EVT_COMBOBOX, self.on_combo_box, self.combo_box)
         add_new_monitor_panel_CENTRE_hbox.Add(self.combo_box, 0, flag=wx.ALIGN_CENTER|wx.LEFT, border=30)
 
         add_new_monitor_panel_hbox.Add(self.add_new_monitor_panel_CENTRE, 3, flag=wx.EXPAND)
@@ -604,6 +605,11 @@ class SignalTracesPanel(wx.Panel):
 
         # Set sizer of SignalTracesPanel
         self.SetSizer(vbox)
+
+    def on_combo_box(self, event):
+        combo_box = event.GetEventObject()
+        self.selected_device = combo_box.GetValue()
+        print(self.selected_device)
 
 
 class SwitchesPanel(wx.Panel):
