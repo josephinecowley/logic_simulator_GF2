@@ -682,8 +682,10 @@ class Parser:
                 self.symbol = self.scanner.get_symbol()
                 return
               # JC!  add this fix above to device list and connections list
-            # elif self.symbol.type == self.scanner.KEYWORD
-            # JC! and case here
+            # Check if semicolon and close brace '{' was missing and now symbol is at the next keyword
+            elif self.symbol.type == self.scanner.KEYWORD:
+                self.display_error(self.symbol, self.NO_BRACE_CLOSE)
+                return
         # Repeat checking monitors in list until the close brace "}"
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
             self.symbol = self.scanner.get_symbol()
