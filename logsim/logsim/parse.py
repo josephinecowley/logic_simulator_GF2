@@ -537,6 +537,14 @@ class Parser:
         if self.symbol.type != self.scanner.SEMICOLON:
             self.display_error(
                 self.symbol, self.NO_SEMICOLON, proceed=False)
+            # Check if semicolon was missing and now symbol is at the close brace '{' symbol
+            if self.symbol.type == self.scanner.BRACE_CLOSE:
+                self.symbol = self.scanner.get_symbol()
+                return
+            # Check if semicolon and close brace '{' was missing and now symbol is at the next keyword
+            elif self.symbol.type == self.scanner.KEYWORD:
+                self.display_error(self.symbol, self.NO_BRACE_CLOSE)
+                return
         # Repeat checking connections in list until the close brace "}"
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
             self.symbol = self.scanner.get_symbol()
