@@ -250,6 +250,7 @@ class Parser:
         # Call error recovery function to resume parsing at appropriate point
         self.error_recovery(error_type,
                             proceed, stopping_symbol_types)
+
         return
 
     # Stopping symbols automatically assigned to semi-colons, braces and keywords
@@ -276,6 +277,7 @@ class Parser:
         # Recover from error
         if proceed == True:
             return
+
         # Check if we need to skip symbols to recover parsing
         else:
             while ((self.symbol.type not in stopping_symbol_types) and (self.symbol.type != self.scanner.EOF)):
@@ -361,53 +363,68 @@ class Parser:
     def device_list(self):
         """Parse device list."""
 
+        # Define required device id
         DEVICES_ID = self.names.lookup(["DEVICES"])[0]
+
         # Common initial error handling
         self.initial_error_checks(DEVICES_ID, self.NO_DEVICES_KEYWORD)
         # If catastrophic error occors, and symbol type is now EOF
         if self.symbol.type == self.scanner.EOF:
             return
+
         # Parse device
         self.device()
+
         # Check if semicolon is missing but next symbol is a NAME type
         if self.symbol.type != self.scanner.SEMICOLON:
             self.display_error(
                 self.symbol, self.NO_SEMICOLON, proceed=False)
+
             # Check if semicolon was missing and now symbol is at the close brace '{' symbol
             if self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.symbol = self.scanner.get_symbol()
                 return
+
             # Check if semicolon and close brace '{' was missing and now symbol is at the next keyword
             elif self.symbol.type == self.scanner.KEYWORD:
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
                 return
+
         # Check all devices in list, which are all separated by a ';'
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
             self.symbol = self.scanner.get_symbol()
+
             # Incase a KEYWORD is entered straight after a ';', assume '}' was missed and go on to monitor list
             if (self.symbol.type == self.scanner.KEYWORD):
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
                 return
-            # Incase now a brace, leave while loop
+
+            # Incase symbol type is a close brace '}', leave while loop
             if self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.symbol = self.scanner.get_symbol()
                 return
+
+            #  Parse device
             self.device()
+
             # If semicolon is missing, but new NAME type symbol is entered, call error and parse to next stopping symbol
             if self.symbol.type == self.scanner.NAME:
                 self.display_error(self.symbol, self.NO_SEMICOLON,
                                    proceed=False)
+
                 # If stopping symbol reached is a semicolon, need to pass, else if brace, need to return
                 if self.symbol.type == self.scanner.BRACE_CLOSE:
                     self.symbol = self.scanner.get_symbol()
                     return
                 elif self.symbol.type == self.scanner.SEMICOLON:
                     pass
+
             # If semicolon is missing, and symbol is now a brace
             elif self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.display_error(self.symbol, self.NO_SEMICOLON)
                 self.symbol = self.scanner.get_symbol()
                 return
+
             # If semicolon missing and unknown symbol (including EOF)
             elif self.symbol.type != self.scanner.SEMICOLON:
                 self.display_error(self.symbol, self.NO_SEMICOLON)
@@ -418,20 +435,28 @@ class Parser:
 
         Make the device if there are no errors."""
 
+        # If symbol type is now a close brace '{'
         if self.symbol.type == self.scanner.BRACE_CLOSE:
             return
+
         # Check that we have a valid user defined name
         if self.symbol.type == self.scanner.NAME:
+
+            # Save device ID for network functionality
             device_ID = self.symbol.id
             self.symbol = self.scanner.get_symbol()
+
             # Check that the name is followed by an equals sign
             if self.symbol.type == self.scanner.EQUALS:
                 self.symbol = self.scanner.get_symbol()
+
                 # Check that we then get a valid component name
                 device_kind, device_property = self.check_device_is_valid()
             else:
                 self.display_error(
                     self.symbol, self.NO_EQUALS, proceed=False)
+
+        # If given name is not valid
         else:
             self.display_error(self.symbol, self.INVALID_NAME, proceed=False)
 
@@ -447,68 +472,101 @@ class Parser:
 
         Return both device kind (eg AND gate) and the device property (eg number of inputs)."""
 
+        # Specify ID numbers of devices
         [AND_ID, NAND_ID, OR_ID, NOR_ID, XOR_ID, DTYPE_ID, SWITCH_ID, CLK_ID] = self.names.lookup(
             ["AND", "NAND", "OR", "NOR", "XOR", "DTYPE",  "SWITCH", "CLOCK"])
+
+        # Specify input ranges
         one_to_sixteen = list(range(1, 17))
         binary_digit = [0, 1]
+
         # Check that name is either a AND, NAND, OR, NOR gate
         if self.symbol.id in [AND_ID, NAND_ID, OR_ID, NOR_ID]:
+
+            # Save device type ID for network functionality
             device_kind = self.symbol.id
             self.symbol = self.scanner.get_symbol()
+
             # Check that gate is followed by open bracket symbol
             if self.symbol.type == self.scanner.BRACKET_OPEN:
                 self.symbol = self.scanner.get_symbol()
+
                 # Check that number of inputs is an integer
                 if self.symbol.type == self.scanner.NUMBER:
+
                     # Check that number is within range
                     number_of_inputs = int(
                         self.names.get_name_string(self.symbol.id))
+
+                    # Check that input number (which describes the number of input ports) is within client specified range of 1 - 16
                     if number_of_inputs in one_to_sixteen:
                         self.symbol = self.scanner.get_symbol()
+
                         # Check that next symbol is a close bracket ")"
                         if self.symbol.type == self.scanner.BRACKET_CLOSE:
                             self.symbol = self.scanner.get_symbol()
                             return device_kind, number_of_inputs
+
+                        # If there is a missing close bracket ')'
                         else:
                             self.display_error(
                                 self.symbol, self.NO_BRACKET_CLOSE,
                                 proceed=False)
                             return None, None
+
                     else:
                         self.display_error(self.symbol, self.INPUT_OUT_OF_RANGE,
                                            proceed=False)
                         return None, None
+
                 else:
                     self.display_error(self.symbol, self.NO_NUMBER,
                                        proceed=False)
                     return None, None
+
             else:
                 self.display_error(self.symbol, self.NO_BRACKET_OPEN,
                                    proceed=False)
                 return None, None
+
         # Check if symbol is an XOR or DTYPE (with no inputs)
         elif self.symbol.id == XOR_ID or self.symbol.id == DTYPE_ID:
+
+            # Save device type ID for network functionality
             device_kind = self.symbol.id
+
             self.symbol = self.scanner.get_symbol()
+
             # Return device kind and None as device property
             return device_kind, None
+
         # Check if symbol is a SWITCH type
         elif self.symbol.id == SWITCH_ID:
+
+            # Save device type ID for network functionality
             device_kind = self.symbol.id
+
             self.symbol = self.scanner.get_symbol()
+
             # Check that gate is followed by open bracket symbol
             if self.symbol.type == self.scanner.BRACKET_OPEN:
                 self.symbol = self.scanner.get_symbol()
+
                 # Check that number of inputs is an integer
                 if self.symbol.type == self.scanner.NUMBER:
+
                     # Check that number is within range
                     switch_initial_state = int(
                         self.names.get_name_string(self.symbol.id))
+
+                    # Check that number is a valid input
                     if switch_initial_state in binary_digit:
+
                         # Check that the next symbol is a closed bracket
                         self.symbol = self.scanner.get_symbol()
                         if self.symbol.type == self.scanner.BRACKET_CLOSE:
                             self.symbol = self.scanner.get_symbol()
+
                             # Return device kind and the initial switch state as device property
                             return device_kind, switch_initial_state
                         else:
@@ -528,10 +586,15 @@ class Parser:
                 self.display_error(self.symbol, self.NO_BRACKET_OPEN,
                                    proceed=False)
                 return None, None
+
         # Check if symbol is a CLK
         elif self.symbol.id == CLK_ID:
+
+            # Save device type ID for network functionality
             device_kind = self.symbol.id
+
             self.symbol = self.scanner.get_symbol()
+
             # Check that the gate is followed by an open bracket symbol
             if self.symbol.type == self.scanner.BRACKET_OPEN:
                 self.symbol = self.scanner.get_symbol()
@@ -572,14 +635,18 @@ class Parser:
     def connection_list(self):
         """Parse connection list."""
 
+        # Define required device id
         CONNECTIONS_ID = self.names.lookup(["CONNECTIONS"])[0]
+
         # Common initial error handling
         self.initial_error_checks(CONNECTIONS_ID, self.NO_CONNECTIONS_KEYWORD)
         # If catastrophic error occors, and symbol type is now EOF
         if self.symbol.type == self.scanner.EOF:
             return
+
         # Parse a connection
         self.connection()
+
         # Check if semicolon is missing but next symbol is a NAME type
         if self.symbol.type != self.scanner.SEMICOLON:
             self.display_error(
@@ -592,6 +659,7 @@ class Parser:
             elif self.symbol.type == self.scanner.KEYWORD:
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
                 return
+
         # Repeat checking connections in list until the close brace "}"
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
             self.symbol = self.scanner.get_symbol()
@@ -661,9 +729,11 @@ class Parser:
         Return None, None if error occurs."""
 
         valid_output_id_list = self.names.lookup(["Q", "QBAR"])
+
         # If after the semicolon we have a '}' , assume we can move onto the monitor_list
         if self.symbol.type == self.scanner.BRACE_CLOSE:
             return None, None
+
         # Check that the output to be connected is an already user-defined name
         if self.symbol.type == self.scanner.NAME:
             output_device_ID = self.symbol.id
@@ -696,6 +766,7 @@ class Parser:
 
         valid_input_suffix_id_list = self.names.lookup(["I1", "I2", "I3", "I4", "I5", "I6", "I7", "I8", "I9",
                                                         "I10", "I11", "I12", "I13", "I14", "I15", "I16", "DATA", "CLK", "SET", "CLEAR"])
+
         # Check that the input is valid syntax
         if self.symbol.type == self.scanner.NAME:
             input_device_ID = self.symbol.id
@@ -724,16 +795,22 @@ class Parser:
     def monitor_list(self):
         """Parse monitor list."""
 
+        # Define required device id
         MONITORS_ID = self.names.lookup(["MONITORS"])[0]
+
         # Common initial error handling
         self.initial_error_checks(MONITORS_ID, self.NO_MONITORS_KEYWORD)
+
         # If catastrophic error occors, and symbol type is now EOF
         if self.symbol.type == self.scanner.EOF:
             return
+
         # Parse a monitor
         [monitor_device_id, monitor_port_id] = self.output()
+
         # Assign the monitor
         self.assign_monitor(monitor_device_id, monitor_port_id)
+
         # Check if semicolon is missing but next symbol is a NAME type
         if self.symbol.type != self.scanner.SEMICOLON:
             self.display_error(
@@ -746,6 +823,7 @@ class Parser:
             elif self.symbol.type == self.scanner.KEYWORD:
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
                 return
+
         # Repeat checking monitors in list until the close brace "}"
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
             self.symbol = self.scanner.get_symbol()
@@ -795,10 +873,12 @@ class Parser:
 
         # Check that the final symbol is the keyword END
         END_ID = self.names.lookup(["END"])[0]
+
         # If nothing after monitors class, assume missing, display error and end program
         if self.symbol.type == self.scanner.EOF:
             self.display_error(self.symbol, self.NO_END_KEYWORD)
             return
+
         # If symbol is anything other than END, display error and pass until END keyword
         elif not (self.symbol.id == END_ID):
             self.display_error(self.symbol, self.NO_END_KEYWORD)
@@ -819,7 +899,9 @@ class Parser:
     def parse_network(self):
         """Parse the circuit definition file and return true if there are no files."""
 
+        # Get first symbol
         self.symbol = self.scanner.get_symbol()
+
         # Check to see if file is empty
         if self.symbol.type == self.scanner.EOF:
             self.display_error(self.symbol, self.EMPTY_FILE)
@@ -855,7 +937,7 @@ class Parser:
                         self.network.execute_network()
                         self.monitors.record_signals()
 
-                    # Display the signals
+                    # Display the signals to terminal
                     self.monitors.display_signals()
 
                     # Check for END keyword
