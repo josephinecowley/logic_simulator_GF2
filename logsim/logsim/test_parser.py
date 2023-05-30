@@ -927,6 +927,167 @@ def test_parser_incorrect_connection_list_parsing(parser_fixture, create_testing
     assert parser.network.check_network() == False
 
 
+def test_parser_correct_parsing_of_monitors_list(parser_fixture, create_testing_file_to_scan):
+    """Test parsing of single monitors list"""
+    scanner = create_testing_file_to_scan(
+        """
+    MONITORS {
+    dtype1.Q;
+    dtype2.Q;
+    dtype3.Q;
+    dtype4.Q;
+    }
+    """, scan_through_all=False)
+
+    parser = parser_fixture(scanner)
+    parser.symbol = parser.scanner.get_symbol()
+
+    assert parser.monitor_list() is None
+
+
+@pytest.mark.parametrize("example, expected", [
+    ("""
+    MONITORS {
+    dtype1.Q;
+    dtype2.Q
+    dtype3.Q;
+    dtype4.Q;
+}
+    """, "  Line 36: Syntax Error: Expected a semicolon\n"),
+    ("""
+    MONITORS {
+    dtype1.Q;
+    dtype2.Q;
+
+    END
+    """, "  Line 37: Syntax Error: Expected a '}' symbol\n"),
+    ("""
+    MONITORS {
+    dtype1.Q;
+    dtype2.Q;
+    dtype3.Q;
+    dtype4.Q
+}
+    """, "  Line 38: Syntax Error: Expected a semicolon\n")
+])
+def test_parser_incorrect_monitors_list_parsing(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+    """Test parsing of incorrect monitors list"""
+
+    scanner = create_testing_file_to_scan("""DEVICES {
+
+    data = SWITCH(0);
+    dtype1 = DTYPE;
+    dtype2 = DTYPE;
+    dtype3 = DTYPE;
+    dtype4 = DTYPE;
+    clock = CLOCK(5);
+    set = SWITCH(0);
+}
+
+CONNECTIONS {
+    dtype1.DATA = data;
+    dtype1.SET = set;
+    dtype1.CLEAR = set;
+    dtype1.CLK = clock;
+
+    dtype2.DATA = dtype1.Q;
+    dtype2.SET = set;
+    dtype2.CLEAR = set;
+    dtype2.CLK = clock;
+
+    dtype3.DATA = dtype2.Q;
+    dtype3.SET = set;
+    dtype3.CLEAR = set;
+    dtype3.CLK = clock;
+
+    dtype4.DATA = dtype3.Q;
+    dtype4.SET = set;
+    dtype4.CLEAR = set;
+    dtype4.CLK = clock;
+}""" + example, scan_through_all=False)
+
+    parser = parser_fixture(scanner)
+    parser.symbol = parser.scanner.get_symbol()
+
+    parser.device_list()
+    parser.connection_list()
+    parser.monitor_list()
+    captured = capfd.readouterr()
+    printed_message = captured.out.splitlines(True)[1]
+
+    assert printed_message == expected
+    assert parser.network.check_network() == True
+
+
+def test_parser_correct_parsing_of_assign_monitor(parser_fixture, create_testing_file_to_scan):
+    """Test parsing of assign monitor"""
+    scanner = create_testing_file_to_scan(
+        """
+    dtype1.Q;
+    }
+    """, scan_through_all=False)
+
+    parser = parser_fixture(scanner)
+    parser.symbol = parser.scanner.get_symbol()
+
+    [monitor_device_id, monitor_port_id] = parser.output()
+
+    assert parser.assign_monitor(monitor_device_id, monitor_port_id) is None
+    assert isinstance(monitor_device_id, int)
+    assert isinstance(monitor_port_id, int)
+
+
+def test_parser_correct_parsing_of_end(parser_fixture, create_testing_file_to_scan):
+    """Test parsing of correct keyword END"""
+    scanner = create_testing_file_to_scan(
+        """
+    END
+    }
+    """, scan_through_all=False)
+
+    parser = parser_fixture(scanner)
+    parser.symbol = parser.scanner.get_symbol()
+
+    assert parser.end() is None
+
+
+@pytest.mark.parametrize("example, expected", [
+    ("""
+    """, "  Line 2: Syntax Error: Expected the keyword END straight after monitors list\n"),
+    ("""
+    end
+    """, "  Line 2: Syntax Error: Expected the keyword END straight after monitors list\n")
+])
+def test_parser_incorrect_keyword_END(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+    """Test parsing of incorrect keyword END"""
+
+    scanner = create_testing_file_to_scan(
+        example, scan_through_all=False)
+
+    parser = parser_fixture(scanner)
+    parser.symbol = parser.scanner.get_symbol()
+
+    assert parser.end() is None
+
+    captured = capfd.readouterr()
+    printed_message = captured.out.splitlines(True)[1]
+
+    assert printed_message == expected
+
+
+@pytest.mark.parametrize("file_path, expected", [
+    ("./example1_logic_description.txt", True),
+    ("./example2_logic_description.txt", True)
+])
+def test_parser_correct_file(scanner_fixture, names_fixture, parser_fixture, file_path, expected):
+    """Test complete parsing of whole correct file"""
+
+    scanner = Scanner(file_path, names_fixture)
+    parser = parser_fixture(scanner)
+
+    assert parser.parse_network() == expected
+
+
 def test_delete_testing_file():
     """This is an in-house helper function not strictly related to testing parse.py"""
     if os.path.exists("testing_file.txt"):
