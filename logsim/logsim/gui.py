@@ -102,17 +102,26 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         """Iterates through each trace and draws it on the canvas with an offset"""
         x_offset = 60
         y_offset = 100
+        color_list = [
+            (1.0, 0.0, 0.0),
+            (0.0, 1.0, 0.0),
+            (0.0, 0.0, 1.0),
+            (1.0, 0.0, 1.0),
+            (0.0, 1.0, 1.0),
+        ]
 
         for i, trace in enumerate(self.traces):
             signal = trace[1]
             label = trace[0]
-            self._draw_trace(signal, x_offset, y_offset, label, (0.0, 0.0, 1.0))
+            color = color_list[i%len(color_list)]
+            self._draw_trace(signal, x_offset, y_offset, label, color)
             y_offset += self.y_spacing
 
     def _draw_trace(self, signal, x_pos, y_pos, label, color = (0.0, 0.0, 1.0)):
         """Draws trace with axes and ticks"""
 
         # draw trace
+        GL.glLineWidth(3.0)
         GL.glColor3f(*color)
         GL.glBegin(GL.GL_LINE_STRIP)
         for i in range(len(signal)):
@@ -245,7 +254,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         """Handle text drawing operations."""
         GL.glColor3f(0.0, 0.0, 0.0)  # text is black
         GL.glRasterPos2f(x_pos, y_pos)
-        font = GLUT.GLUT_BITMAP_HELVETICA_12
+        font = GLUT.GLUT_BITMAP_HELVETICA_18
 
         for character in text:
             if character == '\n':
