@@ -513,42 +513,45 @@ class RunSimulationPanel(wx.Panel):
             wx.FD_PREVIEW
         )
 
+        file_path = None
+
         # Show the dialog and retrieve the user response. If it is the OK response,
         # process the data.
         if dlg.ShowModal() == wx.ID_OK:
             # This returns a Python list of files that were selected.
             file_path = dlg.GetPath()
 
-        names = Names()
-        devices = Devices(names)
-        network = Network(names, devices)
-        monitors = Monitors(names, devices, network)
-        scanner = Scanner(file_path, names)
-        parser = Parser(names, devices, network, monitors, scanner)
+        if file_path is not None: # confirm a file has been selected from upload file dialog
+            names = Names()
+            devices = Devices(names)
+            network = Network(names, devices)
+            monitors = Monitors(names, devices, network)
+            scanner = Scanner(file_path, names)
+            parser = Parser(names, devices, network, monitors, scanner)
 
-        captured_print = StringIO()
-        with redirect_stdout(captured_print):
-            parsing_result = parser.parse_network()
+            captured_print = StringIO()
+            with redirect_stdout(captured_print):
+                parsing_result = parser.parse_network()
 
-        output = captured_print.getvalue()
+            output = captured_print.getvalue()
 
-        if parsing_result:
-            new_Gui = Gui("GF2 Team 7 Logic Simulator GUI",
-                          file_path,
-                          names,
-                          devices,
-                          network,
-                          monitors)
-            new_Gui.Show()
-            self.parent.Close()
-        else:
-            dlg = wx.MessageDialog(self, output,
-                                   "An error occurred.",
-                                   wx.OK | wx.ICON_INFORMATION
-                                   # wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL | wx.ICON_INFORMATION
-                                   )
-            dlg.ShowModal()
-            dlg.Destroy()
+            if parsing_result:
+                new_Gui = Gui("GF2 Team 7 Logic Simulator GUI",
+                            file_path,
+                            names,
+                            devices,
+                            network,
+                            monitors)
+                new_Gui.Show()
+                self.parent.Close()
+            else:
+                dlg = wx.MessageDialog(self, output,
+                                    "An error occurred.",
+                                    wx.OK | wx.ICON_INFORMATION
+                                    # wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL | wx.ICON_INFORMATION
+                                    )
+                dlg.ShowModal()
+                dlg.Destroy()
 
         dlg.Destroy()
 
