@@ -458,6 +458,7 @@ class RunSimulationPanel(wx.Panel):
         self.help_button_panel.SetSizer(help_button_panel_vbox)
 
         self.help_button = wx.Button(self.help_button_panel, wx.ID_ANY, "HELP")
+        self.Bind(wx.EVT_BUTTON, self.on_help_button, self.help_button)
         self.help_button.SetToolTip("Help on running logic simulation")
         help_button_panel_vbox.Add(self.help_button, 1, flag=wx.ALIGN_CENTER)
 
@@ -554,6 +555,38 @@ class RunSimulationPanel(wx.Panel):
                 dlg.Destroy()
 
         dlg.Destroy()
+
+    def on_help_button(self, event):
+        help_guidelines_text = \
+"""
+Welcome to our Logic Simulator!
+
+To get started you need a valid Logic Description File. This is one which follows our defined language syntax.
+
+Click on the “UPLOAD” button in the bottom right corner of the simulator tab and follow the command prompt to select your logic description file.
+Upon clicking this, if you have uploaded a valid Logic Description File, you should see the y-axis of each monitor you have specified, along with all of the valid switches you have added in your logic circuit.
+
+You can update the number of monitors using the “Add new monitor” and “Zap a monitor” drop down boxes, which provides names of device output ports which you could monitor. Once you have specified the monitor that you want to add or zap, you must press the corresponding “+” (for adding a monitor) or “-” (for zapping a monitor) buttons on the right of these dropdown boxes.
+Upon doing so, you should see the monitors update.
+
+You can also change the initial state of the switches in your circuit by using the toggle buttons. Blue indicates the switch state is ON and grey indicates the switch state is OFF.
+
+Now specify the number of cycles you wish to run by using the spin button in the bottom left corner of the simulator.
+
+Now you can press the large green “RUN” button in the bottom left hand corner.
+
+If successful, you should see the signal traces update for each monitored device.
+
+Note that upon clicking “RUN” this button will change to an orange “CONTINUE” button. Click this if you want to add further simulations. You can always change the number of cycles specified or the switch states or monitors in between each simulation.
+"""
+        dlg = wx.MessageDialog(self, help_guidelines_text,
+                                "An error occurred.",
+                                wx.OK | wx.ICON_INFORMATION
+                                # wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL | wx.ICON_INFORMATION
+                                )
+        dlg.ShowModal()
+        dlg.Destroy()
+        
 
 
 class SignalTrace(wx.ScrolledWindow):
@@ -1055,7 +1088,9 @@ class AddDeviceDialog(wx.Dialog):
 
 class LogicSimApp(wx.App):
     def OnInit(self):
-        file_path = "logsim\logsim\example2_logic_description.txt"
+        file_path = "./example1_logic_description.txt"
+        with open(file_path) as f:
+            print('success')
         names = Names()
         devices = Devices(names)
         network = Network(names, devices)
