@@ -661,7 +661,10 @@ class SignalTracesPanel(wx.Panel):
         if selected_signal_to_monitor_selection_index != wx.NOT_FOUND:
             self.select_monitor_combo_box.Delete(selected_signal_to_monitor_selection_index) # remove the selected signal to monitor from add menu
 
-        self.zap_monitor_combo_box.Append(self.selected_signal_to_monitor) # add selected signal to monitor to zap menu
+        if self.selected_signal_to_monitor not in self.zap_monitor_combo_box.GetItems(): # confirm if selected signal not already in zap menu
+            self.zap_monitor_combo_box.Append(self.selected_signal_to_monitor) # add selected signal to monitor to zap menu
+        else:
+            pass
 
     def on_zap_existing_monitor(self, event):
         """Handle the event when the user clicks the zap existing monitor button."""
@@ -681,7 +684,10 @@ class SignalTracesPanel(wx.Panel):
         if selected_signal_to_zap_selection_index != wx.NOT_FOUND:
             self.zap_monitor_combo_box.Delete(selected_signal_to_zap_selection_index) # remove the currently monitored signal from zap menu
 
-        self.select_monitor_combo_box.Append(self.selected_signal_to_zap) # add currently monitored signal to add menu
+        if self.selected_signal_to_zap not in self.select_monitor_combo_box.GetItems(): # confirm if selected signal not already in add menu
+            self.select_monitor_combo_box.Append(self.selected_signal_to_zap) # add currently monitored signal to add menu
+        else:
+            pass
         
     def update_canvas(self):
         self.canvas.update_arguments(self.devices, self.monitors)
