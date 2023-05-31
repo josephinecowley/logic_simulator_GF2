@@ -977,10 +977,10 @@ class Parser:
                     # Parse monitor list
                     self.monitor_list()
 
-                    # Record the signal traces
-                    for i in range(50):
-                        self.network.execute_network()
-                        self.monitors.record_signals()
+                    # # Record the signal traces
+                    # for i in range(50):
+                    #     self.network.execute_network()
+                    #     self.monitors.record_signals()
 
                     # Display the signals to terminal
                     self.monitors.display_signals()
@@ -1002,18 +1002,19 @@ class Parser:
                 return False
 
 
-# JC! This will be deleted once development is complete
-def main():
-    # Check command line arguments
-    file_path = "./example1_logic_description.txt"
-    names = Names()
-    devices = Devices(names)
-    network = Network(names, devices)
-    monitors = Monitors(names, devices, network)
-    scanner = Scanner(file_path, names)
-    parser = Parser(names, devices, network, monitors, scanner)
-    parser.parse_network()
+# This is here for terminal plotting of signals
+
+# def main():
+#     # Check command line arguments
+#     file_path = "./example1_logic_description.txt"
+#     names = Names()
+#     devices = Devices(names)
+#     network = Network(names, devices)
+#     monitors = Monitors(names, devices, network)
+#     scanner = Scanner(file_path, names)
+#     parser = Parser(names, devices, network, monitors, scanner)
+#     parser.parse_network()
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
