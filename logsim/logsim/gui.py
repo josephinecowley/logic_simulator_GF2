@@ -521,7 +521,7 @@ class RunSimulationPanel(wx.Panel):
             # This returns a Python list of files that were selected.
             file_path = dlg.GetPath()
 
-        if file_path is not None: # confirm a file has been selected from upload file dialog
+        if file_path is not None:  # confirm a file has been selected from upload file dialog
             names = Names()
             devices = Devices(names)
             network = Network(names, devices)
@@ -537,19 +537,19 @@ class RunSimulationPanel(wx.Panel):
 
             if parsing_result:
                 new_Gui = Gui("GF2 Team 7 Logic Simulator GUI",
-                            file_path,
-                            names,
-                            devices,
-                            network,
-                            monitors)
+                              file_path,
+                              names,
+                              devices,
+                              network,
+                              monitors)
                 new_Gui.Show()
                 self.parent.Close()
             else:
                 dlg = wx.MessageDialog(self, output,
-                                    "An error occurred.",
-                                    wx.OK | wx.ICON_INFORMATION
-                                    # wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL | wx.ICON_INFORMATION
-                                    )
+                                       "An error occurred.",
+                                       wx.OK | wx.ICON_INFORMATION
+                                       # wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL | wx.ICON_INFORMATION
+                                       )
                 dlg.ShowModal()
                 dlg.Destroy()
 
@@ -711,7 +711,8 @@ class SignalTracesPanel(wx.Panel):
             # confirm if selected signal not already in zap menu
             if self.selected_signal_to_monitor not in self.zap_monitor_combo_box.GetItems():
                 # add selected signal to monitor to zap menu
-                self.zap_monitor_combo_box.Append(self.selected_signal_to_monitor)
+                self.zap_monitor_combo_box.Append(
+                    self.selected_signal_to_monitor)
             else:
                 pass
 
@@ -737,7 +738,8 @@ class SignalTracesPanel(wx.Panel):
             # confirm if selected signal not already in add menu
             if self.selected_signal_to_zap not in self.select_monitor_combo_box.GetItems():
                 # add currently monitored signal to add menu
-                self.select_monitor_combo_box.Append(self.selected_signal_to_zap)
+                self.select_monitor_combo_box.Append(
+                    self.selected_signal_to_zap)
             else:
                 pass
 
