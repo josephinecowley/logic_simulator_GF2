@@ -483,14 +483,6 @@ class RunSimulationPanel(wx.Panel):
     def update_canvas(self):
         self.signal_traces_panel.canvas.update_arguments(self.devices, self.monitors)
 
-    def on_quit_button(self, event):
-        """Handle the event when the user clicks the quit button."""
-        quit_button_pressed = event.GetEventObject()
-        text = "QUIT button pressed"
-        print(text)
-        quit_button_pressed.SetBackgroundColour(wx.Colour(148, 148, 148))
-        self.Close()
-
     def on_spin(self, event):
         pass
 
