@@ -576,7 +576,7 @@ class SignalTracesPanel(wx.Panel):
         self.unmonitored_devices_ids = self.names.lookup(self.unmonitored_devices_names)
 
         # Create and add the dropdown menu for the as-of-yet unmonitored devices, ready to be monitored
-        self.selected_device_to_monitor = None
+        self.selected_signal_to_monitor = None
         self.monitor_output_list = self.unmonitored_devices_names
         self.select_monitor_combo_box = wx.ComboBox(self.add_new_monitor_panel, wx.ID_ANY, "Select output", (90, 50),
                          (160, -1), self.monitor_output_list,
@@ -601,7 +601,7 @@ class SignalTracesPanel(wx.Panel):
         add_new_monitor_panel_fgs.Add(text, 0, flag=wx.ALIGN_CENTER)
 
         # Create and add the dropdown menu for the currently monitored devices, ready to be zapped
-        self.selected_device_to_zap = None
+        self.selected_signal_to_zap = None
         self.monitor_output_list = self.monitored_devices_names
         self.zap_monitor_combo_box = wx.ComboBox(self.add_new_monitor_panel, wx.ID_ANY, "Select output", (90, 50),
                          (160, -1), self.monitor_output_list,
@@ -631,14 +631,14 @@ class SignalTracesPanel(wx.Panel):
     def on_select_new_monitor(self, event):
         """Handle the event when the user selects an as-of-yet unmonitored device to monitor."""
         select_monitor_combo_box = event.GetEventObject()
-        self.selected_device_to_monitor = select_monitor_combo_box.GetValue()
-        print(f'Selected device to monitor: {self.selected_device_to_monitor}')
+        self.selected_signal_to_monitor = select_monitor_combo_box.GetValue()
+        print(f'Selected device to monitor: {self.selected_signal_to_monitor}')
 
     def on_select_zap_monitor(self, event):
         """Handle the event when the user selects a currently monitored device to zap."""
         zap_monitor_combo_box = event.GetEventObject()
-        self.selected_device_to_zap = zap_monitor_combo_box.GetValue()
-        print(f'Selected device to zap: {self.selected_device_to_zap}')
+        self.selected_signal_to_zap = zap_monitor_combo_box.GetValue()
+        print(f'Selected device to zap: {self.selected_signal_to_zap}')
 
     def on_add_new_monitor_button(self, event):
         """Handle the event when the user clicks the add new monitor button."""
@@ -646,26 +646,26 @@ class SignalTracesPanel(wx.Panel):
         text = f"{add_new_monitor_button_pressed.GetLabel()} button pressed."
 
         print(text)
-        print(self.selected_device_to_monitor)
+        print(self.selected_signal_to_monitor)
 
         print('BEFORE')
         print(self.monitors.monitors_dictionary)
 
-        if self.selected_device_to_monitor is not None: # confirm if a new device to monitor has been selected from dropdown menu
-            selected_device_to_monitor_id = self.names.query(self.selected_device_to_monitor)
-            print(selected_device_to_monitor_id)
-            self.monitors.make_monitor(selected_device_to_monitor_id, None)
+
+        if self.selected_signal_to_monitor is not None: # confirm if a new device to monitor has been selected from dropdown menu
+            selected_signal_to_monitor_id = self.devices.get_signal_ids(self.selected_signal_to_monitor)
+            self.monitors.make_monitor(*selected_signal_to_monitor_id)
 
         print('AFTER')
         print(self.monitors.monitors_dictionary)
 
         self.update_canvas()
 
-        selected_device_to_monitor_selection_index = self.select_monitor_combo_box.GetSelection()
-        if selected_device_to_monitor_selection_index != wx.NOT_FOUND:
-            self.select_monitor_combo_box.Delete(selected_device_to_monitor_selection_index) # remove the selected device to monitor from add menu
+        selected_signal_to_monitor_selection_index = self.select_monitor_combo_box.GetSelection()
+        if selected_signal_to_monitor_selection_index != wx.NOT_FOUND:
+            self.select_monitor_combo_box.Delete(selected_signal_to_monitor_selection_index) # remove the selected device to monitor from add menu
 
-        self.zap_monitor_combo_box.Append(self.selected_device_to_monitor) # add selected device to monitor to zap menu
+        self.zap_monitor_combo_box.Append(self.selected_signal_to_monitor) # add selected device to monitor to zap menu
 
     def on_zap_existing_monitor(self, event):
         """Handle the event when the user clicks the zap existing monitor button."""
@@ -673,20 +673,19 @@ class SignalTracesPanel(wx.Panel):
         text = f"{zap_existing_monitor_button_pressed.GetLabel()} button pressed."
 
         print(text)
-        print(self.selected_device_to_zap)
+        print(self.selected_signal_to_zap)
     
-        if self.selected_device_to_zap is not None: # confirm if an existing monitored device has been selected from dropdown menu
-            selected_device_to_zap_id = self.names.query(self.selected_device_to_zap)
-            print(selected_device_to_zap_id)
-            self.monitors.remove_monitor(selected_device_to_zap_id, None)
+        if self.selected_signal_to_zap is not None: # confirm if an existing monitored device has been selected from dropdown menu
+            selected_signal_to_zap_id = self.devices.get_signal_ids(self.selected_signal_to_zap)
+            self.monitors.remove_monitor(*selected_signal_to_zap_id)
 
         self.update_canvas()
 
-        selected_device_to_zap_selection_index = self.zap_monitor_combo_box.GetSelection()
-        if selected_device_to_zap_selection_index != wx.NOT_FOUND:
-            self.zap_monitor_combo_box.Delete(selected_device_to_zap_selection_index) # remove the currently monitored device from zap menu
+        selected_signal_to_zap_selection_index = self.zap_monitor_combo_box.GetSelection()
+        if selected_signal_to_zap_selection_index != wx.NOT_FOUND:
+            self.zap_monitor_combo_box.Delete(selected_signal_to_zap_selection_index) # remove the currently monitored device from zap menu
 
-        self.select_monitor_combo_box.Append(self.selected_device_to_zap) # add currently monitored device to add menu
+        self.select_monitor_combo_box.Append(self.selected_signal_to_zap) # add currently monitored device to add menu
         
     def update_canvas(self):
         self.canvas.update_arguments(self.devices, self.monitors)
@@ -988,7 +987,7 @@ class AddDeviceDialog(wx.Dialog):
 
 class LogicSimApp(wx.App):
     def OnInit(self):
-        file_path = "logsim\logsim\example2_logic_description.txt"
+        file_path = "logsim\logsim\example1_logic_description.txt"
         names = Names()
         devices = Devices(names)
         network = Network(names, devices)
