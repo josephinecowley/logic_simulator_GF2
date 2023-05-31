@@ -175,3 +175,12 @@ class Monitors:
                 if signal == self.devices.BLANK:
                     print(" ", end="")
             print("\n", end="")
+
+    def get_signals_for_GUI(self):
+        """Retrieves signals from monitors and places them in a list of tuples for the GUI"""
+        signals = []
+        for device_id, output_id in self.monitors_dictionary:
+            monitor_name = self.devices.get_signal_name(device_id, output_id)
+            signal_list = self.monitors_dictionary[(device_id, output_id)]
+            signals.append((monitor_name, signal_list))
+        return signals[::-1] #reverse list
