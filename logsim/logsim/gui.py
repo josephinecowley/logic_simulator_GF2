@@ -260,7 +260,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.monitors = monitors
         self.traces = self.monitors.get_signals_for_GUI()
         #print(f'THIRD: {self.traces}')
-        
+
         # Trigger a redraw
         self.Refresh()
 
