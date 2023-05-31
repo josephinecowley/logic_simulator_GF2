@@ -504,13 +504,13 @@ class RunSimulationPanel(wx.Panel):
             # This returns a Python list of files that were selected.
             paths = dlg.GetPaths()
 
-            print('You selected %d files:' % len(paths))
+            print(f"You selected {len(paths)} files:")
 
             for path in paths:
-                print('           %s\n' % path)
+                print(f"           {path}\n")
 
         # Compare this with the debug above; did we change working dirs?
-        print("CWD: %s\n" % os.getcwd())
+        print(f"CWD: {os.getcwd()}\n")
 
         # Destroy the dialog. Don't do this until you are done with it!
         # BAD things can happen otherwise!
