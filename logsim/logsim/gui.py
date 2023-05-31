@@ -750,11 +750,11 @@ class SwitchesPanel(wx.Panel):
 
         # Create and add left panel in switches panel layout
         self.left_panel = wx.Panel(self.switches_panel)
-        self.test_button = wx.Button(self.left_panel, wx.ID_ANY, "Temp \nbutton \nlocation \nfor \nadd \nnew \ndevice", (50,50))
-        self.Bind(wx.EVT_BUTTON, self.on_test_button, self.test_button)
+        #self.test_button = wx.Button(self.left_panel, wx.ID_ANY, "Temp \nbutton \nlocation \nfor \nadd \nnew \ndevice", (50,50))
+        #self.Bind(wx.EVT_BUTTON, self.on_test_button, self.test_button)
         left_panel_vbox = wx.BoxSizer(wx.VERTICAL)
         self.left_panel.SetSizer(left_panel_vbox)
-        left_panel_vbox.Add(self.test_button, 1, flag=wx.EXPAND)
+        #left_panel_vbox.Add(self.test_button, 1, flag=wx.EXPAND)
         #left_panel_vbox.Add(self.add_new_switch_button, 1, flag=wx.EXPAND)
         hbox.Add(self.left_panel, 1, wx.EXPAND)
 
@@ -955,10 +955,6 @@ class AddDeviceDialog(wx.Dialog):
                     if self.devices.make_device(unique_device_id, self.devices.SWITCH, switch_state) == self.devices.NO_ERROR:
                         print(f'Switch state: {self.devices.get_device(unique_device_id).switch_state}')
                         self.update_switches_panel(valid_name)
-                '''print(f'Error: {x}')
-                new_switch_ids = self.devices.find_devices(device_kind=self.devices.SWITCH)
-                new_switch_names = [self.names.get_name_string(i) for i in new_switch_ids]
-                print(new_switch_names)'''
     
     def update_switches_panel(self, switch_name):
         self.switches_panel.num_of_switches += 1
