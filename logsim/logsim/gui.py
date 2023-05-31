@@ -109,7 +109,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             (1.0, 0.0, 1.0),
             (0.0, 1.0, 1.0),
         ]
-        for i, trace in enumerate(self.traces):
+        for i, trace in enumerate(self.traces[::-1]):
             signal = trace[1]
             label = trace[0]
             color = color_list[i % len(color_list)]
@@ -648,10 +648,16 @@ class SignalTracesPanel(wx.Panel):
         print(text)
         print(self.selected_device_to_monitor)
 
+        print('BEFORE')
+        print(self.monitors.monitors_dictionary)
+
         if self.selected_device_to_monitor is not None: # confirm if a new device to monitor has been selected from dropdown menu
             selected_device_to_monitor_id = self.names.query(self.selected_device_to_monitor)
             print(selected_device_to_monitor_id)
             self.monitors.make_monitor(selected_device_to_monitor_id, None)
+
+        print('AFTER')
+        print(self.monitors.monitors_dictionary)
 
         self.update_canvas()
 
@@ -982,7 +988,7 @@ class AddDeviceDialog(wx.Dialog):
 
 class LogicSimApp(wx.App):
     def OnInit(self):
-        file_path = "./example2_logic_description.txt"
+        file_path = "logsim\logsim\example2_logic_description.txt"
         names = Names()
         devices = Devices(names)
         network = Network(names, devices)
