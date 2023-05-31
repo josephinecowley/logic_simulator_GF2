@@ -580,7 +580,7 @@ If successful, you should see the signal traces update for each monitored device
 Note that upon clicking “RUN” this button will change to an orange “CONTINUE” button. Click this if you want to add further simulations. You can always change the number of cycles specified or the switch states or monitors in between each simulation.
 """
         dlg = wx.MessageDialog(self, help_guidelines_text,
-                                "An error occurred.",
+                                "Tutorial on GF2 Team 7 Logic Simulator",
                                 wx.OK | wx.ICON_INFORMATION
                                 # wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL | wx.ICON_INFORMATION
                                 )
@@ -1086,7 +1086,7 @@ class AddDeviceDialog(wx.Dialog):
         self.switches_panel.Layout()
 
 
-class LogicSimApp(wx.App):
+'''class LogicSimApp(wx.App):
     def OnInit(self):
         file_path = "./example1_logic_description.txt"
         with open(file_path) as f:
@@ -1110,6 +1110,6 @@ class LogicSimApp(wx.App):
 
 
 # KO! For development purposes only - will delete once complete
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = LogicSimApp()
-    app.MainLoop()
+    app.MainLoop()'''
