@@ -444,10 +444,8 @@ class RunSimulationPanel(wx.Panel):
         self.help_button.SetToolTip("Help on running logic simulation")
         help_button_panel_vbox.Add(self.help_button, 1, flag=wx.ALIGN_CENTER)
 
-
         upload_and_help_buttons_panel_hbox.Add(self.upload_button_panel, 1, flag=wx.EXPAND)
         upload_and_help_buttons_panel_hbox.Add(self.help_button_panel, 1, flag=wx.EXPAND)
-
 
         hbox.Add(self.upload_and_help_buttons_panel, 1, flag=wx.EXPAND)
         
@@ -561,25 +559,15 @@ class SignalTracesPanel(wx.Panel):
         self.signal_traces_panel.SetSizer(signal_traces_panel_vbox)
 
         self.add_new_monitor_panel = wx.Panel(self, name="add new monitor panel")
-        #add_new_monitor_panel.SetBackgroundColour(wx.Colour(0, 238, 238)) # layout identifier colour for visualisation purposes
-        add_new_monitor_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
-        self.add_new_monitor_panel.SetSizer(add_new_monitor_panel_hbox)
+        add_new_monitor_panel_fgs = wx.FlexGridSizer(cols=3, rows=3, vgap=4, hgap=50)
+        self.add_new_monitor_panel.SetSizer(add_new_monitor_panel_fgs)
 
-
-        self.add_new_monitor_panel_LEFT = wx.Panel(self.add_new_monitor_panel, name="add new monitor LEFT panel")
-        add_new_monitor_panel_hbox.Add(self.add_new_monitor_panel_LEFT, 1, flag=wx.EXPAND)
-
-
-        self.add_new_monitor_panel_CENTRE = wx.Panel(self.add_new_monitor_panel, name="add new monitor CENTRE panel")
-        add_new_monitor_panel_CENTRE_hbox = wx.BoxSizer(wx.HORIZONTAL)
-        self.add_new_monitor_panel_CENTRE.SetSizer(add_new_monitor_panel_CENTRE_hbox)
-
-        # Create and add "Add new monitor" text to centre of add new monitor panel
+        # Create and add "Add new monitor" text to add new monitor panel
         str = "Add new monitor"
-        text = wx.StaticText(self.add_new_monitor_panel_CENTRE, wx.ID_ANY, str)
+        text = wx.StaticText(self.add_new_monitor_panel, wx.ID_ANY, str)
         font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         text.SetFont(font)
-        add_new_monitor_panel_CENTRE_hbox.Add(text, 0, flag=wx.ALIGN_CENTER)
+        add_new_monitor_panel_fgs.Add(text, 0, flag=wx.ALIGN_CENTER)
 
         # Get the ids and user-defined names of all monitored and (as-of-yet) unmonitored devices
         monitored_devices_names = self.monitors.get_signal_names()[0]
@@ -587,29 +575,42 @@ class SignalTracesPanel(wx.Panel):
         unmonitored_devices_names = self.monitors.get_signal_names()[1]
         unmonitored_devices_ids = self.names.lookup(unmonitored_devices_names)
 
-        self.selected_device = None
+        # Create and add the dropdown menu for the as-of-yet unmonitored devices, ready to be monitored
+        self.selected_device_to_monitor = None
         self.monitor_output_list = unmonitored_devices_names
-        self.combo_box = wx.ComboBox(self.add_new_monitor_panel_CENTRE, 500, "Select output", (90, 50),
+        self.select_monitor_combo_box = wx.ComboBox(self.add_new_monitor_panel, 500, "Select output", (90, 50),
                          (160, -1), self.monitor_output_list,
                          wx.CB_DROPDOWN
                          #| wx.TE_PROCESS_ENTER
                          #| wx.CB_SORT
                          )
-        self.Bind(wx.EVT_COMBOBOX, self.on_combo_box, self.combo_box)
-        add_new_monitor_panel_CENTRE_hbox.Add(self.combo_box, 0, flag=wx.ALIGN_CENTER|wx.LEFT, border=30)
+        self.Bind(wx.EVT_COMBOBOX, self.on_select_new_monitor, self.select_monitor_combo_box)
+        add_new_monitor_panel_fgs.Add(self.select_monitor_combo_box, 0, flag=wx.ALIGN_CENTER|wx.LEFT, border=30)
 
-        add_new_monitor_panel_hbox.Add(self.add_new_monitor_panel_CENTRE, 3, flag=wx.EXPAND)
-
-
-        self.add_new_monitor_panel_RIGHT = wx.Panel(self.add_new_monitor_panel, name="add new monitor RIGHT panel")
-        add_new_monitor_panel_RIGHT_hbox = wx.BoxSizer(wx.HORIZONTAL)
-        self.add_new_monitor_panel_RIGHT.SetSizer(add_new_monitor_panel_RIGHT_hbox)
-        self.add_new_monitor_button = wx.Button(self.add_new_monitor_panel_RIGHT, wx.ID_ANY, label="+")
+        # Create and add the "Add a new monitor" button to show up on SignalTraces panel
+        self.add_new_monitor_button = wx.Button(self.add_new_monitor_panel, wx.ID_ANY, label="+")
         self.Bind(wx.EVT_BUTTON, self.on_add_new_monitor_button, self.add_new_monitor_button)
         self.add_new_monitor_button.SetToolTip("Add a new monitor")
-        add_new_monitor_panel_RIGHT_hbox.Add(self.add_new_monitor_button, 1, flag=wx.EXPAND)
+        add_new_monitor_panel_fgs.Add(self.add_new_monitor_button, 1, flag=wx.CENTER|wx.EXPAND)
 
-        add_new_monitor_panel_hbox.Add(self.add_new_monitor_panel_RIGHT, 1, flag=wx.EXPAND)
+        # Create and add "Zap a monitor" text to add new monitor panel
+        str = "Zap a monitor"
+        text = wx.StaticText(self.add_new_monitor_panel, wx.ID_ANY, str)
+        font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        text.SetFont(font)
+        add_new_monitor_panel_fgs.Add(text, 0, flag=wx.ALIGN_CENTER)
+
+        # Create and add the dropdown menu for the currently monitored devices, ready to be zapped
+        self.selected_device = None
+        self.monitor_output_list = unmonitored_devices_names
+        self.combo_box = wx.ComboBox(self.add_new_monitor_panel, 500, "Select output", (90, 50),
+                         (160, -1), self.monitor_output_list,
+                         wx.CB_DROPDOWN
+                         #| wx.TE_PROCESS_ENTER
+                         #| wx.CB_SORT
+                         )
+        self.Bind(wx.EVT_COMBOBOX, self.on_select_new_monitor, self.combo_box)
+        add_new_monitor_panel_fgs.Add(self.combo_box, 0, flag=wx.ALIGN_CENTER|wx.LEFT, border=30)
 
         # Canvas for drawing signals
         self.canvas = MyGLCanvas(self.signal_traces_panel, devices, monitors)
@@ -621,21 +622,21 @@ class SignalTracesPanel(wx.Panel):
         # Set sizer of SignalTracesPanel
         self.SetSizer(vbox)
 
-    def on_combo_box(self, event):
-        combo_box = event.GetEventObject()
-        self.selected_device = combo_box.GetValue()
-        print(self.selected_device)
+    def on_select_new_monitor(self, event):
+        select_monitor_combo_box = event.GetEventObject()
+        self.selected_device_to_monitor = select_monitor_combo_box.GetValue()
+        print(f'Selected device to monitor: {self.selected_device_to_monitor}')
 
     def on_add_new_monitor_button(self, event):
         """Handle the event when the user clicks the add new monitor button."""
         add_new_monitor_button_pressed = event.GetEventObject()
         text = f"{add_new_monitor_button_pressed.GetLabel()} button pressed."
         print(text)
-        print(self.selected_device)
-        if self.selected_device is not None:
-            selected_device_id = self.names.query(self.selected_device)
-            print(selected_device_id)
-            self.monitors.make_monitor(selected_device_id, None) # KO! what is output_id??
+        print(self.selected_device_to_monitor)
+        if self.selected_device_to_monitor is not None:
+            selected_device_to_monitor_id = self.names.query(self.selected_device_to_monitor)
+            print(selected_device_to_monitor_id)
+            self.monitors.make_monitor(selected_device_to_monitor_id, None) # KO! what is output_id??
         self.update_canvas()
         
     def update_canvas(self):
