@@ -492,7 +492,7 @@ class RunSimulationPanel(wx.Panel):
             self, message="Choose a file",
             defaultDir=os.getcwd(),
             defaultFile="",
-            wildcard = "Text file (*.txt)|*.txt|",
+            wildcard = "Text file (*.txt)|*.txt|All files (*.*)|*.*",
             style=wx.FD_OPEN | wx.FD_MULTIPLE |
                   wx.FD_CHANGE_DIR | wx.FD_FILE_MUST_EXIST |
                   wx.FD_PREVIEW
