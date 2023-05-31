@@ -793,13 +793,22 @@ class AddDeviceDialog(wx.Dialog):
         devices_grid = wx.FlexGridSizer(cols=4)
 
         self.device_user_name = None
-        
+        self.switch_device_property = None
+    
         self.add_new_device_ctrls = []
+    
         switch_radio_button = wx.RadioButton(panel, wx.ID_ANY, "Switch", style=wx.RB_GROUP)
         add_new_switch_button = wx.Button(panel, wx.ID_ANY, "+")
         self.Bind(wx.EVT_BUTTON, self.on_add_new_switch_button, add_new_switch_button)
         switch_device_property_panel = wx.Panel(panel, size=(60, 20))
-        switch_device_property_panel.SetBackgroundColour('RED')
+        switch_device_property_panel_fgs = wx.FlexGridSizer(cols=2)
+        switch_device_property_panel.SetSizer(switch_device_property_panel_fgs)
+        switch_states = [wx.RadioButton(switch_device_property_panel, wx.ID_ANY, "1"), 
+                         wx.RadioButton(switch_device_property_panel, wx.ID_ANY, "0")]
+        for switch_state in switch_states:
+            switch_device_property_panel_fgs.Add(switch_state, 0, wx.ALIGN_CENTRE|wx.LEFT|wx.RIGHT|wx.TOP, 5)
+            self.Bind(wx.EVT_RADIOBUTTON, self.on_select_switch_device_property, switch_state)
+        #switch_device_property_panel.SetBackgroundColour('RED')
     
         clock_radio_button = wx.RadioButton(panel, wx.ID_ANY, "Clock")
         add_new_clock_button = wx.Button(panel, wx.ID_ANY, "+")
@@ -848,6 +857,10 @@ class AddDeviceDialog(wx.Dialog):
         device_user_name = event.GetString()
         print(device_user_name)
         self.device_user_name = device_user_name
+
+    def on_select_switch_device_property(self, event):
+        switch_state_selected = event.GetEventObject().GetLabel()
+        self.switch_device_property = switch_state_selected
     
     def on_add_new_switch_button(self, event):
         if self.device_user_name is not None: # confirm if user-defined device name has been entered
@@ -859,8 +872,11 @@ class AddDeviceDialog(wx.Dialog):
             if self.names.query(valid_name) is None: # confirm if user-defined name is unique and not already defined
                 print('Unique name!')
                 unique_device_id = self.names.lookup([valid_name])[0]
-                if self.devices.make_device(unique_device_id, self.devices.SWITCH, 1) == self.devices.NO_ERROR:
-                    self.update_switches_panel(valid_name)
+                if self.switch_device_property is not None: # confirm if a switch state (switch device property) has been selected
+                    switch_state = int(self.switch_device_property)
+                    if self.devices.make_device(unique_device_id, self.devices.SWITCH, switch_state) == self.devices.NO_ERROR:
+                        print(f'Answer: {self.devices.get_device(unique_device_id).switch_state}')
+                        self.update_switches_panel(valid_name)
                 '''print(f'Error: {x}')
                 new_switch_ids = self.devices.find_devices(device_kind=self.devices.SWITCH)
                 new_switch_names = [self.names.get_name_string(i) for i in new_switch_ids]
