@@ -578,7 +578,7 @@ class SignalTracesPanel(wx.Panel):
         # Create and add the dropdown menu for the as-of-yet unmonitored devices, ready to be monitored
         self.selected_device_to_monitor = None
         self.monitor_output_list = unmonitored_devices_names
-        self.select_monitor_combo_box = wx.ComboBox(self.add_new_monitor_panel, 500, "Select output", (90, 50),
+        self.select_monitor_combo_box = wx.ComboBox(self.add_new_monitor_panel, wx.ID_ANY, "Select output", (90, 50),
                          (160, -1), self.monitor_output_list,
                          wx.CB_DROPDOWN
                          #| wx.TE_PROCESS_ENTER
@@ -601,16 +601,16 @@ class SignalTracesPanel(wx.Panel):
         add_new_monitor_panel_fgs.Add(text, 0, flag=wx.ALIGN_CENTER)
 
         # Create and add the dropdown menu for the currently monitored devices, ready to be zapped
-        self.selected_device = None
-        self.monitor_output_list = unmonitored_devices_names
-        self.combo_box = wx.ComboBox(self.add_new_monitor_panel, 500, "Select output", (90, 50),
+        self.selected_device_to_zap = None
+        self.monitor_output_list = monitored_devices_names
+        self.zap_monitor_combo_box = wx.ComboBox(self.add_new_monitor_panel, wx.ID_ANY, "Select output", (90, 50),
                          (160, -1), self.monitor_output_list,
                          wx.CB_DROPDOWN
                          #| wx.TE_PROCESS_ENTER
                          #| wx.CB_SORT
                          )
-        self.Bind(wx.EVT_COMBOBOX, self.on_select_new_monitor, self.combo_box)
-        add_new_monitor_panel_fgs.Add(self.combo_box, 0, flag=wx.ALIGN_CENTER|wx.LEFT, border=30)
+        self.Bind(wx.EVT_COMBOBOX, self.on_select_zap_monitor, self.zap_monitor_combo_box)
+        add_new_monitor_panel_fgs.Add(self.zap_monitor_combo_box, 0, flag=wx.ALIGN_CENTER|wx.LEFT, border=30)
 
         # Canvas for drawing signals
         self.canvas = MyGLCanvas(self.signal_traces_panel, devices, monitors)
@@ -626,6 +626,11 @@ class SignalTracesPanel(wx.Panel):
         select_monitor_combo_box = event.GetEventObject()
         self.selected_device_to_monitor = select_monitor_combo_box.GetValue()
         print(f'Selected device to monitor: {self.selected_device_to_monitor}')
+
+    def on_select_zap_monitor(self, event):
+        zap_monitor_combo_box = event.GetEventObject()
+        self.selected_device_to_zap = zap_monitor_combo_box.GetValue()
+        print(f'Selected device to zap: {self.selected_device_to_zap}')
 
     def on_add_new_monitor_button(self, event):
         """Handle the event when the user clicks the add new monitor button."""
