@@ -977,7 +977,8 @@ class Parser:
                     # Parse monitor list
                     self.monitor_list()
 
-                    # # Record the signal traces
+                    # This is here for terminal plotting of signals
+                    # Record the signal traces
                     # for i in range(50):
                     #     self.network.execute_network()
                     #     self.monitors.record_signals()
