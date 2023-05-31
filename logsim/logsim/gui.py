@@ -79,7 +79,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         # Initialise trace objects
         self.traces = monitors.get_signals_for_GUI()
-        self.y_spacing = 100
+        self.y_spacing = 80
 
         self.devices = devices
 
@@ -100,8 +100,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     def draw_canvas(self):
         """Iterates through each trace and draws it on the canvas with an offset"""
-        x_offset = 60
-        y_offset = 100
+        x_offset = 100
+        y_offset = 420
         color_list = [
             (1.0, 0.0, 0.0),
             (0.0, 1.0, 0.0),
@@ -109,13 +109,12 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             (1.0, 0.0, 1.0),
             (0.0, 1.0, 1.0),
         ]
-
         for i, trace in enumerate(self.traces):
             signal = trace[1]
             label = trace[0]
             color = color_list[i%len(color_list)]
             self._draw_trace(signal, x_offset, y_offset, label, color)
-            y_offset += self.y_spacing
+            y_offset -= self.y_spacing
 
     def _draw_trace(self, signal, x_pos, y_pos, label, color = (0.0, 0.0, 1.0)):
         """Draws trace with axes and ticks"""
@@ -155,8 +154,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             GL.glEnd()
             self.render_text(str(i), x - 5, y_pos - 15)
 
-        x_pos -= int(40 / 3 * len(label))
-        self.render_text(label, x_pos + 60, y_pos + 18)
+        x_pos -= int(20 / 3 * len(label))
+        self.render_text(label, x_pos, y_pos + 18)
 
     def render(self, text):
         """Handle all drawing operations."""
@@ -189,8 +188,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self.init = True
 
         size = self.GetClientSize()
-        text = "".join(["Canvas redrawn on paint event, size is ",
-                        str(size.width), ", ", str(size.height)])
+        text = " "
         self.render(text)
 
     def on_size(self, event):
@@ -210,23 +208,18 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         if event.ButtonDown():
             self.last_mouse_x = event.GetX()
             self.last_mouse_y = event.GetY()
-            text = "".join(["Mouse button pressed at: ", str(event.GetX()),
-                            ", ", str(event.GetY())])
+            text = " "
         if event.ButtonUp():
-            text = "".join(["Mouse button released at: ", str(event.GetX()),
-                            ", ", str(event.GetY())])
+            text = " "
         if event.Leaving():
-            text = "".join(["Mouse left canvas at: ", str(event.GetX()),
-                            ", ", str(event.GetY())])
+            text = " "
         if event.Dragging():
             self.pan_x += event.GetX() - self.last_mouse_x
             self.pan_y -= event.GetY() - self.last_mouse_y
             self.last_mouse_x = event.GetX()
             self.last_mouse_y = event.GetY()
             self.init = False
-            text = "".join(["Mouse dragged to: ", str(event.GetX()),
-                            ", ", str(event.GetY()), ". Pan is now: ",
-                            str(self.pan_x), ", ", str(self.pan_y)])
+            text = " "
         if event.GetWheelRotation() < 0:
             self.zoom *= (1.0 + (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
@@ -234,8 +227,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self.pan_x -= (self.zoom - old_zoom) * ox
             self.pan_y -= (self.zoom - old_zoom) * oy
             self.init = False
-            text = "".join(["Negative mouse wheel rotation. Zoom is now: ",
-                            str(self.zoom)])
+            text = " "
         if event.GetWheelRotation() > 0:
             self.zoom /= (1.0 - (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
@@ -243,8 +235,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self.pan_x -= (self.zoom - old_zoom) * ox
             self.pan_y -= (self.zoom - old_zoom) * oy
             self.init = False
-            text = "".join(["Positive mouse wheel rotation. Zoom is now: ",
-                            str(self.zoom)])
+            text = " "
         if text:
             self.render(text)
         else:
