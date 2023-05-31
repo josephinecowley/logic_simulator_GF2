@@ -334,7 +334,6 @@ class Gui(wx.Frame):
         switches_panel = SwitchesPanel(data_panel, simulation_panel, names, devices, network, monitors)
         hbox.Add(switches_panel, 1, wx.EXPAND, 0)
 
-
         self.SetSizeHints(200, 200)
         self.SetSizer(vbox)
 
@@ -396,7 +395,6 @@ class RunSimulationPanel(wx.Panel):
         self.Bind(wx.EVT_SPINCTRL, self.on_spin, self.cycles_spin_control)
         cycles_hbox.Add(self.cycles_spin_control, 0, flag=wx.LEFT, border=10)
 
-
         # Create, bind running simulation event to and add the "Run simulation" button
         self.run_button = wxbuttons.GenButton(self.left_buttons_panel, wx.ID_ANY, "RUN", name="run button")
         self.Bind(wx.EVT_BUTTON, self.on_run_button, self.run_button)
@@ -422,12 +420,10 @@ class RunSimulationPanel(wx.Panel):
         # Create and add cycles + left buttons panel to RunSimulationPanel
         hbox.Add(self.cycles_and_left_buttons_panel, 1, flag=wx.ALIGN_LEFT)
 
-        
         self.centre_panel = wx.Panel(self)
         centre_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
         hbox.Add(self.centre_panel, 2, flag=wx.EXPAND)
 
-        
         self.upload_and_help_buttons_panel = wx.Panel(self, name="upload and help buttons panel")
         upload_and_help_buttons_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
         self.upload_and_help_buttons_panel.SetSizer(upload_and_help_buttons_panel_hbox)
@@ -440,7 +436,6 @@ class RunSimulationPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.on_upload_button, self.upload_button)
         self.upload_button.SetToolTip("Upload logic description file")
         upload_button_panel_vbox.Add(self.upload_button, 1, flag=wx.ALIGN_CENTER)
-
 
         self.help_button_panel = wx.Panel(self.upload_and_help_buttons_panel, name="help button panel")
         help_button_panel_vbox = wx.BoxSizer(wx.VERTICAL)
@@ -536,8 +531,6 @@ class RunSimulationPanel(wx.Panel):
             dlg.ShowModal()
             dlg.Destroy()
 
-        # Destroy the dialog. Don't do this until you are done with it!
-        # BAD things can happen otherwise!
         dlg.Destroy()
 
 
@@ -794,7 +787,6 @@ class SwitchesPanel(wx.Panel):
     
     def on_test_button(self, event):
         AddDeviceDialog(self, "Add a new device", self, self.names, self.devices, self.network, self.monitors).ShowModal() 
-        
 
     def on_switch_toggle_button(self, event):
         """Handle the event when the user clicks the toggle button for a switch."""
@@ -855,7 +847,6 @@ class AddDeviceDialog(wx.Dialog):
         for switch_state in switch_states:
             switch_device_property_panel_fgs.Add(switch_state, 0, wx.ALIGN_CENTRE|wx.LEFT|wx.RIGHT|wx.TOP, 5)
             self.Bind(wx.EVT_RADIOBUTTON, self.on_select_switch_device_property, switch_state)
-        #switch_device_property_panel.SetBackgroundColour('RED')
     
         clock_radio_button = wx.RadioButton(panel, wx.ID_ANY, "Clock")
         add_new_clock_button = wx.Button(panel, wx.ID_ANY, "+")
@@ -866,7 +857,6 @@ class AddDeviceDialog(wx.Dialog):
         clock_device_property_txtctrl = wx.TextCtrl(clock_device_property_panel, wx.ID_ANY, "")
         clock_device_property_txtctrl.Bind(wx.EVT_TEXT, self.on_type_clock_device_property)
         clock_device_property_panel_vbox.Add(clock_device_property_txtctrl, 1, flag=wx.EXPAND)
-        #clock_device_property_panel.SetBackgroundColour('GREEN')
     
         gate_radio_button = wx.RadioButton(panel, wx.ID_ANY, "Gate")
         add_new_gate_button = wx.Button(panel, wx.ID_ANY, "+")
