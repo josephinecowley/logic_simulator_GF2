@@ -292,6 +292,13 @@ class Gui(wx.Frame):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(1000, 700))
 
+        # Create instance variables for Gui class
+        self.path = path
+        self.names = names
+        self.devices = devices
+        self.network = network
+        self.monitors = monitors
+
         # Configure the file menu
         fileMenu = wx.Menu()
         menuBar = wx.MenuBar()
@@ -347,6 +354,7 @@ class RunSimulationPanel(wx.Panel):
     def __init__(self, parent, signal_traces_panel, names, devices, network, monitors, id=wx.ID_ANY, size=wx.DefaultSize):
         super(RunSimulationPanel, self).__init__(parent, id, size=size, style=wx.SIMPLE_BORDER)
 
+        self.parent = parent
         self.signal_traces_panel = signal_traces_panel
         self.names = names
         self.devices = devices
@@ -493,7 +501,7 @@ class RunSimulationPanel(wx.Panel):
             defaultDir=os.getcwd(),
             defaultFile="",
             wildcard = "Text file (*.txt)|*.txt|All files (*.*)|*.*",
-            style=wx.FD_OPEN | wx.FD_MULTIPLE |
+            style=wx.FD_OPEN |
                   wx.FD_CHANGE_DIR | wx.FD_FILE_MUST_EXIST |
                   wx.FD_PREVIEW
             )
@@ -502,12 +510,11 @@ class RunSimulationPanel(wx.Panel):
         # process the data.
         if dlg.ShowModal() == wx.ID_OK:
             # This returns a Python list of files that were selected.
-            paths = dlg.GetPaths()
+            file_path = dlg.GetPath()
 
-            print(f"You selected {len(paths)} files:")
-
-            for path in paths:
-                print(f"           {path}\n")
+        print(self.parent.names)
+        
+        print(file_path)
 
         # Compare this with the debug above; did we change working dirs?
         print(f"CWD: {os.getcwd()}\n")
