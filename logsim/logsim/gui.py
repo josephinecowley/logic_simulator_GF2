@@ -790,7 +790,7 @@ class AddDeviceDialog(wx.Dialog):
 
         devices_panel = wx.StaticBox(panel, wx.ID_ANY, "Select a device")
         devices_sizer = wx.StaticBoxSizer(devices_panel, wx.VERTICAL)
-        devices_grid = wx.FlexGridSizer(cols=3)
+        devices_grid = wx.FlexGridSizer(cols=4)
 
         self.device_user_name = None
         
@@ -798,10 +798,18 @@ class AddDeviceDialog(wx.Dialog):
         switch_radio_button = wx.RadioButton(panel, wx.ID_ANY, "Switch", style=wx.RB_GROUP)
         add_new_switch_button = wx.Button(panel, wx.ID_ANY, "+")
         self.Bind(wx.EVT_BUTTON, self.on_add_new_switch_button, add_new_switch_button)
+        switch_device_property_panel = wx.Panel(panel, size=(60, 20))
+        switch_device_property_panel.SetBackgroundColour('RED')
+    
         clock_radio_button = wx.RadioButton(panel, wx.ID_ANY, "Clock")
         add_new_clock_button = wx.Button(panel, wx.ID_ANY, "+")
+        clock_device_property_panel = wx.Panel(panel, size=(60, 20))
+        clock_device_property_panel.SetBackgroundColour('GREEN')
+    
         gate_radio_button = wx.RadioButton(panel, wx.ID_ANY, "Gate")
         add_new_gate_button = wx.Button(panel, wx.ID_ANY, "+")
+        gate_device_property_panel = wx.Panel(panel, size=(60, 20))
+        gate_device_property_panel.SetBackgroundColour('BLUE')
 
         switch_user_name = wx.TextCtrl(panel, wx.ID_ANY, "")
         wx.CallAfter(switch_user_name.SetInsertionPoint, 0)
@@ -818,13 +826,14 @@ class AddDeviceDialog(wx.Dialog):
         self.gate_user_name_txtctrl = gate_user_name
         gate_user_name.Bind(wx.EVT_TEXT, self.on_name_entry)
 
-        self.add_new_device_ctrls.append((switch_radio_button, switch_user_name, add_new_switch_button))
-        self.add_new_device_ctrls.append((clock_radio_button, clock_user_name, add_new_clock_button))
-        self.add_new_device_ctrls.append((gate_radio_button, gate_user_name, add_new_gate_button))
+        self.add_new_device_ctrls.append((switch_radio_button, switch_user_name, add_new_switch_button, switch_device_property_panel))
+        self.add_new_device_ctrls.append((clock_radio_button, clock_user_name, add_new_clock_button, clock_device_property_panel))
+        self.add_new_device_ctrls.append((gate_radio_button, gate_user_name, add_new_gate_button, gate_device_property_panel))
 
-        for radio, text, add_button in self.add_new_device_ctrls:
+        for radio, text, add_button, device_property in self.add_new_device_ctrls:
             devices_grid.Add(radio, 0, wx.ALIGN_CENTRE|wx.LEFT|wx.RIGHT|wx.TOP, 5)
             devices_grid.Add(text, 0, wx.ALIGN_CENTRE|wx.LEFT|wx.RIGHT|wx.TOP, 5)
+            devices_grid.Add(device_property, 0, wx.ALIGN_CENTRE|wx.LEFT|wx.RIGHT|wx.TOP, 5)
             devices_grid.Add(add_button, 0, wx.ALIGN_CENTRE|wx.LEFT|wx.RIGHT|wx.TOP, 5)
 
         devices_sizer.Add(devices_grid, 0, wx.ALIGN_CENTRE|wx.ALL, 5)
