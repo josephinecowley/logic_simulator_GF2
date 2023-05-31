@@ -155,7 +155,11 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             GL.glVertex2f(x_pos, y_pos)
             GL.glVertex2f(x_pos, y_pos - 4)
             GL.glEnd()
-            self.render_text(str(i), x - 5, y_pos - 15)
+            # Render sizes
+            if self.zoom > 1:
+                self.render_text(str(i), x - 5, y_pos - 15)
+            elif ((self.zoom < 1) and (i % 5 == 0)):
+                self.render_text(str(i), x - 5, y_pos - 25)
 
         x_pos -= int(20 / 3 * len(label))
         self.render_text(label, x_pos, y_pos + 18)
@@ -558,7 +562,7 @@ class RunSimulationPanel(wx.Panel):
 
     def on_help_button(self, event):
         help_guidelines_text = \
-"""
+            """
 Welcome to our Logic Simulator!
 
 To get started you need a valid Logic Description File. This is one which follows our defined language syntax.
@@ -580,13 +584,12 @@ If successful, you should see the signal traces update for each monitored device
 Note that upon clicking “RUN” this button will change to an orange “CONTINUE” button. Click this if you want to add further simulations. You can always change the number of cycles specified or the switch states or monitors in between each simulation.
 """
         dlg = wx.MessageDialog(self, help_guidelines_text,
-                                "Tutorial on GF2 Team 7 Logic Simulator",
-                                wx.OK | wx.ICON_INFORMATION
-                                # wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL | wx.ICON_INFORMATION
-                                )
+                               "Tutorial on GF2 Team 7 Logic Simulator",
+                               wx.OK | wx.ICON_INFORMATION
+                               # wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL | wx.ICON_INFORMATION
+                               )
         dlg.ShowModal()
         dlg.Destroy()
-        
 
 
 class SignalTrace(wx.ScrolledWindow):
