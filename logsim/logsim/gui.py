@@ -657,9 +657,9 @@ class SignalTracesPanel(wx.Panel):
 
         selected_device_to_monitor_selection_index = self.select_monitor_combo_box.GetSelection()
         if selected_device_to_monitor_selection_index != wx.NOT_FOUND:
-            self.select_monitor_combo_box.Delete(selected_device_to_monitor_selection_index) # remove the selec
+            self.select_monitor_combo_box.Delete(selected_device_to_monitor_selection_index) # remove the selected device to monitor from add menu
 
-        self.zap_monitor_combo_box.Append(self.selected_device_to_monitor)
+        self.zap_monitor_combo_box.Append(self.selected_device_to_monitor) # add selected device to monitor to zap menu
 
     def on_zap_existing_monitor(self, event):
         """Handle the event when the user clicks the zap existing monitor button."""
@@ -669,7 +669,7 @@ class SignalTracesPanel(wx.Panel):
         print(text)
         print(self.selected_device_to_zap)
     
-        if self.selected_device_to_zap is not None:
+        if self.selected_device_to_zap is not None: # confirm if an existing monitored device has been selected from dropdown menu
             selected_device_to_zap_id = self.names.query(self.selected_device_to_zap)
             print(selected_device_to_zap_id)
             self.monitors.remove_monitor(selected_device_to_zap_id, None)
@@ -678,9 +678,9 @@ class SignalTracesPanel(wx.Panel):
 
         selected_device_to_zap_selection_index = self.zap_monitor_combo_box.GetSelection()
         if selected_device_to_zap_selection_index != wx.NOT_FOUND:
-            self.zap_monitor_combo_box.Delete(selected_device_to_zap_selection_index)
+            self.zap_monitor_combo_box.Delete(selected_device_to_zap_selection_index) # remove the currently monitored device from zap menu
 
-        self.select_monitor_combo_box.Append(self.selected_device_to_zap)
+        self.select_monitor_combo_box.Append(self.selected_device_to_zap) # add currently monitored device to add menu
         
     def update_canvas(self):
         self.canvas.update_arguments(self.devices, self.monitors)
