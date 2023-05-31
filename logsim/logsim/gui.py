@@ -623,11 +623,13 @@ class SignalTracesPanel(wx.Panel):
         self.SetSizer(vbox)
 
     def on_select_new_monitor(self, event):
+        """Handle the event when the user selects an as-of-yet unmonitored device to monitor."""
         select_monitor_combo_box = event.GetEventObject()
         self.selected_device_to_monitor = select_monitor_combo_box.GetValue()
         print(f'Selected device to monitor: {self.selected_device_to_monitor}')
 
     def on_select_zap_monitor(self, event):
+        """Handle the event when the user selects a currently monitored device to zap."""
         zap_monitor_combo_box = event.GetEventObject()
         self.selected_device_to_zap = zap_monitor_combo_box.GetValue()
         print(f'Selected device to zap: {self.selected_device_to_zap}')
@@ -643,6 +645,10 @@ class SignalTracesPanel(wx.Panel):
             print(selected_device_to_monitor_id)
             self.monitors.make_monitor(selected_device_to_monitor_id, None) # KO! what is output_id??
         self.update_canvas()
+
+    def on_zap_existing_monitor(self, event):
+        """Handle the event when the user clicks the zap existing monitor button."""
+        ...
         
     def update_canvas(self):
         self.canvas.update_arguments(self.devices, self.monitors)
