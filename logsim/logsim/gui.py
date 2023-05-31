@@ -701,7 +701,7 @@ class SwitchesPanel(wx.Panel):
 
         # Create and add left panel in switches panel layout
         self.left_panel = wx.Panel(self.switches_panel)
-        self.test_button = wx.Button(self.left_panel, wx.ID_ANY, "Test Button", (50,50))
+        self.test_button = wx.Button(self.left_panel, wx.ID_ANY, "Temp \nbutton \nlocation \nfor \nadd \nnew \ndevice", (50,50))
         self.Bind(wx.EVT_BUTTON, self.on_test_button, self.test_button)
         left_panel_vbox = wx.BoxSizer(wx.VERTICAL)
         self.left_panel.SetSizer(left_panel_vbox)
@@ -792,8 +792,13 @@ class AddDeviceDialog(wx.Dialog):
         devices_sizer = wx.StaticBoxSizer(devices_panel, wx.VERTICAL)
         devices_grid = wx.FlexGridSizer(cols=4)
 
-        self.device_user_name = None
+        self.switch_user_name = None
+        self.clock_user_name = None
+        self.gate_user_name = None
+
         self.switch_device_property = None
+        self.clock_device_property = None
+        self.gate_device_property = None
     
         self.add_new_device_ctrls = []
     
@@ -812,28 +817,34 @@ class AddDeviceDialog(wx.Dialog):
     
         clock_radio_button = wx.RadioButton(panel, wx.ID_ANY, "Clock")
         add_new_clock_button = wx.Button(panel, wx.ID_ANY, "+")
-        clock_device_property_panel = wx.Panel(panel, size=(60, 20))
-        clock_device_property_panel.SetBackgroundColour('GREEN')
+        self.Bind(wx.EVT_BUTTON, self.on_add_new_clock_button, add_new_clock_button)
+        clock_device_property_panel = wx.Panel(panel, size=(70, 20))
+        clock_device_property_panel_vbox = wx.BoxSizer(wx.VERTICAL)
+        clock_device_property_panel.SetSizer(clock_device_property_panel_vbox)
+        clock_device_property_txtctrl = wx.TextCtrl(clock_device_property_panel, wx.ID_ANY, "")
+        clock_device_property_txtctrl.Bind(wx.EVT_TEXT, self.on_type_clock_device_property)
+        clock_device_property_panel_vbox.Add(clock_device_property_txtctrl, 1, flag=wx.EXPAND)
+        #clock_device_property_panel.SetBackgroundColour('GREEN')
     
         gate_radio_button = wx.RadioButton(panel, wx.ID_ANY, "Gate")
         add_new_gate_button = wx.Button(panel, wx.ID_ANY, "+")
         gate_device_property_panel = wx.Panel(panel, size=(60, 20))
         gate_device_property_panel.SetBackgroundColour('BLUE')
 
-        switch_user_name = wx.TextCtrl(panel, wx.ID_ANY, "")
+        switch_user_name = wx.TextCtrl(panel, wx.ID_ANY, "Switch name")
         wx.CallAfter(switch_user_name.SetInsertionPoint, 0)
         self.switch_user_name_txtctrl = switch_user_name
-        switch_user_name.Bind(wx.EVT_TEXT, self.on_name_entry)
+        switch_user_name.Bind(wx.EVT_TEXT, self.on_switch_name_entry)
 
-        clock_user_name = wx.TextCtrl(panel, wx.ID_ANY, "")
+        clock_user_name = wx.TextCtrl(panel, wx.ID_ANY, "Clock name")
         wx.CallAfter(clock_user_name.SetInsertionPoint, 0)
         self.clock_user_name_txtctrl = clock_user_name
-        clock_user_name.Bind(wx.EVT_TEXT, self.on_name_entry)
+        clock_user_name.Bind(wx.EVT_TEXT, self.on_clock_name_entry)
 
-        gate_user_name = wx.TextCtrl(panel, wx.ID_ANY, "")
+        gate_user_name = wx.TextCtrl(panel, wx.ID_ANY, "Gate name")
         wx.CallAfter(gate_user_name.SetInsertionPoint, 0)
         self.gate_user_name_txtctrl = gate_user_name
-        gate_user_name.Bind(wx.EVT_TEXT, self.on_name_entry)
+        gate_user_name.Bind(wx.EVT_TEXT, self.on_gate_name_entry)
 
         self.add_new_device_ctrls.append((switch_radio_button, switch_user_name, add_new_switch_button, switch_device_property_panel))
         self.add_new_device_ctrls.append((clock_radio_button, clock_user_name, add_new_clock_button, clock_device_property_panel))
@@ -853,29 +864,61 @@ class AddDeviceDialog(wx.Dialog):
         panel.Move((50,50))
         self.panel = panel
     
-    def on_name_entry(self, event):
-        device_user_name = event.GetString()
-        print(device_user_name)
-        self.device_user_name = device_user_name
+    def on_switch_name_entry(self, event):
+        switch_user_name = event.GetString()
+        print(switch_user_name)
+        self.switch_user_name = switch_user_name
+
+    def on_clock_name_entry(self, event):
+        clock_user_name = event.GetString()
+        print(clock_user_name)
+        self.clock_user_name = clock_user_name
+
+    def on_gate_name_entry(self, event):
+        gate_user_name = event.GetString()
+        print(gate_user_name)
+        self.gate_user_name = gate_user_name
 
     def on_select_switch_device_property(self, event):
         switch_state_selected = event.GetEventObject().GetLabel()
         self.switch_device_property = switch_state_selected
+
+    def on_type_clock_device_property(self, event):
+        clock_period_typed = event.GetString()
+        if clock_period_typed.isnumeric():
+            if clock_period_typed.isdigit():
+                if int(clock_period_typed) > 0:
+                    self.clock_device_property = int(clock_period_typed)
+                    print(f'Answer: {self.clock_device_property}')
+                    #print(self.clock_device_property)
+    
+    def on_add_new_clock_button(self, event):
+        if self.clock_user_name is not None: # confirm if user-defined device name has been entered
+            valid_name = self.clock_user_name
+            print(f'Clock name: {valid_name}')
+            if self.names.query(valid_name) is None: # confirm if user-defined name is unique and not already defined
+                print('Unique clock!')
+                unique_device_id = self.names.lookup([valid_name])[0]
+                if self.clock_device_property is not None: # confirm if a clock period (clock device property) has been written (correctly)
+                    clock_period = self.clock_device_property
+                    if self.devices.make_device(unique_device_id, self.devices.CLOCK, clock_period) == self.devices.NO_ERROR:
+                        print(f'Clock half period: {self.devices.get_device(unique_device_id).clock_half_period}')
+                        print(f'Clock counter: {self.devices.get_device(unique_device_id).clock_counter}')
     
     def on_add_new_switch_button(self, event):
-        if self.device_user_name is not None: # confirm if user-defined device name has been entered
-            valid_name = self.device_user_name
+        if self.switch_user_name is not None: # confirm if user-defined device name has been entered
+            valid_name = self.switch_user_name
             old_switch_ids = self.devices.find_devices(device_kind=self.devices.SWITCH)
             old_switch_names = [self.names.get_name_string(i) for i in old_switch_ids]
             print(old_switch_names)
-            print(f'Enterred name: {valid_name}')
+            print(f'Switch name: {valid_name}')
             if self.names.query(valid_name) is None: # confirm if user-defined name is unique and not already defined
-                print('Unique name!')
+                print('Unique switch!')
                 unique_device_id = self.names.lookup([valid_name])[0]
                 if self.switch_device_property is not None: # confirm if a switch state (switch device property) has been selected
                     switch_state = int(self.switch_device_property)
                     if self.devices.make_device(unique_device_id, self.devices.SWITCH, switch_state) == self.devices.NO_ERROR:
-                        print(f'Answer: {self.devices.get_device(unique_device_id).switch_state}')
+                        print(f'Switch state: {self.devices.get_device(unique_device_id).switch_state}')
                         self.update_switches_panel(valid_name)
                 '''print(f'Error: {x}')
                 new_switch_ids = self.devices.find_devices(device_kind=self.devices.SWITCH)
