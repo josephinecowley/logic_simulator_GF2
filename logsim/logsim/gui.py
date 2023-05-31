@@ -262,7 +262,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.devices = devices
         self.monitors = monitors
         self.traces = self.monitors.get_signals_for_GUI()
-        #print(f'THIRD: {self.traces}')
 
         # Trigger a redraw
         self.Refresh()
@@ -364,9 +363,6 @@ class RunSimulationPanel(wx.Panel):
         self.network = network
         self.monitors = monitors
 
-        #self.SetBackgroundColour("RED") # layout identifier colour for visualisation purposes
-        #print(self.GetLabel())
-
         # Configure sizers for layout of RunSimulationPanel
         vbox = wx.BoxSizer(wx.VERTICAL)
         hbox = wx.BoxSizer(wx.HORIZONTAL)
@@ -428,18 +424,15 @@ class RunSimulationPanel(wx.Panel):
 
         
         self.centre_panel = wx.Panel(self)
-        #self.centre_panel.SetBackgroundColour("GREEN") # layout identifier colour for visualisation purposes
         centre_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
         hbox.Add(self.centre_panel, 2, flag=wx.EXPAND)
 
         
         self.upload_and_help_buttons_panel = wx.Panel(self, name="upload and help buttons panel")
-        #upload_and_help_buttons_panel.SetBackgroundColour("CYAN") # layout identifier colour for visualisation purposes
         upload_and_help_buttons_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
         self.upload_and_help_buttons_panel.SetSizer(upload_and_help_buttons_panel_hbox)
 
         self.upload_button_panel = wx.Panel(self.upload_and_help_buttons_panel, name="upload button panel")
-        #upload_button_panel.SetBackgroundColour("RED") # layout identifier colour for visualisation purposes
         upload_button_panel_vbox = wx.BoxSizer(wx.VERTICAL)
         self.upload_button_panel.SetSizer(upload_button_panel_vbox)
 
@@ -450,7 +443,6 @@ class RunSimulationPanel(wx.Panel):
 
 
         self.help_button_panel = wx.Panel(self.upload_and_help_buttons_panel, name="help button panel")
-        #help_button_panel.SetBackgroundColour("BLUE") # layout identifier colour for visualisation purposes
         help_button_panel_vbox = wx.BoxSizer(wx.VERTICAL)
         self.help_button_panel.SetSizer(help_button_panel_vbox)
 
@@ -470,7 +462,6 @@ class RunSimulationPanel(wx.Panel):
         """Handle the event when the user clicks the run button."""
         run_button_pressed = event.GetEventObject()
         text = f"{run_button_pressed.GetLabel()} simulation button pressed."
-        print(text)
         run_button_pressed.SetLabel("CONTINUE")
         run_button_pressed.SetBackgroundColour(wx.Colour(181, 150, 27))
         run_button_pressed.SetToolTip("Continue running the simulation")
@@ -481,7 +472,6 @@ class RunSimulationPanel(wx.Panel):
         self.update_canvas()
         
     def run_network(self, cycles):
-        #print(f'No of cycles: {cycles}')
         for _ in range(cycles):
             if self.network.execute_network():
                 self.monitors.record_signals()
@@ -551,18 +541,6 @@ class RunSimulationPanel(wx.Panel):
         dlg.Destroy()
 
 
-class Capturing(list):
-    def __enter__(self):
-        self._stdout = sys.stdout
-        sys.stdout = self._stringio = StringIO()
-        return self
-
-    def __exit__(self, *args):
-        self.extend(self._stringio.getvalue().splitlines())
-        del self._stringio    # free up some memory
-        sys.stdout = self._stdout
-
-
 class SignalTrace(wx.ScrolledWindow):
     def __init__(self, parent, names, devices, network, monitors, id=wx.ID_ANY, size=wx.DefaultSize):
         super(SignalTrace, self).__init__(parent, id, size=size)
@@ -576,8 +554,6 @@ class SignalTrace(wx.ScrolledWindow):
         self.x = self.y = 0
         self.curLine = []
         self.drawing = False
-
-        #self.SetBackgroundColour("PURPLE") # layout identifier colour for visualisation purposes
 
         # Set settings for ScrolledWindow
         self.SetVirtualSize((self.maxWidth, self.maxHeight))
@@ -675,32 +651,20 @@ class SignalTracesPanel(wx.Panel):
         """Handle the event when the user selects an as-of-yet unmonitored signal to monitor."""
         select_monitor_combo_box = event.GetEventObject()
         self.selected_signal_to_monitor = select_monitor_combo_box.GetValue()
-        print(f'Selected device to monitor: {self.selected_signal_to_monitor}')
 
     def on_select_zap_monitor(self, event):
         """Handle the event when the user selects a currently monitored signal to zap."""
         zap_monitor_combo_box = event.GetEventObject()
         self.selected_signal_to_zap = zap_monitor_combo_box.GetValue()
-        print(f'Selected device to zap: {self.selected_signal_to_zap}')
 
     def on_add_new_monitor_button(self, event):
         """Handle the event when the user clicks the add new signal button."""
         add_new_monitor_button_pressed = event.GetEventObject()
         text = f"{add_new_monitor_button_pressed.GetLabel()} button pressed."
 
-        print(text)
-        print(self.selected_signal_to_monitor)
-
-        print('BEFORE')
-        print(self.monitors.monitors_dictionary)
-
-
         if self.selected_signal_to_monitor is not None: # confirm if a new signal to monitor has been selected from dropdown menu
             selected_signal_to_monitor_id = self.devices.get_signal_ids(self.selected_signal_to_monitor)
             self.monitors.make_monitor(*selected_signal_to_monitor_id)
-
-        print('AFTER')
-        print(self.monitors.monitors_dictionary)
 
         self.update_canvas()
 
@@ -718,9 +682,6 @@ class SignalTracesPanel(wx.Panel):
         zap_existing_monitor_button_pressed = event.GetEventObject()
         text = f"{zap_existing_monitor_button_pressed.GetLabel()} button pressed."
 
-        print(text)
-        print(self.selected_signal_to_zap)
-    
         if self.selected_signal_to_zap is not None: # confirm if an existing monitored signal has been selected from dropdown menu
             selected_signal_to_zap_id = self.devices.get_signal_ids(self.selected_signal_to_zap)
             self.monitors.remove_monitor(*selected_signal_to_zap_id)
@@ -810,7 +771,6 @@ class SwitchesPanel(wx.Panel):
 
         # Create and add right panel in switches panel layout
         self.right_panel = wx.Panel(self.switches_panel)
-        #right_panel.SetBackgroundColour("BLUE") # layout identifier colour for visualisation purposes
         hbox.Add(self.right_panel, 1, wx.EXPAND)
 
         self.add_switch_panel = wx.Panel(self)
@@ -948,17 +908,14 @@ class AddDeviceDialog(wx.Dialog):
     
     def on_switch_name_entry(self, event):
         switch_user_name = event.GetString()
-        print(switch_user_name)
         self.switch_user_name = switch_user_name
 
     def on_clock_name_entry(self, event):
         clock_user_name = event.GetString()
-        print(clock_user_name)
         self.clock_user_name = clock_user_name
 
     def on_gate_name_entry(self, event):
         gate_user_name = event.GetString()
-        print(gate_user_name)
         self.gate_user_name = gate_user_name
 
     def on_select_switch_device_property(self, event):
@@ -971,8 +928,6 @@ class AddDeviceDialog(wx.Dialog):
             if clock_period_typed.isdigit():
                 if int(clock_period_typed) > 0:
                     self.clock_device_property = int(clock_period_typed)
-                    print(f'Answer: {self.clock_device_property}')
-                    #print(self.clock_device_property)
     
     def on_add_new_clock_button(self, event):
         if self.clock_user_name is not None: # confirm if user-defined device name has been entered
@@ -1025,9 +980,7 @@ class LogicSimApp(wx.App):
         monitors = Monitors(names, devices, network)
         scanner = Scanner(file_path, names)
         parser = Parser(names, devices, network, monitors, scanner)
-        #breakpoint()
         parser.parse_network()
-        #print(parser.parse_network())
         self.frame = Gui("GF2 Team 7 Logic Simulator GUI",
                          file_path,
                          names,
