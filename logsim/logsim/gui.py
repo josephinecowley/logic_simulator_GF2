@@ -587,7 +587,7 @@ class SignalTracesPanel(wx.Panel):
         self.Bind(wx.EVT_COMBOBOX, self.on_select_new_monitor, self.select_monitor_combo_box)
         add_new_monitor_panel_fgs.Add(self.select_monitor_combo_box, 0, flag=wx.ALIGN_CENTER|wx.LEFT, border=30)
 
-        # Create and add the "Add a new monitor" button to show up on SignalTraces panel
+        # Create and add the "Add a new monitor" button to show the newly monitored device's signal trace on SignalTraces panel
         self.add_new_monitor_button = wx.Button(self.add_new_monitor_panel, wx.ID_ANY, label="+")
         self.Bind(wx.EVT_BUTTON, self.on_add_new_monitor_button, self.add_new_monitor_button)
         self.add_new_monitor_button.SetToolTip("Add a new monitor")
@@ -611,6 +611,12 @@ class SignalTracesPanel(wx.Panel):
                          )
         self.Bind(wx.EVT_COMBOBOX, self.on_select_zap_monitor, self.zap_monitor_combo_box)
         add_new_monitor_panel_fgs.Add(self.zap_monitor_combo_box, 0, flag=wx.ALIGN_CENTER|wx.LEFT, border=30)
+
+        # Create and add the "Zap an existing monitor" button to remove a currently monitored device's signal trace on SignalTraces panel
+        self.zap_existing_monitor_button = wx.Button(self.add_new_monitor_panel, wx.ID_ANY, label="-")
+        self.Bind(wx.EVT_BUTTON, self.on_zap_existing_monitor, self.zap_existing_monitor_button)
+        self.zap_existing_monitor_button.SetToolTip("Zap an existing monitor")
+        add_new_monitor_panel_fgs.Add(self.zap_existing_monitor_button, 1, flag=wx.CENTER|wx.EXPAND)
 
         # Canvas for drawing signals
         self.canvas = MyGLCanvas(self.signal_traces_panel, devices, monitors)
@@ -643,12 +649,24 @@ class SignalTracesPanel(wx.Panel):
         if self.selected_device_to_monitor is not None:
             selected_device_to_monitor_id = self.names.query(self.selected_device_to_monitor)
             print(selected_device_to_monitor_id)
-            self.monitors.make_monitor(selected_device_to_monitor_id, None) # KO! what is output_id??
+            self.monitors.make_monitor(selected_device_to_monitor_id, None)
         self.update_canvas()
 
     def on_zap_existing_monitor(self, event):
         """Handle the event when the user clicks the zap existing monitor button."""
-        ...
+        zap_existing_monitor_button_pressed = event.GetEventObject()
+        text = f"{zap_existing_monitor_button_pressed.GetLabel()} button pressed."
+        print(text)
+        print(self.selected_device_to_zap)
+        if self.selected_device_to_zap is not None:
+            selected_device_to_zap_id = self.names.query(self.selected_device_to_zap)
+            print(selected_device_to_zap_id)
+            #print('BEFORE')
+            #print(self.monitors.monitors_dictionary)
+            self.monitors.remove_monitor(selected_device_to_zap_id, None)
+            #print('AFTER')
+            #print(self.monitors.monitors_dictionary)
+        self.update_canvas()
         
     def update_canvas(self):
         self.canvas.update_arguments(self.devices, self.monitors)
