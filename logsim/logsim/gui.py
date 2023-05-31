@@ -109,7 +109,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             (1.0, 0.0, 1.0),
             (0.0, 1.0, 1.0),
         ]
-        for i, trace in enumerate(self.traces[::-1]):
+        for i, trace in enumerate(self.traces):
             signal = trace[1]
             label = trace[0]
             color = color_list[i % len(color_list)]
@@ -994,7 +994,7 @@ class AddDeviceDialog(wx.Dialog):
 
 class LogicSimApp(wx.App):
     def OnInit(self):
-        file_path = "logsim\logsim\example1_logic_description.txt"
+        file_path = "logsim\logsim\example2_logic_description.txt"
         names = Names()
         devices = Devices(names)
         network = Network(names, devices)
