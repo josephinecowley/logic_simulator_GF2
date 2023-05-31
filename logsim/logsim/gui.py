@@ -9,6 +9,9 @@ MyGLCanvas - handles all canvas drawing operations.
 Gui - configures the main window and all the widgets.
 """
 import os
+from io import StringIO 
+import sys
+from contextlib import redirect_stdout
 
 import wx
 import wx.glcanvas as wxcanvas
@@ -512,32 +515,53 @@ class RunSimulationPanel(wx.Panel):
             # This returns a Python list of files that were selected.
             file_path = dlg.GetPath()
 
-        print(self.parent.names)
-        print(file_path)
-
         names = Names()
         devices = Devices(names)
         network = Network(names, devices)
         monitors = Monitors(names, devices, network)
         scanner = Scanner(file_path, names)
         parser = Parser(names, devices, network, monitors, scanner)
-        parser.parse_network()
 
-        new_Gui = Gui("GF2 Team 7 Logic Simulator GUI",
-                         file_path,
-                         names,
-                         devices,
-                         network,
-                         monitors)
-        new_Gui.Show()
-        self.parent.Close()
+        captured_print = StringIO()
+        with redirect_stdout(captured_print):
+            parsing_result = parser.parse_network()
+        
+        output = captured_print.getvalue()
 
-        # Compare this with the debug above; did we change working dirs?
-        print(f"CWD: {os.getcwd()}\n")
+        if parsing_result:
+            new_Gui = Gui("GF2 Team 7 Logic Simulator GUI",
+                            file_path,
+                            names,
+                            devices,
+                            network,
+                            monitors)
+            new_Gui.Show()
+            self.parent.Close()
+        else:
+            dlg = wx.MessageDialog(self, output,
+                            "An error occurred.",
+                            wx.OK | wx.ICON_INFORMATION
+                            #wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL | wx.ICON_INFORMATION
+                            )
+            dlg.ShowModal()
+            dlg.Destroy()
 
         # Destroy the dialog. Don't do this until you are done with it!
         # BAD things can happen otherwise!
         dlg.Destroy()
+
+
+class Capturing(list):
+    def __enter__(self):
+        self._stdout = sys.stdout
+        sys.stdout = self._stringio = StringIO()
+        return self
+
+    def __exit__(self, *args):
+        self.extend(self._stringio.getvalue().splitlines())
+        del self._stringio    # free up some memory
+        sys.stdout = self._stdout
+
 
 class SignalTrace(wx.ScrolledWindow):
     def __init__(self, parent, names, devices, network, monitors, id=wx.ID_ANY, size=wx.DefaultSize):
@@ -994,15 +1018,15 @@ class AddDeviceDialog(wx.Dialog):
 
 class LogicSimApp(wx.App):
     def OnInit(self):
-        file_path = "logsim\logsim\example2_logic_description.txt"
+        file_path = "logsim\logsim\example1_logic_description.txt"
         names = Names()
         devices = Devices(names)
         network = Network(names, devices)
         monitors = Monitors(names, devices, network)
         scanner = Scanner(file_path, names)
         parser = Parser(names, devices, network, monitors, scanner)
-        parser.parse_network()
         #breakpoint()
+        parser.parse_network()
         #print(parser.parse_network())
         self.frame = Gui("GF2 Team 7 Logic Simulator GUI",
                          file_path,
