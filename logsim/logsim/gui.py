@@ -513,8 +513,24 @@ class RunSimulationPanel(wx.Panel):
             file_path = dlg.GetPath()
 
         print(self.parent.names)
-        
         print(file_path)
+
+        names = Names()
+        devices = Devices(names)
+        network = Network(names, devices)
+        monitors = Monitors(names, devices, network)
+        scanner = Scanner(file_path, names)
+        parser = Parser(names, devices, network, monitors, scanner)
+        parser.parse_network()
+
+        new_Gui = Gui("GF2 Team 7 Logic Simulator GUI",
+                         file_path,
+                         names,
+                         devices,
+                         network,
+                         monitors)
+        new_Gui.Show()
+        self.parent.Close()
 
         # Compare this with the debug above; did we change working dirs?
         print(f"CWD: {os.getcwd()}\n")
