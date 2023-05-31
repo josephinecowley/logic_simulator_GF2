@@ -1,21 +1,34 @@
 DEVICES {
+
+    data = SWITCH(0);
     dtype1 = DTYPE;
     dtype2 = DTYPE;
     dtype3 = DTYPE;
     dtype4 = DTYPE;
-    clock = CLK(25);
-    data = SWITCH(0);
+    clock = CLOCK(2);
+    set = SWITCH(0);
 }
 
 CONNECTIONS {
-    data = dtype1.DATA;
-    dtype1.Q = dtype2.DATA;
-    dtype2.Q = dtype3.DATA;
-    dtype3.Q = dtype4.DATA;
-    clock = dtype1.CLOCK;
-    clock = dtype2.CLOCK;
-    clock = dtype3.CLOCK;
-    clock = dtype4.CLOCK;
+    dtype1.DATA = data;
+    dtype1.SET = set;
+    dtype1.CLEAR = set;
+    dtype1.CLK = clock;
+
+    dtype2.DATA = dtype1.Q;
+    dtype2.SET = set;
+    dtype2.CLEAR = set;
+    dtype2.CLK = clock;
+
+    dtype3.DATA = dtype2.Q;
+    dtype3.SET = set;
+    dtype3.CLEAR = set;
+    dtype3.CLK = clock;
+    
+    dtype4.DATA = dtype3.Q;
+    dtype4.SET = set;
+    dtype4.CLEAR = set;
+    dtype4.CLK = clock;
 }
 
 MONITORS {
@@ -24,3 +37,4 @@ MONITORS {
     dtype3.Q;
     dtype4.Q;
 }
+END
