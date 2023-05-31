@@ -701,8 +701,11 @@ class SwitchesPanel(wx.Panel):
 
         # Create and add left panel in switches panel layout
         self.left_panel = wx.Panel(self.switches_panel)
+        self.test_button = wx.Button(self.left_panel, wx.ID_ANY, "Test Button", (50,50))
+        self.Bind(wx.EVT_BUTTON, self.on_test_button, self.test_button)
         left_panel_vbox = wx.BoxSizer(wx.VERTICAL)
         self.left_panel.SetSizer(left_panel_vbox)
+        left_panel_vbox.Add(self.test_button, 1, flag=wx.EXPAND)
         #left_panel_vbox.Add(self.add_new_switch_button, 1, flag=wx.EXPAND)
         hbox.Add(self.left_panel, 1, wx.EXPAND)
 
@@ -736,6 +739,10 @@ class SwitchesPanel(wx.Panel):
 
         # Set sizer of SwitchesPanel
         self.SetSizer(vbox)
+    
+    def on_test_button(self, event):
+        AddDeviceDialog(self, "Add a new device", self, self.names, self.devices, self.network, self.monitors).ShowModal() 
+        
 
     def on_switch_toggle_button(self, event):
         """Handle the event when the user clicks the toggle button for a switch."""
@@ -760,6 +767,107 @@ class SwitchesPanel(wx.Panel):
         self.right_panel.Layout()
         self.right_panel.Refresh()
         self.right_panel.Update()
+
+
+class AddDeviceDialog(wx.Dialog): 
+    def __init__(self, parent, title, switches_panel, names, devices, network, monitors):
+        super(AddDeviceDialog, self).__init__(parent, title=title, size=(250,150))
+
+        self.switches_panel = switches_panel
+        self.names = names
+        self.devices = devices
+        self.network = network
+        self.monitors = monitors
+
+        vbox = wx.BoxSizer(wx.VERTICAL)
+
+        wx.Panel.__init__(self, parent, wx.ID_ANY)
+
+        panel = wx.Panel(self, wx.ID_ANY)
+
+        # Configure sizer for devices panel
+        vbox = wx.BoxSizer(wx.VERTICAL)
+
+        devices_panel = wx.StaticBox(panel, wx.ID_ANY, "Select a device")
+        devices_sizer = wx.StaticBoxSizer(devices_panel, wx.VERTICAL)
+        devices_grid = wx.FlexGridSizer(cols=3)
+
+        self.device_user_name = None
+        
+        self.add_new_device_ctrls = []
+        switch_radio_button = wx.RadioButton(panel, wx.ID_ANY, "Switch", style=wx.RB_GROUP)
+        add_new_switch_button = wx.Button(panel, wx.ID_ANY, "+")
+        self.Bind(wx.EVT_BUTTON, self.on_add_new_switch_button, add_new_switch_button)
+        clock_radio_button = wx.RadioButton(panel, wx.ID_ANY, "Clock")
+        add_new_clock_button = wx.Button(panel, wx.ID_ANY, "+")
+        gate_radio_button = wx.RadioButton(panel, wx.ID_ANY, "Gate")
+        add_new_gate_button = wx.Button(panel, wx.ID_ANY, "+")
+
+        switch_user_name = wx.TextCtrl(panel, wx.ID_ANY, "")
+        wx.CallAfter(switch_user_name.SetInsertionPoint, 0)
+        self.switch_user_name_txtctrl = switch_user_name
+        switch_user_name.Bind(wx.EVT_TEXT, self.on_name_entry)
+
+        clock_user_name = wx.TextCtrl(panel, wx.ID_ANY, "")
+        wx.CallAfter(clock_user_name.SetInsertionPoint, 0)
+        self.clock_user_name_txtctrl = clock_user_name
+        clock_user_name.Bind(wx.EVT_TEXT, self.on_name_entry)
+
+        gate_user_name = wx.TextCtrl(panel, wx.ID_ANY, "")
+        wx.CallAfter(gate_user_name.SetInsertionPoint, 0)
+        self.gate_user_name_txtctrl = gate_user_name
+        gate_user_name.Bind(wx.EVT_TEXT, self.on_name_entry)
+
+        self.add_new_device_ctrls.append((switch_radio_button, switch_user_name, add_new_switch_button))
+        self.add_new_device_ctrls.append((clock_radio_button, clock_user_name, add_new_clock_button))
+        self.add_new_device_ctrls.append((gate_radio_button, gate_user_name, add_new_gate_button))
+
+        for radio, text, add_button in self.add_new_device_ctrls:
+            devices_grid.Add(radio, 0, wx.ALIGN_CENTRE|wx.LEFT|wx.RIGHT|wx.TOP, 5)
+            devices_grid.Add(text, 0, wx.ALIGN_CENTRE|wx.LEFT|wx.RIGHT|wx.TOP, 5)
+            devices_grid.Add(add_button, 0, wx.ALIGN_CENTRE|wx.LEFT|wx.RIGHT|wx.TOP, 5)
+
+        devices_sizer.Add(devices_grid, 0, wx.ALIGN_CENTRE|wx.ALL, 5)
+        vbox.Add(devices_sizer, 0, wx.ALIGN_CENTRE|wx.ALL, 5)
+
+        panel.SetSizer(vbox)
+        vbox.Fit(panel)
+        panel.Move((50,50))
+        self.panel = panel
+    
+    def on_name_entry(self, event):
+        device_user_name = event.GetString()
+        print(device_user_name)
+        self.device_user_name = device_user_name
+    
+    def on_add_new_switch_button(self, event):
+        if self.device_user_name is not None: # confirm if user-defined device name has been entered
+            valid_name = self.device_user_name
+            old_switch_ids = self.devices.find_devices(device_kind=self.devices.SWITCH)
+            old_switch_names = [self.names.get_name_string(i) for i in old_switch_ids]
+            print(old_switch_names)
+            print(f'Enterred name: {valid_name}')
+            if self.names.query(valid_name) is None: # confirm if user-defined name is unique and not already defined
+                print('Unique name!')
+                unique_device_id = self.names.lookup([valid_name])[0]
+                if self.devices.make_device(unique_device_id, self.devices.SWITCH, 1) == self.devices.NO_ERROR:
+                    self.update_switches_panel(valid_name)
+                '''print(f'Error: {x}')
+                new_switch_ids = self.devices.find_devices(device_kind=self.devices.SWITCH)
+                new_switch_names = [self.names.get_name_string(i) for i in new_switch_ids]
+                print(new_switch_names)'''
+    
+    def update_switches_panel(self, switch_name):
+        self.switches_panel.num_of_switches += 1
+        new_switch = wx.ToggleButton(parent=self.switches_panel.switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"{switch_name}")
+        new_switch_id = self.names.query(switch_name)
+        new_switch_state = self.devices.get_device(new_switch_id).switch_state 
+        new_switch.SetValue(bool(new_switch_state))
+        self.switches_panel.fgs.SetRows(self.switches_panel.num_of_switches + 1)
+        self.switches_panel.Bind(wx.EVT_TOGGLEBUTTON, self.switches_panel.on_switch_toggle_button, new_switch)
+        self.switches_panel.fgs.Add(new_switch, 1, flag=wx.ALL, border=10)
+        self.switches_panel.switch_buttons_scrolled_panel.Refresh()
+        self.switches_panel.Layout()
 
 
 class LogicSimApp(wx.App):
