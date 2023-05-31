@@ -338,6 +338,9 @@ class Gui(wx.Frame):
         if Id == wx.ID_ABOUT:
             wx.MessageBox("Logic Simulator\nCreated by Josephine Cowley (jhmdc2), Tom Hill (th621), Khalid Omar (ko366)\n2023",
                           "About Logsim", wx.ICON_INFORMATION | wx.OK)
+    
+    def on_quit_button(self, event):
+        self.Close()
 
 
 class RunSimulationPanel(wx.Panel):
@@ -400,7 +403,7 @@ class RunSimulationPanel(wx.Panel):
 
         # Create, bind quitting event to and add the "Quit simulation" button
         self.quit_button = wxbuttons.GenButton(self.left_buttons_panel, wx.ID_ANY, "QUIT", name="quit button")
-        self.Bind(wx.EVT_BUTTON, self.on_quit_button, self.quit_button)
+        self.Bind(wx.EVT_BUTTON, parent.on_quit_button, self.quit_button)
         self.quit_button.SetFont(wx.Font(20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
         self.quit_button.SetBezelWidth(5)
         self.quit_button.SetMinSize(wx.DefaultSize)
@@ -486,6 +489,7 @@ class RunSimulationPanel(wx.Panel):
         text = "QUIT button pressed"
         print(text)
         quit_button_pressed.SetBackgroundColour(wx.Colour(148, 148, 148))
+        self.Close()
 
     def on_spin(self, event):
         pass
@@ -773,10 +777,6 @@ class SwitchesPanel(wx.Panel):
 
         self.add_switch_panel_centre = wx.Panel(self.add_switch_panel)
         add_switch_panel_centre_vbox = wx.BoxSizer(wx.VERTICAL)
-        self.add_new_switch_button = wx.Button(self.add_switch_panel_centre, wx.ID_ANY, "Add new switch")
-        self.add_new_switch_button.SetToolTip("Add a new switch")
-        self.Bind(wx.EVT_BUTTON, self.on_add_new_switch_button, self.add_new_switch_button)
-        add_switch_panel_centre_vbox.Add(self.add_new_switch_button, 1, flag=wx.CENTER|wx.EXPAND)
         add_switch_panel_hbox.Add(self.add_switch_panel_centre, 2, wx.EXPAND)
 
         self.add_switch_panel_right = wx.Panel(self.add_switch_panel)
@@ -798,16 +798,6 @@ class SwitchesPanel(wx.Panel):
         switch_state = switch_selected.GetValue()
         if self.devices.set_switch(switch_id, int(switch_state)): # successfully switched the state of switch
             pass
-
-    def on_add_new_switch_button(self, event):
-        print("Add new switch button pressed")
-        self.num_of_switches += 1
-        new_switch = wx.ToggleButton(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"switch {self.num_of_switches}")
-        self.fgs.SetRows(self.num_of_switches + 1)
-        self.Bind(wx.EVT_TOGGLEBUTTON, self.on_switch_toggle_button, new_switch)
-        self.fgs.Add(new_switch, 1, flag=wx.ALL, border=10)
-        self.switch_buttons_scrolled_panel.Refresh()
-        self.switches_panel.Layout()
 
     def on_change_right_panel_colour(self, event):
         self.right_panel.SetBackgroundColour("GREEN")
