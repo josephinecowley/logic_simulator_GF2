@@ -1055,7 +1055,7 @@ class AddDeviceDialog(wx.Dialog):
 
 class LogicSimApp(wx.App):
     def OnInit(self):
-        file_path = "logsim\logsim\example1_logic_description.txt"
+        file_path = "logsim\logsim\example2_logic_description.txt"
         names = Names()
         devices = Devices(names)
         network = Network(names, devices)
