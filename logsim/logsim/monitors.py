@@ -175,3 +175,23 @@ class Monitors:
                 if signal == self.devices.BLANK:
                     print(" ", end="")
             print("\n", end="")
+
+    def get_signals_for_GUI(self):
+        """Retrieves signals from monitors and places them in a list of tuples for the GUI"""
+        signals = []
+        for device_id, output_id in self.monitors_dictionary:
+            monitor_name = self.devices.get_signal_name(device_id, output_id)
+            signal_list = self.monitors_dictionary[(device_id, output_id)]
+            signals.append((monitor_name, signal_list))
+
+        # get longest signal
+        max_signal_len = max([len(signal[1]) for signal in signals])
+
+        # pre-append blanks to all signals shorter than the max
+        for i, signal in enumerate(signals):
+            length_dif = max_signal_len - len(signal[1])
+            if length_dif > 0:
+                # replace signal tuple with longer version
+                signals[i] = (signal[0], [0] * length_dif + signal[1])
+
+        return signals
