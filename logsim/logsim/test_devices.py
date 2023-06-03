@@ -44,14 +44,16 @@ def test_find_devices(devices_with_items):
     """Test if find_devices returns the correct devices of the given kind."""
     devices = devices_with_items
     names = devices.names
-    device_names = [AND1_ID, NOR1_ID, SW1_ID] = names.lookup(["And1", "Nor1",
-                                                              "Sw1"])
+    device_names = [AND1_ID, NOR1_ID, SW1_ID, SIG_ID, RC_ID] = names.lookup(["And1", "Nor1",
+                                                              "Sw1", "Sig1", "RC1"])
 
     assert devices.find_devices() == device_names
     assert devices.find_devices(devices.AND) == [AND1_ID]
     assert devices.find_devices(devices.NOR) == [NOR1_ID]
     assert devices.find_devices(devices.SWITCH) == [SW1_ID]
     assert devices.find_devices(devices.XOR) == []
+    assert devices.find_devices(devices.SIGGEN) == [SIG_ID]
+    assert devices.find_devices(devices.RC) == [RC_ID]
 
 
 def test_make_device(new_devices):
@@ -59,7 +61,7 @@ def test_make_device(new_devices):
     names = new_devices.names
 
     [NAND1_ID, CLOCK1_ID, D1_ID, I1_ID,
-     I2_ID] = names.lookup(["Nand1", "Clock1", "D1", "I1", "I2"])
+     I2_ID, SIG_ID, RC_ID] = names.lookup(["Nand1", "Clock1", "D1", "I1", "I2", "Sig1", "RC1"])
     new_devices.make_device(NAND1_ID, new_devices.NAND, 2)  # 2-input NAND
     # Clock half period is 5
     new_devices.make_device(CLOCK1_ID, new_devices.CLOCK, 5)
