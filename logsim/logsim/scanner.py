@@ -159,7 +159,7 @@ class Scanner:
 
         return symbol
 
-    def display_line_and_marker(self, symbol):
+    def display_line_and_marker(self, symbol, display_marker=True):
         """Takes a symbol instance and prints its line in the file with a marker underneath.
         If the 'name' is over length one, use tildes, otherwise use caret.
         Printed lines will have a standard indent of eight spaces."""
@@ -213,6 +213,11 @@ class Scanner:
         filled_marker_string = " "*8 + \
             filled_marker_string[start_of_text_index:]
 
+        if display_marker == False:
+            # Just print line text
+            print(line_text)
+            return
+
         if symbol.type == self.EOF:  # handle case of error in END keyword
             print(line_text)
             print(filled_marker_string, end="\n\n")
@@ -265,19 +270,14 @@ class Scanner:
             self.skip_spaces()  # current_character now non-whitespace, line_number and position updated
         else:
             self.advance()  # get first character in comment
-            # closed by " (have to break PEP8 for this) or EOF
-            while not self.current_character in ['"', ""]:
+            # closed by " (have to break PEP8 for this)
+            while not self.current_character == '"':
                 if self.current_character == "\n":
                     self.line_number += 1
                     self.position = 0
                 self.advance()
-            
-            # return with current_char == "" or non-whitespace
-            if self.current_character == "":
-                pass
-            else:
-                self.advance()
-                self.skip_spaces()
+            self.advance()
+            self.skip_spaces()
 
     def get_name(self):
         """Assumes that current character is alphabetical and returns an alphanumeric name."""
