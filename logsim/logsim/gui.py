@@ -139,9 +139,14 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             x = (i * 20) + x_pos
             x_next = (i * 20) + x_pos + 20
             if signal[i] == 0:
+                GL.glColor3f(*color)
                 y = y_pos
-            else:
+            elif signal[i] == 1:
+                GL.glColor3f(*color)
                 y = y_pos + 25
+            else:
+                GL.glColor3f(1.0, 1.0, 1.0)
+                y = y_pos
             GL.glVertex2f(x, y)
             GL.glVertex2f(x_next, y)
         GL.glEnd()
