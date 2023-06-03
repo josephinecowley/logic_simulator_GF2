@@ -71,7 +71,7 @@ class Scanner:
 
         # initialises a list of symbol types
         self.symbol_type_list = [self.BRACKET_OPEN, self.BRACKET_CLOSE, self.BRACE_OPEN, self.BRACE_CLOSE, self.COMMA, self.FULLSTOP,
-                                 self.SEMICOLON, self.EQUALS, self.KEYWORD, self.NUMBER, self.NAME, self.EOF] = range(12)
+                                 self.SEMICOLON, self.EQUALS, self.KEYWORD, self.NUMBER, self.NAME, self.EOF, self.SIGNAL] = range(13)
         self.keywords_list = ["DEVICES", "CONNECTIONS", "MONITORS", "END"]
 
         # populates name table with keywords and assigns keywork IDs
@@ -96,8 +96,8 @@ class Scanner:
 
             else:
                 symbol.type = self.NAME
-            symbol.id = self.names.lookup([name_string])[
-                0]  # lookup a symbol id
+            symbol.id = self.names.lookup([name_string])[0]  
+            # lookup a symbol id
 
         elif self.current_character.isdigit():  # number
             self.load_scanner_data(symbol)
@@ -152,6 +152,13 @@ class Scanner:
         elif self.current_character == "":  # end of file
             self.load_scanner_data(symbol)
             symbol.type = self.EOF
+        
+        elif self.current_character == "[":
+            signal_string = self.get_siggen_signal()
+            symbol.type = self.SIGNAL
+
+            # lookup signal string in name table
+            symbol.id = self.names.lookup([signal_string])[0]  
 
         else:  # not a valid character
             self.advance()
@@ -296,3 +303,15 @@ class Scanner:
             num += self.current_character
             self.advance()
         return num  # returns the number as a string
+    
+    def get_siggen_signal(self):
+        """Assumes current character is '[' and reads string from file until ']' or EOF.
+        Returns a string like '[1, 2, 3, 4, 5]'. """
+        signal_string = f"{self.current_character}"
+        self.advance
+        while not self.current_character in ["]", ""]:
+            signal_string += self.current_character
+            self.advance()
+        signal_string += self.current_character
+        return signal_string
+
