@@ -85,9 +85,11 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.traces = monitors.get_signals_for_GUI()
         self.y_spacing = 80
 
+        # Initialise instance attributes
         self.devices = devices
         self.monitors = monitors
 
+        # self.current_time initialised as 0 and then takes future args for current_time
         if current_time is None:
             self.current_time = 0
         else:
@@ -194,8 +196,14 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.SwapBuffers()
     
     def on_right_click(self, event):
+        # update current_time 
+        no_of_cycles= len(self.traces[0][1]) 
+        self.current_time += no_of_cycles
+
+        # clear monitor traces
         self.monitors.reset_monitors()
         self.update_arguments(self.devices, self.monitors)
+
 
     def on_paint(self, event):
         """Handle the paint event."""
