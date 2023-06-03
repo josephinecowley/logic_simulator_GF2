@@ -113,9 +113,9 @@ class Parser:
         # List of syntax errors
         self.syntax_errors = [self.NO_DEVICES_KEYWORD, self.NO_CONNECTIONS_KEYWORD, self.NO_MONITORS_KEYWORD, self.NO_END_KEYWORD, self.NO_BRACE_OPEN,
                               self.NO_BRACE_CLOSE, self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_BRACKET_OPEN, self.NO_BRACKET_CLOSE,
-                              self.NO_NUMBER, self.INPUT_OUT_OF_RANGE, self.CLK_OUT_OF_RANGE, self.SWITCH_OUT_OF_RANGE, self.UNDEFINED_NAME,
+                              self.NO_NUMBER, self.INPUT_OUT_OF_RANGE, self.CLK_OUT_OF_RANGE, self.BINARY_NUMBER_OUT_OF_RANGE, self.UNDEFINED_NAME,
                               self.NO_FULLSTOP, self.NO_SEMICOLON, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE,
-                              self.TERMINATE, self.WRONG_ORDER] = self.names.unique_error_codes(24)
+                              self.TERMINATE, self.WRONG_ORDER, self.NO_COMMA] = self.names.unique_error_codes(25)
 
     # Stopping symbols automatically assigned to semi-colons, braces and keywords
     def display_error(self,  symbol, error_type, display=True, display_marker=True, proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
@@ -191,10 +191,10 @@ class Parser:
             # Semantic error
             print(
                 "Input clock half period is out of range. Must be a positive integer", end="\n \n")
-        elif error_type == self.SWITCH_OUT_OF_RANGE:
+        elif error_type == self.BINARY_NUMBER_OUT_OF_RANGE:
             # Semantic error
             print(
-                "Input switch number is out of range. Must be either 1 or 0", end="\n \n")
+                "Input number is out of range. Must be either 1 or 0", end="\n \n")
         elif error_type == self.UNDEFINED_NAME:
             # Syntax error
             print("Undefined device name given", end="\n \n")
@@ -269,6 +269,10 @@ class Parser:
             # Syntax error
             print(
                 "Wrong keyword entered, ensure order of lists is: DEVICES, CONNECTIONS, MONITORS, END. \n          Program terminated early as this is an error which cannot be easily handled.", end="\n \n")
+        elif error_type == self.monitors.NO_COMMA:
+            # Syntax error
+            print(
+                "Expected a comma", end="\n \n")
         else:
             raise ValueError("Expected a valid error code")
 
@@ -619,7 +623,7 @@ class Parser:
                                 proceed=False)
                             return None, None
                     else:
-                        self.display_error(self.symbol, self.SWITCH_OUT_OF_RANGE,
+                        self.display_error(self.symbol, self.BINARY_NUMBER_OUT_OF_RANGE,
                                            proceed=False)
                         return None, None
                 else:
@@ -723,17 +727,17 @@ class Parser:
                                                        proceed=False)
                             else:
                                 print("wrong signal given!")
-                                self.display_error(self.symbol, self.SWITCH_OUT_OF_RANGE,
+                                self.display_error(self.symbol, self.BINARY_NUMBER_OUT_OF_RANGE,
                                                    proceed=False)  # JC! you need to change this to it's own own no comma
                         else:
                             print("no comma!")
-                            self.display_error(self.symbol, self.SWITCH_OUT_OF_RANGE,
-                                               proceed=False)  # JC! you need to change this to it's own own no comma
+                            self.display_error(self.symbol, self.NO_COMMA,
+                                               proceed=False)
 
                     else:
                         print("out of siggen range!")
-                        self.display_error(self.symbol, self.SWITCH_OUT_OF_RANGE,
-                                           proceed=False)  # JC! you need to change this to it's own own out of range error later
+                        self.display_error(self.symbol, self.BINARY_NUMBER_OUT_OF_RANGE,
+                                           proceed=False)
                         return None, None
                 else:
                     self.display_error(self.symbol, self.NO_NUMBER,
