@@ -153,7 +153,7 @@ class Scanner:
             self.load_scanner_data(symbol)
             symbol.type = self.EOF
         
-        elif self.current_character == "[":
+        elif self.current_character == "[": # siggen signal opener
             signal_string = self.get_siggen_signal()
             symbol.type = self.SIGNAL
 
