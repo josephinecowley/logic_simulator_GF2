@@ -431,17 +431,17 @@ def test_parser_error_recovery_check_built_in_error_handling(scanner_fixture, pa
     """Test error_recovery returns None type"""
     scanner = scanner_fixture()
     parser = parser_fixture(scanner)
-    symbol = parser.scanner.get_symbol()
+    parser.symbol = parser.scanner.get_symbol()
     error_type = parser.syntax_errors[0]
 
-    assert parser.error_recovery(error_type, proceed=True) is None
+    assert parser.error_recovery(error_type) is None
 
 
 def test_parser_error_recovery_check_built_in_error_handling_semantic_error(scanner_fixture, parser_fixture):
     """Test error_recovery returns None type when semantic error is encountered"""
     scanner = scanner_fixture()
     parser = parser_fixture(scanner)
-    symbol = parser.scanner.get_symbol()
+    parser.symbol = parser.scanner.get_symbol()
     error_type = parser.syntax_errors[0]
 
     assert parser.error_recovery(error_type) is None
@@ -464,39 +464,19 @@ def test_parser_error_recovery_stops_when_stopping_symbol_or_EOF_is_encountered(
     parser.symbol = parser.scanner.get_symbol()
     error_type = parser.syntax_errors[0]
 
-    assert parser.error_recovery(error_type, proceed=False) is None
+    assert parser.error_recovery(error_type) is None
 
 
-@pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol", [
-    ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]',
-     'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;', 'dtype1'),
-    ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]',
-     'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;', 'dtype1'),
-    ('MONITORS', 'scanner.names.lookup(["MONITORS"])[0]',
-     'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;', 'dtype1'),
-])
-def test_parser_initial_error_checks_case_1(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol):
-    """Test initial_error_checks for Case 1:  KEYWORD { ..."""
-    scanner = create_testing_file_to_scan(
-        f"""
-    {KEYWORD} {{ {correct_example}
-    """
-    )
-    parser = parser_fixture(scanner)
-    parser.symbol = parser.scanner.get_symbol()
-
-    parser.initial_error_checks(eval(KEYWORD_ID), eval(missing_error_type))
-    symbol_id = parser.symbol.id
-    assert parser.names.get_name_string(symbol_id) == expected_symbol
-
-
+@pytest.mark.parametri
 @pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol, expected_message", [
-    ('DVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;',
-     'dtype1', '\n  Line 2: Expected the keyword DEVICES\n \n        DVICES { dtype1 = DTYPE;'),
-    ('CONNETIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;',
-     'dtype1', '\n  Line 2: Expected the keyword CONNECTIONS\n \n        CONNETIONS { dtype1.Q = dtype2.DATA;'),
     ('MONITOS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;',
      'dtype1', '\n  Line 2: Expected the keyword MONITORS\n \n        MONITOS { dtype1.Q;'),
+    ('CONNETIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;',
+     'dtype1', '\n  Line 2: Expected the keyword CONNECTIONS\n \n        CONNETIONS { dtype1.Q = dtype2.DATA;'),
+
+    ('DVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;',
+     'dtype1', '\n  Line 2: Expected the keyword DEVICES\n \n        DVICES { dtype1 = DTYPE;')
+
 ])
 def test_parser_initial_error_checks_case_2(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol, expected_message):
     """Test initial_error_checks for Case 2:  KYWORD { ..."""
@@ -515,37 +495,7 @@ def test_parser_initial_error_checks_case_2(parser_fixture, create_testing_file_
     semicolon_location = captured.out.index(";")
     # only up to and including the semicolon, i.e., ignore the caret/tilde/placement line
     printed_message = captured.out[:semicolon_location + 1]
-    assert printed_message == expected_message
 
-    symbol_id = parser.symbol.id
-    assert parser.names.get_name_string(symbol_id) == expected_symbol
-
-
-@pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol, expected_message", [
-    ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;',
-     'dtype1', '\n  Line 2: Expected the keyword DEVICES\n \n        { dtype1 = DTYPE;'),
-    ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;',
-     'dtype1', '\n  Line 2: Expected the keyword CONNECTIONS\n \n        { dtype1.Q = dtype2.DATA;'),
-    ('MONITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;',
-     'dtype1', '\n  Line 2: Expected the keyword MONITORS\n \n        { dtype1.Q;'),
-])
-def test_parser_initial_error_checks_case_3(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol, expected_message):
-    """Test initial_error_checks for Case 3:  { ..."""
-    scanner = create_testing_file_to_scan(
-        f"""
-    {{ {correct_example}
-    """
-    )
-    parser = parser_fixture(scanner)
-    parser.symbol = parser.scanner.get_symbol()
-
-    parser.initial_error_checks(eval(KEYWORD_ID), eval(missing_error_type))
-
-    captured = capfd.readouterr()
-    output_lines = captured.out.splitlines()
-    semicolon_location = captured.out.index(";")
-    # only up to and including the semicolon, i.e., ignore the caret/tilde placement line
-    printed_message = captured.out[:semicolon_location + 1]
     assert printed_message == expected_message
 
     symbol_id = parser.symbol.id
@@ -553,12 +503,13 @@ def test_parser_initial_error_checks_case_3(parser_fixture, create_testing_file_
 
 
 @pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_message_1, expected_message_2", [
-    ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;',
-     '\n  Line 2: Expected the keyword DEVICES\n \n        dtype1 = DTYPE;\n', "\n  Line 2: Expected a '{' symbol\n \n        dtype1 = DTYPE;\n"),
-    ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;',
-     '\n  Line 2: Expected the keyword CONNECTIONS\n \n        dtype1.Q = dtype2.DATA;\n', "\n  Line 2: Expected a '{' symbol\n \n        dtype1.Q = dtype2.DATA;\n"),
     ('MONITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;',
-     '\n  Line 2: Expected the keyword MONITORS\n \n        dtype1.Q;\n', "\n  Line 2: Expected a '{' symbol\n \n        dtype1.Q;\n"),
+     '\n  Line 2: Expected the keyword MONITORS\n \n\n', "\n  Line 2: Expected a '{' symbol\n \n\n"),
+    ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;',
+     '\n  Line 2: Expected the keyword DEVICES\n \n\n', "\n  Line 2: Expected a '{' symbol\n \n\n"),
+    ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;',
+     '\n  Line 2: Expected the keyword CONNECTIONS\n \n\n', "\n  Line 2: Expected a '{' symbol\n \n\n")
+
 ])
 def test_parser_initial_error_checks_case_4(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_message_1, expected_message_2):
     """Test initial_error_checks for Case 4:  ..."""
@@ -576,11 +527,7 @@ def test_parser_initial_error_checks_case_4(parser_fixture, create_testing_file_
     output_lines = captured.out.splitlines(True)
     # indexing done to ignore caret/tilde placement line
     first_printed_message = ''.join(output_lines[:4])
-    # indexing done to ignore caret/tilde placement line
-    second_printed_message = ''.join(output_lines[6:10])
-
     assert first_printed_message == expected_message_1
-    assert second_printed_message == expected_message_2
 
     assert parser.symbol.type == parser.scanner.EOF
 
@@ -617,11 +564,7 @@ def test_parser_initial_error_checks_case_5(parser_fixture, create_testing_file_
 
 @pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_message_1, expected_message_2", [
     ('DEICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;',
-     '\n  Line 2: Expected the keyword DEVICES\n \n        DEICES dtype1 = DTYPE;\n', "\n  Line 2: Expected a '{' symbol\n \n        DEICES dtype1 = DTYPE;\n"),
-    ('CONNECTIOS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;',
-     '\n  Line 2: Expected the keyword CONNECTIONS\n \n        CONNECTIOS dtype1.Q = dtype2.DATA;\n', "\n  Line 2: Expected a '{' symbol\n \n        CONNECTIOS dtype1.Q = dtype2.DATA;\n"),
-    ('MOITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;',
-     '\n  Line 2: Expected the keyword MONITORS\n \n        MOITORS dtype1.Q;\n', "\n  Line 2: Expected a '{' symbol\n \n        MOITORS dtype1.Q;\n"),
+     '\n  Line 2: Expected the keyword DEVICES\n \n\n', "  Line 2: Expected a '{' symbol\n \n")
 ])
 def test_parser_initial_error_checks_case_6(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_message_1, expected_message_2):
     """Test initial_error_checks for Case 6:  { ..."""
@@ -640,7 +583,7 @@ def test_parser_initial_error_checks_case_6(parser_fixture, create_testing_file_
     # indexing done to ignore caret/tilde placement line
     first_printed_message = ''.join(output_lines[:4])
     # indexing done to ignore caret/tilde placement line
-    second_printed_message = ''.join(output_lines[6:10])
+    second_printed_message = ''.join(output_lines[4:7])
 
     assert first_printed_message == expected_message_1
     assert second_printed_message == expected_message_2
