@@ -148,95 +148,131 @@ class Parser:
         # Display location and type of error
         print(f"\n  Line {symbol.line_number}:", end=" ")
         if error_type == self.NO_DEVICES_KEYWORD:
-            print("Syntax Error: Expected the keyword DEVICES", end="\n \n")
+            # Syntax error
+            print("Expected the keyword DEVICES", end="\n \n")
         elif error_type == self.NO_CONNECTIONS_KEYWORD:
-            print("Syntax Error: Expected the keyword CONNECTIONS", end="\n \n")
+            # Syntax error
+            print("Expected the keyword CONNECTIONS", end="\n \n")
         elif error_type == self.NO_MONITORS_KEYWORD:
-            print("Syntax Error: Expected the keyword MONITORS", end="\n \n")
+            # Syntax error
+            print("Expected the keyword MONITORS", end="\n \n")
         elif error_type == self.NO_END_KEYWORD:
-            print(
-                "Syntax Error: Expected the keyword END straight after monitors list", end="\n \n")
+            # Syntax error
+            print("Expected the keyword END straight after monitors list", end="\n \n")
         elif error_type == self.NO_BRACE_OPEN:
-            print("Syntax Error: Expected a '{' symbol", end="\n \n")
+            # Syntax error
+            print("Expected a '{' symbol", end="\n \n")
         elif error_type == self.NO_BRACE_CLOSE:
-            print("Syntax Error: Expected a '}' symbol", end="\n \n")
+            # Syntax error
+            print("Expected a '}' symbol", end="\n \n")
         elif error_type == self.INVALID_NAME:
-            print("Syntax Error: Invalid user name entered", end="\n \n")
+            # Syntax error
+            print("Invalid user name entered", end="\n \n")
         elif error_type == self.NO_EQUALS:
-            print("Syntax Error: Expected an '=' symbol", end="\n \n")
+            # Syntax error
+            print("Expected an '=' symbol", end="\n \n")
         elif error_type == self.INVALID_COMPONENT:
-            print("Syntax Error: Invalid component name entered", end="\n \n")
+            # Syntax error
+            print("Invalid component name entered", end="\n \n")
         elif error_type == self.NO_BRACKET_OPEN:
-            print("Syntax Error: Expected a '(' for an input", end="\n \n")
+            # Syntax error
+            print("Expected a '(' for an input", end="\n \n")
         elif error_type == self.NO_BRACKET_CLOSE:
-            print("Syntax Error: Expected a ')' for an input", end="\n \n")
+            # Syntax error
+            print("Expected a ')' for an input", end="\n \n")
         elif error_type == self.NO_NUMBER:
-            print("Syntax Error: Expected a positive integer", end="\n \n")
+            # Syntax error
+            print("Expected a positive integer", end="\n \n")
         elif error_type == self.INPUT_OUT_OF_RANGE:
+            # Semantic error
             print(
-                "Semantic Error: Input number of gates is out of range. Must be an integer between 1 and 16", end="\n \n")
+                "Input number of gates is out of range. Must be an integer between 1 and 16", end="\n \n")
         elif error_type == self.CLK_OUT_OF_RANGE:
+            # Semantic error
             print(
-                "Semantic Error: Input clock half period is out of range. Must be a positive integer", end="\n \n")
+                "Input clock half period is out of range. Must be a positive integer", end="\n \n")
         elif error_type == self.SWITCH_OUT_OF_RANGE:
+            # Semantic error
             print(
-                "Semantic Error: Input switch number is out of range. Must be either 1 or 0", end="\n \n")
+                "Input switch number is out of range. Must be either 1 or 0", end="\n \n")
         elif error_type == self.UNDEFINED_NAME:
-            print("Syntax Error: Undefined device name given", end="\n \n")
+            # Syntax error
+            print("Undefined device name given", end="\n \n")
         elif error_type == self.NO_FULLSTOP:
-            print("Syntax Error: Expected a full stop", end="\n \n")
+            # Syntax error
+            print("Expected a full stop", end="\n \n")
         elif error_type == self.NO_SEMICOLON:
-            print("Syntax Error: Expected a semicolon", end="\n \n")
+            # Syntax error
+            print("Expected a semicolon", end="\n \n")
         elif error_type == self.NO_Q_OR_QBAR:
-            print("Syntax Error: Expected a Q or QBAR after the full stop", end="\n \n")
+            # Syntax error
+            print("Expected a Q or QBAR after the full stop", end="\n \n")
         elif error_type == self.NO_INPUT_SUFFIX:
-            print("Syntax Error: Expected a valid input suffix", end="\n \n")
+            # Syntax error
+            print("Expected a valid input suffix", end="\n \n")
         elif error_type == self.SYMBOL_AFTER_END:
-            print(
-                "Syntax Error: There should not be any text after the keyword END", end="\n \n")
+            # Syntax error
+            print("There should not be any text after the keyword END", end="\n \n")
         elif error_type == self.EMPTY_FILE:
-            print("Syntax Error: Cannot parse an empty file", end="\n \n")
+            # Syntax error
+            print("Cannot parse an empty file", end="\n \n")
         elif error_type == self.TERMINATE:
+            # Syntax error
             print(
-                "Syntax Error: Could not find parsing point to restart, program terminated early", end="\n \n")
+                "Could not find parsing point to restart, program terminated early", end="\n \n")
         elif error_type == self.devices.INVALID_QUALIFIER:
-            print("Semantic Error: Invalid device property", end="\n \n")
+            # Semantic error
+            print("Invalid device property", end="\n \n")
         elif error_type == self.devices.NO_QUALIFIER:
+            # Semantic error
             print(
-                "Semantic Error: Expected a device property for initialisation", end="\n \n")
+                "Expected a device property for initialisation", end="\n \n")
         elif error_type == self.devices.QUALIFIER_PRESENT:
+            # Semantic error
             print(
-                "Semantic Error: Expected no device property for this device", end="\n \n")
+                "Expected no device property for this device", end="\n \n")
         elif error_type == self.devices.DEVICE_PRESENT:
-            print("Semantic Error: Device already exists in the device list", end="\n \n")
+            # Semantic error
+            print("Device already exists in the device list", end="\n \n")
         elif error_type == self.devices.BAD_DEVICE:
-            print("Semantic Error: Invalid type of device", end="\n \n")
+            # Semantic error
+            print("Invalid type of device", end="\n \n")
         elif error_type == self.network.INPUT_TO_INPUT:
+            # Semantic error
             print(
-                "Semantic Error: Cannot connect an input port to another input port", end="\n \n")
+                "Cannot connect an input port to another input port", end="\n \n")
         elif error_type == self.network.OUTPUT_TO_OUTPUT:
+            # Semantic error
             print(
-                "Semantic Error: Cannot connect an output port to another output port", end="\n \n")
+                "Cannot connect an output port to another output port", end="\n \n")
         elif error_type == self.network.INPUT_CONNECTED:
+            # Semantic error
             print(
-                "Semantic Error: Cannot connect input port as it is already connected", end="\n \n")
+                "Cannot connect input port as it is already connected", end="\n \n")
         elif error_type == self.network.PORT_ABSENT:
+            # Semantic error
             print(
-                "Semantic Error: Cannot make connection as specified port does not exist", end="\n \n")
+                "Cannot make connection as specified port does not exist", end="\n \n")
         elif error_type == self.network.DEVICE_ABSENT:
+            # Semantic error
             print(
-                "Semantic Error: Cannot make connection as device is undefined in DEVICE list", end="\n \n")
+                "Cannot make connection as device is undefined in DEVICE list", end="\n \n")
         elif error_type == self.FLOATING_INPUT:
+            # Semantic error
             print(
-                "Semantic Error: Cannot make network as not all inputs are connected to an output", end="\n \n")
+                "Cannot make network as not all inputs are connected to an output", end="\n \n")
         elif error_type == self.monitors.NOT_OUTPUT:
-            print("Semantic Error: Cannot assign a monitor as specified device port is not an output port", end="\n \n")
+            # Semantic error
+            print(
+                "Cannot assign a monitor as specified device port is not an output port", end="\n \n")
         elif error_type == self.monitors.MONITOR_PRESENT:
+            # Semantic error
             print(
-                "Semantic Error: Cannot assign more than one monitor to a single device output port", end="\n \n")
+                "Cannot assign more than one monitor to a single device output port", end="\n \n")
         elif error_type == self.WRONG_ORDER:
+            # Syntax error
             print(
-                "Syntax Error: Wrong keyword entered, ensure order of lists is: DEVICES, CONNECTIONS, MONITORS, END", end="\n \n")
+                "Wrong keyword entered, ensure order of lists is: DEVICES, CONNECTIONS, MONITORS, END", end="\n \n")
         else:
             raise ValueError("Expected a valid error code")
 
