@@ -42,7 +42,7 @@ class Parser:
     display_error(self, symbol, error_type, proceed=True, stopping_symbol_types=[6]): Display the error message and where it occured.
     Calls the error handling method to resume from the next available point.
 
-    error_recovery(self, error_type, proceed=True, stopping_symbol_types=[6]): Recover from an error by resuming parsing at an appropriate 
+    error_recovery(self, error_type, proceed=True, stopping_symbol_types=[6]): Recover from an error by resuming parsing at an appropriate
     point specified by the stopping_symbol.
 
     initial_error_checks(self, KEYWORD_ID, missing_error_type): Check initial symbols for common errors. This function tests for 6 cases:
@@ -115,7 +115,7 @@ class Parser:
                               self.NO_BRACE_CLOSE, self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_BRACKET_OPEN, self.NO_BRACKET_CLOSE,
                               self.NO_NUMBER, self.INPUT_OUT_OF_RANGE, self.CLK_OUT_OF_RANGE, self.SWITCH_OUT_OF_RANGE, self.UNDEFINED_NAME,
                               self.NO_FULLSTOP, self.NO_SEMICOLON, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE,
-                              self.FLOATING_INPUT, self.TERMINATE, self.WRONG_ORDER] = self.names.unique_error_codes(25)
+                              self.TERMINATE, self.WRONG_ORDER] = self.names.unique_error_codes(24)
 
     # Stopping symbols automatically assigned to semi-colons, braces and keywords
     def display_error(self,  symbol, error_type, proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
@@ -257,10 +257,6 @@ class Parser:
             # Semantic error
             print(
                 "Cannot make connection as device is undefined in DEVICE list", end="\n \n")
-        elif error_type == self.FLOATING_INPUT:
-            # Semantic error
-            print(
-                "Cannot make network as not all inputs are connected to an output", end="\n \n")
         elif error_type == self.monitors.NOT_OUTPUT:
             # Semantic error
             print(
@@ -999,11 +995,38 @@ class Parser:
                 # Parse connection list
                 self.connection_list()
 
-                # Check all inputs in network are connected to an output
+                # If there are no semantic errors, check the 'built' network
                 if self.error_count == 0:
+
+                    # If network is not valid (check there are no floating inputs)
                     if not self.network.check_network():
-                        self.display_error(
-                            self.symbol, self.FLOATING_INPUT)
+
+                        # Initiate lists to hold missing input id ports and corresponding devices
+                        missing_input_id_list = []
+                        device_missing_input_id_list = []
+
+                        # Loop through device list to identify where the missing input connection is
+                        for i in self.devices.devices_list:
+
+                            # Look through each item in each device class
+                            for input_id, value in i.inputs.items():
+                                if value == None:
+
+                                    # Increase error count by one as this is a semantic error (floating input error)
+                                    self.error_count += 1
+
+                                    # For the missing input port, assign this port id and corresponding device id
+                                    missing_input_id_list.append(input_id)
+                                    device_missing_input_id_list.append(i)
+
+                        # Carry out display error for FLOATING_INPUT here to allow us to display missing/incorrect input port
+                        print(
+                            "Cannot build network as not all inputs have a valid connection", end="\n \n")
+                        print(
+                            f"Missing {self.error_count} input(s): ", end="\n \n")
+                        for j in range(len(missing_input_id_list)):
+                            print(self.names.get_name_string(
+                                device_missing_input_id_list[j].device_id)+"."+self.names.get_name_string(missing_input_id_list[j]), end="\n \n")
 
                 # If nothing after connections list
                 if self.symbol.type == self.scanner.EOF:
