@@ -417,9 +417,36 @@ class RunSimulationPanel(wx.Panel):
         left_buttons_panel_hbox.Add(
             self.run_button, 1, flag=wx.ALIGN_LEFT, border=5)
 
+        # Create and add cycles + left buttons panel to RunSimulationPanel
+        hbox.Add(self.cycles_and_left_buttons_panel, 1, flag=wx.ALIGN_LEFT)
+
+        self.centre_panel = wx.Panel(self)
+        centre_panel_vbox = wx.BoxSizer(wx.VERTICAL)
+        self.centre_panel.SetSizer(centre_panel_vbox)
+        hbox.Add(self.centre_panel, 2, flag=wx.EXPAND)
+
+        self.centre_panel_top_padding = wx.Panel(self.centre_panel)
+        centre_panel_vbox.Add(self.centre_panel_top_padding, 1, flag=wx.EXPAND)
+
+        self.centre_panel_bottom_padding = wx.Panel(self.centre_panel)
+        centre_panel_bottom_padding_hbox = wx.BoxSizer(wx.HORIZONTAL)
+        self.centre_panel_bottom_padding.SetSizer(centre_panel_bottom_padding_hbox)
+        centre_panel_vbox.Add(self.centre_panel_bottom_padding, 2, flag=wx.EXPAND)
+
+        self.centre_panel_bottom_padding_left = wx.Panel(self.centre_panel_bottom_padding)
+        centre_panel_bottom_padding_hbox.Add(self.centre_panel_bottom_padding_left, 1, flag=wx.EXPAND)
+
+        self.centre_panel_bottom_padding_centre = wx.Panel(self.centre_panel_bottom_padding)
+        centre_panel_bottom_padding_hbox.Add(self.centre_panel_bottom_padding_centre, 2, flag=wx.EXPAND)
+
+        self.centre_panel_bottom_padding_right = wx.Panel(self.centre_panel_bottom_padding)
+        centre_panel_bottom_padding_right_vbox = wx.BoxSizer(wx.VERTICAL)
+        self.centre_panel_bottom_padding_right.SetSizer(centre_panel_bottom_padding_right_vbox)
+        centre_panel_bottom_padding_hbox.Add(self.centre_panel_bottom_padding_right, 1, flag=wx.EXPAND)
+
         # Create, bind quitting event to and add the "Quit simulation" button
         self.quit_button = wxbuttons.GenButton(
-            self.left_buttons_panel, wx.ID_ANY, "QUIT", name="quit button")
+            self.centre_panel_bottom_padding_right, wx.ID_ANY, "QUIT", name="quit button")
         self.Bind(wx.EVT_BUTTON, parent.on_quit_button, self.quit_button)
         self.quit_button.SetFont(wx.Font(
             20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
@@ -428,15 +455,8 @@ class RunSimulationPanel(wx.Panel):
         self.quit_button.SetBackgroundColour(wx.Colour(139, 26, 26))
         self.quit_button.SetForegroundColour(wx.WHITE)
         self.quit_button.SetToolTip("Quit the simulation")
-        left_buttons_panel_hbox.Add(
-            self.quit_button, 1, flag=wx.ALIGN_LEFT, border=5)
-
-        # Create and add cycles + left buttons panel to RunSimulationPanel
-        hbox.Add(self.cycles_and_left_buttons_panel, 1, flag=wx.ALIGN_LEFT)
-
-        self.centre_panel = wx.Panel(self)
-        centre_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
-        hbox.Add(self.centre_panel, 2, flag=wx.EXPAND)
+        centre_panel_bottom_padding_right_vbox.Add(
+            self.quit_button, 1, flag=wx.ALIGN_RIGHT, border=5)
 
         self.upload_and_help_buttons_panel = wx.Panel(
             self, name="upload and help buttons panel")
