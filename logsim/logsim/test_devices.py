@@ -18,11 +18,13 @@ def devices_with_items():
     new_names = Names()
     new_devices = Devices(new_names)
 
-    [AND1_ID, NOR1_ID, SW1_ID] = new_names.lookup(["And1", "Nor1", "Sw1"])
+    [AND1_ID, NOR1_ID, SW1_ID, SIG_ID, RC_ID] = new_names.lookup(["And1", "Nor1", "Sw1", "Sig1", "RC1"])
 
     new_devices.make_device(AND1_ID, new_devices.AND, 2)
     new_devices.make_device(NOR1_ID, new_devices.NOR, 16)
     new_devices.make_device(SW1_ID, new_devices.SWITCH, 0)
+    new_devices.make_device(SIG_ID, new_devices.SIGGEN, (new_devices.HIGH, [1, 2, 3, 4]) )
+    new_devices.make_device(RC_ID, new_devices.RC, 4)
 
     return new_devices
 
