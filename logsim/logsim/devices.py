@@ -41,8 +41,10 @@ class Device:
         self.clock_counter = None
         self.switch_state = None
         self.dtype_memory = None
+
         self.siggen_initial_state = None
         self.siggen_signal_list = None
+        self.siggen_counter = None
 
 
 class Devices:
@@ -248,8 +250,10 @@ class Devices:
         signal periods. """
         self.add_device(device_id, self.SIGGEN)
         device = self.get_device(device_id)
+
         device.siggen_initial_state = initial_state
         device.siggen_signal_list = signal_list
+        device.siggen.counter = 0
 
     def make_gate(self, device_id, device_kind, no_of_inputs):
         """Make logic gates with the specified number of inputs."""
