@@ -56,6 +56,16 @@ class Network:
 
     update_clocks(self): If it is time to do so, sets clock signals to RISING
                          or FALLING.
+    
+    execute_siggen(self, device_id):
+        Simulate a siggen device and update its output signal value.
+
+    update_siggens(self): If it is time to do so, set siggen signals to RISING 
+                          or FALLING.
+    
+    execute_RC(self, device_id): Simulate an RC device and update its output signal value.
+
+    update_RCs(self): If it is time to do so, set RC signals to FALLING.
 
     execute_network(self): Executes all the devices in the network for one
                            simulation cycle.
@@ -394,7 +404,7 @@ class Network:
             device.siggen_counter += 1
 
     def execute_RC(self, device_id):
-        """Simulate an RC device and update its output signal value
+        """Simulate an RC device and update its output signal value.
 
         Return True if successful."""
         device = self.devices.get_device(device_id)
