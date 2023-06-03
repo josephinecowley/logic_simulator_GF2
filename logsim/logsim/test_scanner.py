@@ -75,7 +75,7 @@ def test_scanner_initialisation(scanner_fixture, names_fixture):
     assert scanner.line_number == 1
     assert scanner.position == 0
     assert scanner.names is names_fixture
-    assert scanner.symbol_type_list == range(0, 12)
+    assert scanner.symbol_type_list == range(0, 13)
     assert scanner.keywords_list == [
         "DEVICES", "CONNECTIONS", "MONITORS", "END"]
     assert scanner.DEVICES_ID is not None
