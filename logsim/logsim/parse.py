@@ -115,7 +115,7 @@ class Parser:
                               self.NO_BRACE_CLOSE, self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_BRACKET_OPEN, self.NO_BRACKET_CLOSE,
                               self.NO_NUMBER, self.INPUT_OUT_OF_RANGE, self.CLK_OUT_OF_RANGE, self.BINARY_NUMBER_OUT_OF_RANGE, self.UNDEFINED_NAME,
                               self.NO_FULLSTOP, self.NO_SEMICOLON, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE,
-                              self.TERMINATE, self.WRONG_ORDER, self.NO_COMMA] = self.names.unique_error_codes(25)
+                              self.TERMINATE, self.WRONG_ORDER, self.NO_COMMA, self.EMPTY_DEVICE_LIST] = self.names.unique_error_codes(26)
 
     # Stopping symbols automatically assigned to semi-colons, braces and keywords
     def display_error(self,  symbol, error_type, display=True, display_marker=True, proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
@@ -268,11 +268,15 @@ class Parser:
         elif error_type == self.WRONG_ORDER:
             # Syntax error
             print(
-                "Wrong keyword entered, ensure order of lists is: DEVICES, CONNECTIONS, MONITORS, END. \n          Program terminated early as this is an error which cannot be easily handled.", end="\n \n")
-        elif error_type == self.monitors.NO_COMMA:
+                "Wrong keyword entered, ensure order of lists is: DEVICES, CONNECTIONS, MONITORS, END.\n          Program terminated early as this is an error which cannot be handled.", end="\n \n")
+        elif error_type == self.NO_COMMA:
             # Syntax error
             print(
                 "Expected a comma", end="\n \n")
+        elif error_type == self.EMPTY_DEVICE_LIST:
+            # Syntax error
+            print(
+                "Cannot parse an empty device list.\n          Program terminated early as this is an error which cannot be handled.", end="\n \n")
         else:
             raise ValueError("Expected a valid error code")
 
@@ -360,7 +364,7 @@ class Parser:
 
                 # If symbol type is not open brace '{'
                 if not (self.symbol.type == self.scanner.BRACE_OPEN):
-                    # Cannot differentiate easily between Case 4 and Case 6 thus will proceed to next stopping symbol
+                    # Cannot differentiate between Case 4 and Case 6 thus will proceed to next stopping symbol
                     # Case 4: ...
                     # and Case 6: D ...
                     self.display_error(
@@ -418,6 +422,12 @@ class Parser:
         self.initial_error_checks(DEVICES_ID, self.NO_DEVICES_KEYWORD)
         # If catastrophic error occors, and symbol type is now EOF
         if self.symbol.type == self.scanner.EOF:
+            return True
+
+        # If Device list is empty
+        if self.symbol.type == self.scanner.BRACE_CLOSE:
+            self.display_error(self.symbol, self.EMPTY_DEVICE_LIST,
+                               display=False, proceed=False, stopping_symbol_types=[11])
             return True
 
         # Parse device
@@ -726,16 +736,13 @@ class Parser:
                                     self.display_error(self.symbol, self.NO_BRACKET_CLOSE,
                                                        proceed=False)
                             else:
-                                print("wrong signal given!")
                                 self.display_error(self.symbol, self.BINARY_NUMBER_OUT_OF_RANGE,
                                                    proceed=False)  # JC! you need to change this to it's own own no comma
                         else:
-                            print("no comma!")
                             self.display_error(self.symbol, self.NO_COMMA,
                                                proceed=False)
 
                     else:
-                        print("out of siggen range!")
                         self.display_error(self.symbol, self.BINARY_NUMBER_OUT_OF_RANGE,
                                            proceed=False)
                         return None, None
@@ -765,6 +772,8 @@ class Parser:
         # If catastrophic error occors, and symbol type is now EOF
         if self.symbol.type == self.scanner.EOF:
             return True
+
+            # JC! NEED TO ADD ERROR HANDLING FOR EMTPY CONNECTION AND MONITOR LISTS
 
         # Parse a connection
         self.connection()
