@@ -382,12 +382,6 @@ class RunSimulationPanel(wx.Panel):
         self.cycles_panel.SetSizer(cycles_hbox)
         vbox.Add(self.cycles_panel)
 
-        # Create, configure, set and add left buttons panel to overall cycles + left buttons panel
-        self.left_buttons_panel = wx.Panel(self.cycles_and_left_buttons_panel)
-        left_buttons_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
-        self.left_buttons_panel.SetSizer(left_buttons_panel_hbox)
-        vbox.Add(self.left_buttons_panel)
-
         # Create and add number of cycles text to cycles panel
         str = "No. Cycles"
         text = wx.StaticText(self.cycles_panel, wx.ID_ANY,
@@ -403,9 +397,20 @@ class RunSimulationPanel(wx.Panel):
         self.Bind(wx.EVT_SPINCTRL, self.on_spin, self.cycles_spin_control)
         cycles_hbox.Add(self.cycles_spin_control, 0, flag=wx.LEFT, border=10)
 
-        # Create, bind running simulation event to and add the "Run simulation" button
+        # Create, configure, set and add left buttons panel to overall cycles + left buttons panel
+        self.left_buttons_panel = wx.Panel(self.cycles_and_left_buttons_panel)
+        left_buttons_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
+        self.left_buttons_panel.SetSizer(left_buttons_panel_hbox)
+        vbox.Add(self.left_buttons_panel)
+
+        # Create, bind running simulation event to and add the "RUN" button to the RUN button panel in left buttons panel
+        self.run_button_panel = wx.Panel(self.left_buttons_panel)
+        run_buttons_panel_vbox = wx.BoxSizer(wx.VERTICAL)
+        self.run_button_panel.SetSizer(run_buttons_panel_vbox)
+        left_buttons_panel_hbox.Add(self.run_button_panel)
+
         self.run_button = wxbuttons.GenButton(
-            self.left_buttons_panel, wx.ID_ANY, "RUN", name="run button")
+            self.run_button_panel, wx.ID_ANY, "RUN", name="run button")
         self.Bind(wx.EVT_BUTTON, self.on_run_button, self.run_button)
         self.run_button.SetFont(wx.Font(
             20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
@@ -414,8 +419,36 @@ class RunSimulationPanel(wx.Panel):
         self.run_button.SetBackgroundColour(wx.Colour(4, 84, 14))
         self.run_button.SetForegroundColour(wx.WHITE)
         self.run_button.SetToolTip("Begin running the simulation")
-        left_buttons_panel_hbox.Add(
+        run_buttons_panel_vbox.Add(
             self.run_button, 1, flag=wx.ALIGN_LEFT, border=5)
+        
+        # Create, bind clearing signal traces event to and add the "CLEAR" button
+        self.clear_button = wxbuttons.GenButton(
+            self.left_buttons_panel, wx.ID_ANY, "CLEAR", name="clear button")
+        self.Bind(wx.EVT_BUTTON, self.on_run_button, self.run_button)
+        self.clear_button.SetFont(wx.Font(
+            20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
+        self.clear_button.SetBezelWidth(5)
+        self.clear_button.SetMinSize(wx.DefaultSize)
+        self.clear_button.SetBackgroundColour(wx.Colour(0, 0, 205))
+        self.clear_button.SetForegroundColour(wx.WHITE)
+        self.clear_button.SetToolTip("Begin running the simulation")
+        left_buttons_panel_hbox.Add(
+            self.clear_button, 1, flag=wx.ALIGN_LEFT, border=5)
+        
+        # Create, bind resetting signal traces event to and add the "RESET" button
+        self.reset_button = wxbuttons.GenButton(
+            self.left_buttons_panel, wx.ID_ANY, "RESET", name="reset button")
+        self.Bind(wx.EVT_BUTTON, self.on_run_button, self.run_button)
+        self.reset_button.SetFont(wx.Font(
+            20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
+        self.reset_button.SetBezelWidth(5)
+        self.reset_button.SetMinSize(wx.DefaultSize)
+        self.reset_button.SetBackgroundColour(wx.Colour(205, 102, 29))
+        self.reset_button.SetForegroundColour(wx.WHITE)
+        self.reset_button.SetToolTip("Begin running the simulation")
+        left_buttons_panel_hbox.Add(
+            self.reset_button, 1, flag=wx.ALIGN_LEFT, border=5)
 
         # Create and add cycles + left buttons panel to RunSimulationPanel
         hbox.Add(self.cycles_and_left_buttons_panel, 1, flag=wx.ALIGN_LEFT)
