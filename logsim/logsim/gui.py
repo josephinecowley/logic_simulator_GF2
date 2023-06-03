@@ -1089,9 +1089,9 @@ class AddDeviceDialog(wx.Dialog):
         self.switches_panel.Layout()
 
 
-'''class LogicSimApp(wx.App):
+class LogicSimApp(wx.App):
     def OnInit(self):
-        file_path = "./example1_logic_description.txt"
+        file_path = "logsim\logsim\example1_logic_description.txt"
         with open(file_path) as f:
             print('success')
         names = Names()
@@ -1101,7 +1101,7 @@ class AddDeviceDialog(wx.Dialog):
         scanner = Scanner(file_path, names)
         parser = Parser(names, devices, network, monitors, scanner)
         parser.parse_network()
-        self.frame = Gui("GF2 Team 7 Logic Simulator GUI",
+        self.frame = Gui(f"GF2 Team 7 Logic Simulator GUI: {file_path}",
                          file_path,
                          names,
                          devices,
@@ -1115,4 +1115,4 @@ class AddDeviceDialog(wx.Dialog):
 # KO! For development purposes only - will delete once complete
 if __name__ == "__main__":
     app = LogicSimApp()
-    app.MainLoop()'''
+    app.MainLoop()
