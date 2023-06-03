@@ -344,7 +344,7 @@ class Network:
                 elif output_signal == self.devices.LOW:
                     device.outputs[None] = self.devices.RISING
             device.clock_counter += 1
-    
+
     def execute_siggen(self, device_id):
         """Simulate a siggen device and update its output signal value.
 
@@ -380,9 +380,9 @@ class Network:
             signal_list = device.siggen_signal_list
             signal_length = len(signal_list)
 
-            if device.siggen_counter == signal_length: # if one greater than the last index of signal
-                device.siggen_counter = 0 # reset counter to 0
-            
+            if device.siggen_counter == signal_length:  # if one greater than the last index of signal
+                device.siggen_counter = 0  # reset counter to 0
+
             target = signal_list[device.siggen_counter]
             output_signal = self.get_output_signal(device_id, output_id=None)
 
@@ -390,12 +390,12 @@ class Network:
                 device.outputs[None] = self.devices.RISING
             elif output_signal == self.devices.HIGH and target == self.devices.LOW:
                 device.outputs[None] = self.devices.FALLING
-            
+
             device.siggen_counter += 1
-        
+
     def execute_RC(self, device_id):
         """Simulate an RC device and update its output signal value
-        
+
         Return True if successful."""
         device = self.devices.get_device(device_id)
         output_signal = device.outputs[None]  # output ID is None
@@ -412,7 +412,7 @@ class Network:
 
         else:
             return False
-        
+
     def update_RCs(self):
         """If it is time to do so, set RC signals to FALLING."""
         RC_devices = self.devices.find_devices(self.devices.RC)
@@ -422,9 +422,8 @@ class Network:
 
             if device.RC_counter == N:
                 device.outputs[None] = self.devices.FALLING
-            
-            device.siggen_counter += 1
 
+            device.siggen_counter += 1
 
     def execute_network(self):
         """Execute all the devices in the network for one simulation cycle.
