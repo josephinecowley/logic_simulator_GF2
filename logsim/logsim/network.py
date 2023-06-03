@@ -384,29 +384,14 @@ class Network:
                 device.siggen_counter = 0 # reset counter to 0
             
             target = signal_list[device.siggen_counter]
-            output_signal = 
+            output_signal = self.get_output_signal(device_id, output_id=None)
 
-
-            current_index = device.siggen_counter%(signal_length) 
-            if device.siggen_counter == signal_length:
-                device.siggen_counter = 0
-                output_signal = self.get_output_signal(device_id,
-                                                       output_id=None)
-                if output_signal == self.devices.HIGH:
-                    device.outputs[None] = self.devices.FALLING
-                elif output_signal == self.devices.LOW:
-                    device.outputs[None] = self.devices.RISING
+            if output_signal == self.devices.LOW and target == self.devices.HIGH:
+                device.outputs[None] = self.devices.RISING
+            elif output_signal == self.devices.HIGH and target == self.devices.LOW:
+                device.outputs[None] = self.devices.FALLING
+            
             device.siggen_counter += 1
-
-        target = device.switch_state
-        signal = self.get_output_signal(device_id, output_id=None)
-        # Update and store the updated signal
-        updated_signal = self.update_signal(signal, target)
-        if updated_signal is None:  # signal update is unsuccessful
-            return False
-        else:
-            device.outputs[None] = updated_signal
-            return True
 
     def execute_network(self):
         """Execute all the devices in the network for one simulation cycle.
