@@ -84,19 +84,19 @@ class Gui(wx.Frame):
         data_panel.SetSizer(hbox)
 
         # Instantiate SignalTracesPanel widget and add to Frame
-        signal_traces_panel = SignalTracesPanel(
+        self.signal_traces_panel = SignalTracesPanel(
             data_panel, names, devices, network, monitors)
-        hbox.Add(signal_traces_panel, 3, wx.EXPAND, 0)
+        hbox.Add(self.signal_traces_panel, 3, wx.EXPAND, 0)
 
         # Instantiate RunSimulationPanel widget and add to Frame
-        simulation_panel = RunSimulationPanel(
-            self, signal_traces_panel, names, devices, network, monitors)
-        vbox.Add(simulation_panel, 1, wx.EXPAND)
+        self.simulation_panel = RunSimulationPanel(
+            self, self.signal_traces_panel, names, devices, network, monitors)
+        vbox.Add(self.simulation_panel, 1, wx.EXPAND)
 
         # Instantiate SwitchesPanel widget and add to Frame
-        switches_panel = SwitchesPanel(
-            data_panel, simulation_panel, names, devices, network, monitors)
-        hbox.Add(switches_panel, 1, wx.EXPAND, 0)
+        self.switches_panel = SwitchesPanel(
+            data_panel, self.simulation_panel, names, devices, network, monitors)
+        hbox.Add(self.switches_panel, 1, wx.EXPAND, 0)
 
         self.SetSizeHints(200, 200)
         self.SetSizer(vbox)
@@ -301,7 +301,7 @@ class RunSimulationPanel(wx.Panel):
         self.update_canvas()
 
     def on_clear_button(self, event):
-        print("CLEAR button has been pressed.")
+        self.parent.signal_traces_panel.canvas.clear_traces()
 
     def on_reset_button(self, event):
         file_path = self.parent.path
