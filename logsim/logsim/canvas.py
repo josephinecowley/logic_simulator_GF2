@@ -79,7 +79,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_PAINT, self.on_paint)
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
-        self.Bind(wx.EVT_RIGHT_DOWN, self.clear_traces)
+        self.Bind(wx.EVT_RIGHT_DOWN, self.on_right_click)
 
         # Initialise trace objects
         self.traces = monitors.get_signals_for_GUI()
@@ -200,13 +200,13 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glFlush()
         self.SwapBuffers()
 
-    def on_right_click(self):
+    def on_right_click(self, event):
         self.clear_traces()
     
     def clear_traces(self):
         """Updates current time and clears traces"""
         # update current_time 
-        no_of_cycles= len(self.traces[0][1]) 
+        no_of_cycles = len(self.traces[0][1]) 
         self.current_time += no_of_cycles
 
         # clear monitor traces
