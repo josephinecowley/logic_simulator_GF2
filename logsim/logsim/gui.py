@@ -199,6 +199,9 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # and swap the back buffer to the front
         GL.glFlush()
         self.SwapBuffers()
+
+    def on_right_click(self):
+        self.clear_traces()
     
     def clear_traces(self):
         """Updates current time and clears traces"""
