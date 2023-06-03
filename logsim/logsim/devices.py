@@ -41,6 +41,8 @@ class Device:
         self.clock_counter = None
         self.switch_state = None
         self.dtype_memory = None
+        self.siggen_initial_state = None
+        self.siggen_signal_list = None
 
 
 class Devices:
@@ -105,7 +107,7 @@ class Devices:
         self.devices_list = []
 
         gate_strings = ["AND", "OR", "NAND", "NOR", "XOR"]
-        device_strings = ["CLOCK", "SWITCH", "DTYPE"]
+        device_strings = ["CLOCK", "SWITCH", "DTYPE", "SIGGEN", "RC"]
         dtype_inputs = ["CLK", "SET", "CLEAR", "DATA"]
         dtype_outputs = ["Q", "QBAR"]
 
@@ -118,7 +120,7 @@ class Devices:
         self.gate_types = [self.AND, self.OR, self.NAND, self.NOR,
                            self.XOR] = self.names.lookup(gate_strings)
         self.device_types = [self.CLOCK, self.SWITCH,
-                             self.D_TYPE] = self.names.lookup(device_strings)
+                             self.D_TYPE, self.SIGGEN, self.RC] = self.names.lookup(device_strings)
         self.dtype_input_ids = [self.CLK_ID, self.SET_ID, self.CLEAR_ID,
                                 self.DATA_ID] = self.names.lookup(dtype_inputs)
         self.dtype_output_ids = [
@@ -241,6 +243,14 @@ class Devices:
         device.clock_half_period = clock_half_period
         self.cold_startup()  # clock initialised to a random point in its cycle
 
+    def make_siggen(self, device_id, initial_state, signal_list):
+        """Make a siggen device with the specified initial state and 
+        signal periods. """
+        self.add_device(device_id, self.SIGGEN)
+        device = self.get_device(device_id)
+        device.siggen_initial_state = initial_state
+        device.siggen_signal_list = signal_list
+
     def make_gate(self, device_id, device_kind, no_of_inputs):
         """Make logic gates with the specified number of inputs."""
         self.add_device(device_id, device_kind)
@@ -330,6 +340,17 @@ class Devices:
             else:
                 self.make_d_type(device_id)
                 error_type = self.NO_ERROR
+
+        elif device_kind == self.SIGGEN:
+            # Device property is a tuple of the siggen initial state: 0(LOW) or 1(HIGH) and a list of signal periods
+            if device_property is None:
+                error_type = self.NO_QUALIFIER
+            elif device_property[0] not in [self.LOW, self.HIGH] or not isinstance(device_property[1], list):
+                error_type = self.INVALID_QUALIFIER
+            else:
+                self.make_siggen(device_id, *device_property) # unpack device device property
+                error_type = self.NO_ERROR
+
 
         else:
             error_type = self.BAD_DEVICE
