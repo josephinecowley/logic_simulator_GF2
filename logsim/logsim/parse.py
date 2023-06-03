@@ -118,7 +118,7 @@ class Parser:
                               self.TERMINATE, self.WRONG_ORDER] = self.names.unique_error_codes(24)
 
     # Stopping symbols automatically assigned to semi-colons, braces and keywords
-    def display_error(self,  symbol, error_type, proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
+    def display_error(self,  symbol, error_type, display=True, display_marker=True, proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
         """Display the error message and where it occured.
 
         Calls the error handling method to resume from the next available point."""
@@ -148,7 +148,7 @@ class Parser:
         # Display location and type of error
         print(f"\n  Line {symbol.line_number}:", end=" ")
         if error_type == self.NO_DEVICES_KEYWORD:
-            # Syntax error
+            # Syntax error.
             print("Expected the keyword DEVICES", end="\n \n")
         elif error_type == self.NO_CONNECTIONS_KEYWORD:
             # Syntax error
@@ -268,7 +268,7 @@ class Parser:
         elif error_type == self.WRONG_ORDER:
             # Syntax error
             print(
-                "Wrong keyword entered, ensure order of lists is: DEVICES, CONNECTIONS, MONITORS, END", end="\n \n")
+                "Wrong keyword entered, ensure order of lists is: DEVICES, CONNECTIONS, MONITORS, END. \n          Program terminated early as this is an error which cannot be easily handled.", end="\n \n")
         else:
             raise ValueError("Expected a valid error code")
 
@@ -276,17 +276,22 @@ class Parser:
         if symbol.type == self.scanner.EOF:
             return
 
-        # Display error line and visual marker
-        self.scanner.display_line_and_marker(symbol)
+        # Display error line and visual marker if display is True
+        if display == True:
+            # Display error line and indicator (latter only if display_marker is true)
+            self.scanner.display_line_and_marker(symbol)
+        #   self.scanner.display_line_and_marker(symbol, display_marker)
 
-        # Call error recovery function to resume parsing at appropriate point
-        self.error_recovery(error_type,
-                            proceed, stopping_symbol_types)
-
-        return
+        if proceed == True:
+            return
+        else:
+            # Call error recovery function to resume parsing at appropriate point
+            self.error_recovery(error_type, stopping_symbol_types)
+            return
 
     # Stopping symbols automatically assigned to semi-colons, braces and keywords
-    def error_recovery(self, error_type,  proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
+
+    def error_recovery(self, error_type, stopping_symbol_types=[2, 3, 6, 8]):
         """Recover from an error by resuming parsing at an appropriate point."""
 
         if not isinstance(error_type, int):
@@ -297,8 +302,6 @@ class Parser:
                 "Cannot have an error type greater than the number of errors present")
         elif error_type < 0:
             raise ValueError("Cannot have a negative error code")
-        elif not isinstance(proceed, bool):
-            raise TypeError("Expected bool type argument for proceed")
         elif not isinstance(stopping_symbol_types, list):
             raise TypeError(
                 "Expected stopping symbol to be an integer type argument")
@@ -306,21 +309,15 @@ class Parser:
             raise ValueError(
                 "Expected stopping symbol to be within range of given symbols")
 
-        # Recover from error
-        if proceed == True:
+        # To skip symbols to recover parsing
+        while ((self.symbol.type not in stopping_symbol_types) and (self.symbol.type != self.scanner.EOF)):
+            self.symbol = self.scanner.get_symbol()
+        # Stop when stopping symbol is encountered
+        if self.symbol.type in stopping_symbol_types:
             return
-
-        # Check if we need to skip symbols to recover parsing
-        else:
-            while ((self.symbol.type not in stopping_symbol_types) and (self.symbol.type != self.scanner.EOF)):
-                self.symbol = self.scanner.get_symbol()
-
-            # Stop when stopping symbol is encountered
-            if self.symbol.type in stopping_symbol_types:
-                return
-            elif self.symbol.type == self.scanner.EOF:
-                self.display_error(self.symbol, self.TERMINATE)
-                return
+        elif self.symbol.type == self.scanner.EOF:
+            self.display_error(self.symbol, self.TERMINATE)
+            return
 
     def initial_error_checks(self, KEYWORD_ID, missing_error_type):
         """Check initial symbols for common errors. This function tests for 6 cases:
@@ -347,12 +344,14 @@ class Parser:
                 # If symbol type is open brace '{'
                 if self.symbol.type == self.scanner.BRACE_OPEN:
                     # Case 3: { ...
-                    self.display_error(self.symbol, missing_error_type)
+                    self.display_error(
+                        self.symbol, missing_error_type, display=False)
                     self.symbol = self.scanner.get_symbol()
                     return
 
             # If symbol type is not name
             else:
+                previous_symbol = self.symbol
                 self.symbol = self.scanner.get_symbol()
 
                 # If symbol type is not open brace '{'
@@ -360,9 +359,10 @@ class Parser:
                     # Cannot differentiate easily between Case 4 and Case 6 thus will proceed to next stopping symbol
                     # Case 4: ...
                     # and Case 6: D ...
-                    self.display_error(self.symbol, missing_error_type)
                     self.display_error(
-                        self.symbol, self.NO_BRACE_OPEN, proceed=False)
+                        self.symbol, missing_error_type, display=False)
+                    self.display_error(
+                        self.symbol, self.NO_BRACE_OPEN, display=False, proceed=False)
                     self.symbol = self.scanner.get_symbol()
                     return
 
@@ -370,7 +370,7 @@ class Parser:
                 else:
                     # Case 2: D { ...
                     self.display_error(
-                        self.symbol, missing_error_type)
+                        previous_symbol, missing_error_type)
                     self.symbol = self.scanner.get_symbol()
                     return
 
@@ -378,12 +378,14 @@ class Parser:
         else:
             # If symbol id is correct
             if self.symbol.id == KEYWORD_ID:
+                previous_symbol = self.symbol
                 self.symbol = self.scanner.get_symbol()
 
                 # If symbol type is not open brace '{'
                 if not (self.symbol.type == self.scanner.BRACE_OPEN):
                     # Case 5. KEYWORD ...
-                    self.display_error(self.symbol, self.NO_BRACE_OPEN)
+                    self.display_error(
+                        previous_symbol, self.NO_BRACE_OPEN, display_marker=False)
                     return
 
                 # If symbol type is open brace '{'
@@ -395,11 +397,11 @@ class Parser:
             # If symbol id is incorrect
             else:
                 # Case 7: Wrong keyword given (e.g. END is called after device_list).
-                # We will treat this as a special case and terminate the program early by skipping to the end.
+                # We will treat this as a special case and terminate the program early
+                previous_symbol = self.symbol
+                self.symbol = self.scanner.get_symbol()
                 self.display_error(
-                    self.symbol, self.WRONG_ORDER)
-                self.display_error(self.symbol, self.TERMINATE,
-                                   proceed=False, stopping_symbol_types=[11])
+                    previous_symbol, self.WRONG_ORDER, proceed=False, stopping_symbol_types=[11])
                 return
 
     def device_list(self):
@@ -412,7 +414,7 @@ class Parser:
         self.initial_error_checks(DEVICES_ID, self.NO_DEVICES_KEYWORD)
         # If catastrophic error occors, and symbol type is now EOF
         if self.symbol.type == self.scanner.EOF:
-            return
+            return True
 
         # Parse device
         self.device()
@@ -687,7 +689,7 @@ class Parser:
         self.initial_error_checks(CONNECTIONS_ID, self.NO_CONNECTIONS_KEYWORD)
         # If catastrophic error occors, and symbol type is now EOF
         if self.symbol.type == self.scanner.EOF:
-            return
+            return True
 
         # Parse a connection
         self.connection()
@@ -863,9 +865,9 @@ class Parser:
         # Common initial error handling
         self.initial_error_checks(MONITORS_ID, self.NO_MONITORS_KEYWORD)
 
-        # If catastrophic error occors, and symbol type is now EOF
+        # If catastrophic error occors, and symbol type is now EOF. Also return true to indicate that this needs to terminate early
         if self.symbol.type == self.scanner.EOF:
-            return
+            return True
 
         # Parse a monitor
         [monitor_device_id, monitor_port_id] = self.output()
@@ -949,12 +951,12 @@ class Parser:
 
         # If nothing after monitors class, assume missing, display error and end program
         if self.symbol.type == self.scanner.EOF:
-            self.display_error(self.symbol, self.NO_END_KEYWORD)
+            self.display_error(self.symbol, self.NO_END_KEYWORD, display=False)
             return
 
         # If symbol is anything other than END, display error and pass until END keyword
         elif not (self.symbol.id == END_ID):
-            self.display_error(self.symbol, self.NO_END_KEYWORD)
+            self.display_error(self.symbol, self.NO_END_KEYWORD, display=False)
             self.symbol = self.scanner.get_symbol()
 
             # If after incorrect keyword END there is nothing, pass
@@ -981,72 +983,76 @@ class Parser:
 
         # Check to see if file is empty
         if self.symbol.type == self.scanner.EOF:
-            self.display_error(self.symbol, self.EMPTY_FILE)
+            self.display_error(self.symbol, self.EMPTY_FILE, display=False)
         else:
 
             # Parse device list
-            self.device_list()
+            # If returns propogated error = True, this signifies we have parsed to the EOF
+            propagated_error = self.device_list()
 
-            # If nothing after device list
-            if self.symbol.type == self.scanner.EOF:
-                self.display_error(self.symbol, self.EMPTY_FILE)
+            # If nothing after device list (excluding cases where we have identified a propagated error)
+            if (self.symbol.type == self.scanner.EOF) and (propagated_error != True):
+                self.display_error(self.symbol, self.EMPTY_FILE, display=False)
             else:
 
-                # Parse connection list
-                self.connection_list()
+                if propagated_error != True:
+                    # Parse connection list
+                    propagated_error = self.connection_list()
 
-                # If there are no semantic errors, check the 'built' network
-                if self.error_count == 0:
+                    # If there are no errors, check the 'built' network
+                    if self.error_count == 0:
 
-                    # If network is not valid (check there are no floating inputs)
-                    if not self.network.check_network():
+                        # If network is not valid (check there are no floating inputs)
+                        if not self.network.check_network():
 
-                        # Initiate lists to hold missing input id ports and corresponding devices
-                        missing_input_id_list = []
-                        device_missing_input_id_list = []
+                            # Initiate lists to hold missing input id ports and corresponding devices
+                            missing_input_id_list = []
+                            device_missing_input_id_list = []
 
-                        # Loop through device list to identify where the missing input connection is
-                        for i in self.devices.devices_list:
+                            # Loop through device list to identify where the missing input connection is
+                            for i in self.devices.devices_list:
 
-                            # Look through each item in each device class
-                            for input_id, value in i.inputs.items():
-                                if value == None:
+                                # Look through each item in each device class
+                                for input_id, value in i.inputs.items():
+                                    if value == None:
 
-                                    # Increase error count by one as this is a semantic error (floating input error)
-                                    self.error_count += 1
+                                        # Increase error count by one as this is a semantic error (floating input error)
+                                        self.error_count += 1
 
-                                    # For the missing input port, assign this port id and corresponding device id
-                                    missing_input_id_list.append(input_id)
-                                    device_missing_input_id_list.append(i)
+                                        # For the missing input port, assign this port id and corresponding device id
+                                        missing_input_id_list.append(input_id)
+                                        device_missing_input_id_list.append(i)
 
-                        # Carry out display error for FLOATING_INPUT here to allow us to display missing/incorrect input port
-                        print(
-                            "Cannot build network as not all inputs have a valid connection", end="\n \n")
-                        print(
-                            f"Missing {self.error_count} input(s): ", end="\n \n")
-                        for j in range(len(missing_input_id_list)):
-                            print(self.names.get_name_string(
-                                device_missing_input_id_list[j].device_id)+"."+self.names.get_name_string(missing_input_id_list[j]), end="\n \n")
+                            # Carry out display error for FLOATING_INPUT here to allow us to display missing/incorrect input port
+                            print(
+                                "Cannot build network as not all inputs have a valid connection", end="\n \n")
+                            print(
+                                f"Missing {self.error_count} input(s): ", end="\n \n")
+                            for j in range(len(missing_input_id_list)):
+                                print(self.names.get_name_string(
+                                    device_missing_input_id_list[j].device_id)+"."+self.names.get_name_string(missing_input_id_list[j]), end="\n \n")
 
-                # If nothing after connections list
-                if self.symbol.type == self.scanner.EOF:
-                    self.display_error(self.symbol, self.EMPTY_FILE)
-                else:
+                    # If nothing after connections list
+                    if (self.symbol.type == self.scanner.EOF) and (propagated_error != True):
+                        self.display_error(
+                            self.symbol, self.EMPTY_FILE, display=False)
+                    else:
+                        if propagated_error != True:
+                            # Parse monitor list. If catastrophic error occurs (ie order of keywords wrong, terminate the program early)
+                            propagated_error = self.monitor_list()
 
-                    # Parse monitor list
-                    self.monitor_list()
+                        # This is here for terminal plotting of signals
+                        # Record the signal traces
+                        for i in range(50):
+                            self.network.execute_network()
+                            self.monitors.record_signals()
 
-                    # This is here for terminal plotting of signals
-                    # Record the signal traces
-                    # for i in range(50):
-                    #     self.network.execute_network()
-                    #     self.monitors.record_signals()
+                        # Display the signals to terminal
+                        self.monitors.display_signals()
 
-                    # Display the signals to terminal
-                    self.monitors.display_signals()
-
-                    # Check for END keyword
-                    self.end()
+                        # Check for END keyword
+                        if propagated_error != True:
+                            self.end()
 
             # Check if there are errors, and return True if error count is zero, otherwise return falsex
             if self.error_count == 0:
@@ -1064,17 +1070,17 @@ class Parser:
 
 # This is here for terminal plotting of signals
 
-# def main():
-#     # Check command line arguments
-#     file_path = "./example1_logic_description.txt"
-#     names = Names()
-#     devices = Devices(names)
-#     network = Network(names, devices)
-#     monitors = Monitors(names, devices, network)
-#     scanner = Scanner(file_path, names)
-#     parser = Parser(names, devices, network, monitors, scanner)
-#     parser.parse_network()
+def main():
+    # Check command line arguments
+    file_path = "./example1_logic_description.txt"
+    names = Names()
+    devices = Devices(names)
+    network = Network(names, devices)
+    monitors = Monitors(names, devices, network)
+    scanner = Scanner(file_path, names)
+    parser = Parser(names, devices, network, monitors, scanner)
+    parser.parse_network()
 
 
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()
