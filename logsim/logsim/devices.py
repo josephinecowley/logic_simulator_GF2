@@ -47,6 +47,7 @@ class Device:
         self.siggen_counter = None
 
         self.RC_period = None
+        self.RC_counter = None
 
 
 class Devices:
@@ -257,6 +258,13 @@ class Devices:
         device.siggen_signal_list = signal_list
         device.siggen.counter = 0
 
+    def make_RC(self, device_id, RC_period):
+        """Make a RC device with the specified period. """
+        self.add_device(device_id, self.RC)
+        device = self.get_device(device_id)
+        device.RC_period = RC_period
+        device.RC_counter = 0
+
     def make_gate(self, device_id, device_kind, no_of_inputs):
         """Make logic gates with the specified number of inputs."""
         self.add_device(device_id, device_kind)
@@ -276,11 +284,7 @@ class Devices:
             self.add_output(device_id, output_id)
         self.cold_startup()  # D-type initialised to a random state
 
-    def make_RC(self, device_id, RC_period):
-        """Make a RC device with the specified period. """
-        self.add_device(device_id, self.RC)
-        device = self.get_device(device_id)
-        device.RC_period = RC_period
+
 
     def cold_startup(self):
         """Simulate cold start-up of D-types and clocks.

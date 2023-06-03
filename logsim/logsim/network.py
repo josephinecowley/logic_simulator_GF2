@@ -392,6 +392,39 @@ class Network:
                 device.outputs[None] = self.devices.FALLING
             
             device.siggen_counter += 1
+        
+    def execute_RC(self, device_id):
+        """Simulate an RC device and update its output signal value
+        
+        Return True if successful."""
+        device = self.devices.get_device(device_id)
+        output_signal = device.outputs[None]  # output ID is None
+
+        if output_signal == self.devices.FALLING:
+            new_signal = self.update_signal(output_signal, self.devices.LOW)
+            if new_signal is None:  # update is unsuccessful
+                return False
+            device.outputs[None] = new_signal
+            return True
+
+        elif output_signal in [self.devices.HIGH, self.devices.LOW]:
+            return True
+
+        else:
+            return False
+        
+    def update_RCs(self):
+        """If it is time to do so, set RC signals to FALLING."""
+        RC_devices = self.devices.find_devices(self.devices.RC)
+        for device_id in RC_devices:
+            device = self.devices.get_device(device_id)
+            N = device.RC_period
+
+            if device.RC_counter == N:
+                device.outputs[None] = self.devices.FALLING
+            
+            device.siggen_counter += 1
+
 
     def execute_network(self):
         """Execute all the devices in the network for one simulation cycle.
@@ -399,6 +432,8 @@ class Network:
         Return True if successful and the network does not oscillate.
         """
         clock_devices = self.devices.find_devices(self.devices.CLOCK)
+        siggen_devices = self.devices.find_devices(self.devices.SIGGEN)
+        RC_devices = self.devices.find_devices(self.devices.RC)
         switch_devices = self.devices.find_devices(self.devices.SWITCH)
         d_type_devices = self.devices.find_devices(self.devices.D_TYPE)
         and_devices = self.devices.find_devices(self.devices.AND)
@@ -410,6 +445,7 @@ class Network:
         # This sets clock signals to RISING or FALLING, where necessary
         self.update_clocks()
         self.update_siggens()
+        self.update_RCs()
 
         # Number of iterations to wait for the signals to settle before
         # declaring the network unstable
