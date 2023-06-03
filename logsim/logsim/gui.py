@@ -503,12 +503,12 @@ class SignalTracesPanel(wx.Panel):
             self.add_new_monitor_panel, wx.ID_ANY, label="+")
         self.Bind(wx.EVT_BUTTON, self.on_add_new_monitor_button,
                   self.add_new_monitor_button)
-        self.add_new_monitor_button.SetToolTip("Add a new monitor")
+        self.add_new_monitor_button.SetToolTip("Add monitor")
         add_new_monitor_panel_fgs.Add(
             self.add_new_monitor_button, 1, flag=wx.CENTER | wx.EXPAND)
 
         # Create and add "Zap a monitor" text to add new monitor panel
-        str = "Zap a monitor"
+        str = "Delete monitor"
         text = wx.StaticText(self.add_new_monitor_panel, wx.ID_ANY, str)
         font = wx.Font(15, wx.FONTFAMILY_SWISS,
                        wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
