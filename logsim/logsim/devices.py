@@ -284,8 +284,6 @@ class Devices:
             self.add_output(device_id, output_id)
         self.cold_startup()  # D-type initialised to a random state
 
-
-
     def cold_startup(self):
         """Simulate cold start-up of D-types and clocks.
 
@@ -364,9 +362,10 @@ class Devices:
             elif device_property[0] not in [self.LOW, self.HIGH] or not isinstance(device_property[1], list):
                 error_type = self.INVALID_QUALIFIER
             else:
-                self.make_siggen(device_id, *device_property) # unpack device device property
+                # unpack device device property
+                self.make_siggen(device_id, *device_property)
                 error_type = self.NO_ERROR
-        
+
         elif device_kind == self.RC:
             # Device property is an integer for the RC period
             if device_property is None:
@@ -376,7 +375,6 @@ class Devices:
             else:
                 self.make_RC(device_id, device_property)
                 error_type = self.NO_ERROR
-
 
         else:
             error_type = self.BAD_DEVICE
