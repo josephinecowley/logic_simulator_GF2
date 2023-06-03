@@ -46,6 +46,8 @@ class Device:
         self.siggen_signal_list = None
         self.siggen_counter = None
 
+        self.RC_period = None
+
 
 class Devices:
 
@@ -274,6 +276,12 @@ class Devices:
             self.add_output(device_id, output_id)
         self.cold_startup()  # D-type initialised to a random state
 
+    def make_RC(self, device_id, RC_period):
+        """Make a RC device with the specified period. """
+        self.add_device(device_id, self.RC)
+        device = self.get_device(device_id)
+        device.RC_period = RC_period
+
     def cold_startup(self):
         """Simulate cold start-up of D-types and clocks.
 
@@ -353,6 +361,16 @@ class Devices:
                 error_type = self.INVALID_QUALIFIER
             else:
                 self.make_siggen(device_id, *device_property) # unpack device device property
+                error_type = self.NO_ERROR
+        
+        elif device_kind == self.RC:
+            # Device property is an integer for the RC period
+            if device_property is None:
+                error_type = self.NO_QUALIFIER
+            elif not isinstance(device_property, int):
+                error_type = self.INVALID_QUALIFIER
+            else:
+                self.make_RC(device_id, device_property)
                 error_type = self.NO_ERROR
 
 
