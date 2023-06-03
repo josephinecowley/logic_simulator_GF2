@@ -79,12 +79,14 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_PAINT, self.on_paint)
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
+        self.Bind(wx.EVT_RIGHT_DOWN, self.on_right_click)
 
         # Initialise trace objects
         self.traces = monitors.get_signals_for_GUI()
         self.y_spacing = 80
 
         self.devices = devices
+        self.current_time = 0
 
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
@@ -118,6 +120,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             color = color_list[i % len(color_list)]
             self._draw_trace(signal, x_offset, y_offset, label, color)
             y_offset -= self.y_spacing
+        
+        self.current_time += len(self.traces[0][1]) # add the length of the signals to current time
 
     def _draw_trace(self, signal, x_pos, y_pos, label, color=(0.0, 0.0, 1.0)):
         """Draws trace with axes and ticks"""
@@ -157,10 +161,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             GL.glEnd()
             # Render sizes
             if self.zoom > 1:
-                self.render_text(str(i), x - 5, y_pos - 15)
+                self.render_text(str(i + self.current_time), x - 5, y_pos - 15)
             elif ((self.zoom < 1) and (i % 5 == 0)):
-                self.render_text(str(i), x - 5, y_pos - 25)
-
+                self.render_text(str(i + self.current_time), x - 5, y_pos - 25)
+        
         x_pos -= int(20 / 3 * len(label))
         self.render_text(label, x_pos, y_pos + 18)
 
@@ -185,6 +189,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # and swap the back buffer to the front
         GL.glFlush()
         self.SwapBuffers()
+    
+    def on_right_click(self, event):
+        self.monitors.reset_monitors()
+        self.update_arguments(self.devices, self.monitors)
 
     def on_paint(self, event):
         """Handle the paint event."""
@@ -1089,9 +1097,9 @@ class AddDeviceDialog(wx.Dialog):
         self.switches_panel.Layout()
 
 
-'''class LogicSimApp(wx.App):
+class LogicSimApp(wx.App):
     def OnInit(self):
-        file_path = "./example1_logic_description.txt"
+        file_path = "logsim/logsim/example1_logic_description.txt"
         with open(file_path) as f:
             print('success')
         names = Names()
@@ -1115,4 +1123,4 @@ class AddDeviceDialog(wx.Dialog):
 # KO! For development purposes only - will delete once complete
 if __name__ == "__main__":
     app = LogicSimApp()
-    app.MainLoop()'''
+    app.MainLoop()
