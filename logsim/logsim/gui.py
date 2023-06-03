@@ -12,6 +12,7 @@ import os
 from io import StringIO
 import sys
 from contextlib import redirect_stdout
+from collections import defaultdict
 
 import wx
 import wx.glcanvas as wxcanvas
@@ -303,6 +304,7 @@ class RunSimulationPanel(wx.Panel):
     def on_clear_button(self, event):
         self.parent.signal_traces_panel.canvas.clear_traces()
 
+
     def on_reset_button(self, event):
         file_path = self.parent.path
         names = Names()
@@ -447,7 +449,7 @@ class SignalTrace(wx.ScrolledWindow):
 class SignalTracesPanel(wx.Panel):
     def __init__(self, parent, names, devices, network, monitors):
         super(SignalTracesPanel, self).__init__(
-            parent, size=wx.DefaultSize, style=wx.SUNKEN_BORDER)
+            parent, size=wx.DefaultSize, style=wx.BORDER_SUNKEN)
 
         self.names = names
         self.devices = devices
@@ -659,20 +661,52 @@ class SwitchesPanel(wx.Panel):
         # Configure sizer of ScrolledPanel
         self.num_of_switches = len(switch_names)
         self.fgs = wx.FlexGridSizer(
-            cols=1, rows=self.num_of_switches, vgap=4, hgap=4)
+            cols=2, rows=self.num_of_switches, vgap=4, hgap=4)
 
-        for switch in switch_names:
-            switch_id = self.names.query(switch)
+        self.switch_dict = defaultdict(list)
+        for switch_name in switch_names:
+            switch_id = self.names.query(switch_name)
             initial_switch_state = devices.get_device(switch_id).switch_state
+
+            if initial_switch_state == 1:
+                initial_switch_state_word = "ON"
+                initial_switch_state_colour = (4, 84, 14)
+            elif initial_switch_state == 0:
+                initial_switch_state_word = "OFF"
+                initial_switch_state_colour = (139, 26, 26)
+
+            switch_slider_panel = wx.Panel(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, style=wx.BORDER_SUNKEN, size=(90, 30))
+            switch_slider_panel_sizer = wx.BoxSizer(wx.VERTICAL)
+            switch_slider_panel.SetSizer(switch_slider_panel_sizer)
+
+            switch_slider_button = wxbuttons.GenButton(parent=switch_slider_panel, id=wx.ID_ANY, label=initial_switch_state_word, name="switch slider")
+            switch_slider_id = switch_slider_panel.GetId()
+            self.switch_dict[switch_slider_id].extend([switch_id, switch_name, initial_switch_state, switch_slider_panel, switch_slider_panel_sizer])
+        
+            self.Bind(wx.EVT_BUTTON, self.on_switch_slider_button, switch_slider_button)
+            switch_slider_button.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
+            switch_slider_button.SetBezelWidth(5)
+            switch_slider_button.SetMinSize((45, 30))
+            switch_slider_button.SetBackgroundColour(wx.Colour(*initial_switch_state_colour))
+            switch_slider_button.SetForegroundColour(wx.WHITE)
+            switch_slider_button.SetToolTip(f"{switch_name} is {initial_switch_state_word}")
+        
+            if initial_switch_state == 1:
+                switch_slider_panel_sizer.Add(switch_slider_button, 0, flag=wx.ALIGN_RIGHT, border=5)
+            elif initial_switch_state == 0:
+                switch_slider_panel_sizer.Add(switch_slider_button, 0, flag=wx.ALIGN_LEFT, border=5)
+
             # create switch toggle button object with appropriate label
             switch_toggle_button = wx.ToggleButton(
-                parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"{switch}")
+                parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"{switch_name}")
             switch_toggle_button.SetValue(bool(initial_switch_state))
             # bind switch toggle button to its event
             self.Bind(wx.EVT_TOGGLEBUTTON,
                       self.on_switch_toggle_button, switch_toggle_button)
+
             # add switch toggle buttons to ScrolledPanel
             self.fgs.Add(switch_toggle_button, 1, flag=wx.ALL, border=10)
+            self.fgs.Add(switch_slider_panel, 2, flag=wx.ALL, border=10)
 
         # Set sizer of ScrolledPanel
         self.switch_buttons_scrolled_panel.SetSizer(self.fgs)
@@ -688,14 +722,14 @@ class SwitchesPanel(wx.Panel):
         self.left_panel.SetSizer(left_panel_vbox)
         # left_panel_vbox.Add(self.test_button, 1, flag=wx.EXPAND)
         # left_panel_vbox.Add(self.add_new_switch_button, 1, flag=wx.EXPAND)
-        hbox.Add(self.left_panel, 1, wx.EXPAND)
+        #hbox.Add(self.left_panel, 1, wx.EXPAND)
 
         # Add the ScrolledPanel widget to SwitchesPanel panel
-        hbox.Add(self.switch_buttons_scrolled_panel, 2, wx.EXPAND)
+        hbox.Add(self.switch_buttons_scrolled_panel, 3, wx.EXPAND)
 
         # Create and add right panel in switches panel layout
         self.right_panel = wx.Panel(self.switches_panel)
-        hbox.Add(self.right_panel, 1, wx.EXPAND)
+        #hbox.Add(self.right_panel, 1, wx.EXPAND)
 
         self.add_switch_panel = wx.Panel(self)
         add_switch_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
@@ -728,6 +762,59 @@ class SwitchesPanel(wx.Panel):
         # successfully switched the state of switch
         if self.devices.set_switch(switch_id, int(switch_state)):
             pass
+
+    def on_switch_slider_button(self, event):
+        selected_switch_panel_id = event.GetEventObject().GetParent().GetId()
+        selected_switch_id = self.switch_dict[selected_switch_panel_id][0]
+        selected_switch_name = self.switch_dict[selected_switch_panel_id][1]
+        selected_switch_state = self.switch_dict[selected_switch_panel_id][2]
+        selected_switch_panel = self.switch_dict[selected_switch_panel_id][3]
+        selected_switch_panel_sizer = self.switch_dict[selected_switch_panel_id][4]
+
+        window = selected_switch_panel_sizer.GetItem(0).GetWindow()
+        window.Destroy()
+
+        if selected_switch_state == 0: # switch is currently OFF
+            selected_switch_state = 1 # switch is now ON
+            self.devices.set_switch(selected_switch_id, self.switch_dict[selected_switch_panel_id][2])
+            self.switch_dict[selected_switch_panel_id][2] = selected_switch_state
+
+            switch_slider_button = wxbuttons.GenButton(parent=selected_switch_panel, id=wx.ID_ANY, label="ON")
+        
+            self.Bind(wx.EVT_BUTTON, self.on_switch_slider_button, switch_slider_button)
+            switch_slider_button.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
+            switch_slider_button.SetBezelWidth(5)
+            switch_slider_button.SetMinSize((45, 30))
+            switch_slider_button.SetBackgroundColour(wx.Colour((4, 84, 14)))
+            switch_slider_button.SetForegroundColour(wx.WHITE)
+            switch_slider_button.SetToolTip(f"{selected_switch_name} is ON")
+
+            selected_switch_panel_sizer.Add(switch_slider_button, 0, flag=wx.ALIGN_RIGHT, border=5)
+            selected_switch_panel.GetSizer().Layout()
+            selected_switch_panel.Refresh()
+            selected_switch_panel.Update()
+
+
+        elif selected_switch_state == 1: # switch is currently ON
+            selected_switch_state = 0 # switch is now OFF
+            self.devices.set_switch(selected_switch_id, self.switch_dict[selected_switch_panel_id][2])
+            self.switch_dict[selected_switch_panel_id][2] = selected_switch_state
+
+            switch_slider_button = wxbuttons.GenButton(parent=selected_switch_panel, id=wx.ID_ANY, label="OFF")
+        
+            self.Bind(wx.EVT_BUTTON, self.on_switch_slider_button, switch_slider_button)
+            switch_slider_button.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
+            switch_slider_button.SetBezelWidth(5)
+            switch_slider_button.SetMinSize((45, 30))
+            switch_slider_button.SetBackgroundColour(wx.Colour((139, 26, 26)))
+            switch_slider_button.SetForegroundColour(wx.WHITE)
+            switch_slider_button.SetToolTip(f"{selected_switch_name} is OFF")
+
+            selected_switch_panel_sizer.Add(switch_slider_button, 0, flag=wx.ALIGN_LEFT, border=5)
+            selected_switch_panel.GetSizer().Layout()
+            selected_switch_panel.Refresh()
+            selected_switch_panel.Update()
+
 
     def on_change_right_panel_colour(self, event):
         self.right_panel.SetBackgroundColour("GREEN")
@@ -924,7 +1011,7 @@ class AddDeviceDialog(wx.Dialog):
 
 class LogicSimApp(wx.App):
     def OnInit(self):
-        file_path = "logsim\logsim\example1_logic_description.txt"
+        file_path = "logsim\logsim\example2_logic_description.txt"
         with open(file_path) as f:
             print('success')
         names = Names()
