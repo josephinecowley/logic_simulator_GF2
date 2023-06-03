@@ -56,7 +56,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                                            operations.
     """
 
-    def __init__(self, parent, devices, monitors):
+    def __init__(self, parent, devices, monitors, current_time=None):
         """Initialise canvas properties and useful variables."""
         super().__init__(parent, -1,
                          attribList=[wxcanvas.WX_GL_RGBA,
@@ -86,7 +86,12 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.y_spacing = 80
 
         self.devices = devices
-        self.current_time = 0
+        self.monitors = monitors
+
+        if current_time is None:
+            self.current_time = 0
+        else:
+            self.current_time = current_time
 
     def init_gl(self):
         """Configure and initialise the OpenGL context."""
@@ -121,8 +126,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self._draw_trace(signal, x_offset, y_offset, label, color)
             y_offset -= self.y_spacing
         
-        self.current_time += len(self.traces[0][1]) # add the length of the signals to current time
-
     def _draw_trace(self, signal, x_pos, y_pos, label, color=(0.0, 0.0, 1.0)):
         """Draws trace with axes and ticks"""
 
