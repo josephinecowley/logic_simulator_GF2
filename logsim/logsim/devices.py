@@ -248,11 +248,18 @@ class Devices:
         device.clock_half_period = clock_half_period
         self.cold_startup()  # clock initialised to a random point in its cycle
 
-    def make_siggen(self, device_id, initial_state, signal_list):
+    def make_siggen(self, device_id, initial_state, period_list):
         """Make a siggen device with the specified initial state and 
         signal periods. """
         self.add_device(device_id, self.SIGGEN)
         device = self.get_device(device_id)
+
+        signal_list = []
+        
+        current_state = initial_state
+        for period in period_list:
+            signal_list.extend([current_state] * period)
+            current_state = 1 - current_state  # Switch the state
 
         device.siggen_initial_state = initial_state
         device.siggen_signal_list = signal_list
