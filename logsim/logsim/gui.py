@@ -425,28 +425,28 @@ class RunSimulationPanel(wx.Panel):
         # Create, bind clearing signal traces event to and add the "CLEAR" button
         self.clear_button = wxbuttons.GenButton(
             self.left_buttons_panel, wx.ID_ANY, "CLEAR", name="clear button")
-        self.Bind(wx.EVT_BUTTON, self.on_run_button, self.run_button)
+        self.Bind(wx.EVT_BUTTON, self.on_clear_button, self.clear_button)
         self.clear_button.SetFont(wx.Font(
             20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
         self.clear_button.SetBezelWidth(5)
         self.clear_button.SetMinSize(wx.DefaultSize)
         self.clear_button.SetBackgroundColour(wx.Colour(0, 0, 205))
         self.clear_button.SetForegroundColour(wx.WHITE)
-        self.clear_button.SetToolTip("Begin running the simulation")
+        self.clear_button.SetToolTip("Clear all signal traces")
         left_buttons_panel_hbox.Add(
             self.clear_button, 1, flag=wx.ALIGN_LEFT, border=5)
         
         # Create, bind resetting signal traces event to and add the "RESET" button
         self.reset_button = wxbuttons.GenButton(
             self.left_buttons_panel, wx.ID_ANY, "RESET", name="reset button")
-        self.Bind(wx.EVT_BUTTON, self.on_run_button, self.run_button)
+        self.Bind(wx.EVT_BUTTON, self.on_reset_button, self.reset_button)
         self.reset_button.SetFont(wx.Font(
             20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
         self.reset_button.SetBezelWidth(5)
         self.reset_button.SetMinSize(wx.DefaultSize)
         self.reset_button.SetBackgroundColour(wx.Colour(205, 102, 29))
         self.reset_button.SetForegroundColour(wx.WHITE)
-        self.reset_button.SetToolTip("Begin running the simulation")
+        self.reset_button.SetToolTip("Reset the simulation from initialisation")
         left_buttons_panel_hbox.Add(
             self.reset_button, 1, flag=wx.ALIGN_LEFT, border=5)
 
@@ -541,6 +541,28 @@ class RunSimulationPanel(wx.Panel):
         no_of_cycles = self.cycles_spin_control.GetValue()
         self.run_network(no_of_cycles)
         self.update_canvas()
+
+    def on_clear_button(self, event):
+        print("CLEAR button has been pressed.")
+
+    def on_reset_button(self, event):
+        file_path = self.parent.path
+        names = Names()
+        devices = Devices(names)
+        network = Network(names, devices)
+        monitors = Monitors(names, devices, network)
+        scanner = Scanner(file_path, names)
+        parser = Parser(names, devices, network, monitors, scanner)#
+        parser.parse_network()
+
+        new_Gui = Gui("GF2 Team 7 Logic Simulator GUI",
+                              file_path,
+                              names,
+                              devices,
+                              network,
+                              monitors)
+        new_Gui.Show()
+        self.parent.Close()
 
     def run_network(self, cycles):
         for _ in range(cycles):
