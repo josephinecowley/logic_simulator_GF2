@@ -216,7 +216,7 @@ def test_parser_initialisation(scanner_fixture, parser_fixture):
 
     assert parser.error_count == 0
     # Check unique error coes are appended onto existing syntax_errors of which there are 15 from devices, network and monitors initialisation
-    assert parser.syntax_errors == range(15, 43)
+    assert parser.syntax_errors == range(15, 44)
 
 
 def test_parser_display_error_instance_handling(scanner_fixture, parser_fixture):
@@ -270,6 +270,11 @@ def test_parser_display_error_see_error_count_increment_by_one(scanner_fixture, 
 
 
 @pytest.mark.parametrize("error_type, expected_message", [
+    ("parser.EMPTY_DEVICE_LIST", "  Line 2: Cannot parse an empty device list."),
+    ("parser.EMPTY_CONNECTION_LIST",
+     "  Line 2: Cannot parse an empty connections list."),
+    ("parser.RC_OUT_OF_RANGE",
+     "  Line 2: Input RC period is out of range. Must be a positive integer"),
     ("parser.NO_DEVICES_KEYWORD", "  Line 2: Expected the keyword DEVICES"),
     ("parser.NO_CONNECTIONS_KEYWORD",
      "  Line 2: Expected the keyword CONNECTIONS"),
@@ -337,6 +342,7 @@ def test_parser_display_error_show_appropriate_error_message(scanner_fixture, pa
 
     captured = capfd.readouterr()
     output_lines = captured.out.splitlines()
+    # breakpoint()
 
     assert output_lines[1] == expected_message
 
@@ -574,6 +580,8 @@ def test_parser_initial_error_checks_case_6(parser_fixture, create_testing_file_
 
 
 @pytest.mark.parametrize("example, expected", [
+    ("SIGGEN(1, [1,3])", "(parser.symbol.id, (1, [1,3]))"),
+    ("RC(5)", "(parser.symbol.id, 5)"),
     ("AND(10)", "(parser.symbol.id, 10)"),
     ("NAND(11)", "(parser.symbol.id, 11)"),
     ("OR(12)", "(parser.symbol.id, 12)"),
@@ -581,7 +589,7 @@ def test_parser_initial_error_checks_case_6(parser_fixture, create_testing_file_
     ("CLOCK(14)", "(parser.symbol.id, 14)"),
     ("SWITCH(1)", "(parser.symbol.id, 1)"),
     ("XOR", "(parser.symbol.id, None)"),
-    ("DTYPE", "(parser.symbol.id, None)"),
+    ("DTYPE", "(parser.symbol.id, None)")
 ])
 def test_parser_check_device_is_valid_correct_example(parser_fixture, create_testing_file_to_scan, example, expected):
     """Test check_device_is_valid works with some correct examples covering all gate types"""
