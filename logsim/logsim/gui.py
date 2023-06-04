@@ -641,19 +641,20 @@ class SwitchesPanel(wx.Panel):
         # Configure sizer of ScrolledPanel
         self.num_of_switches = len(switch_names)
         self.fgs = wx.FlexGridSizer(
-            cols=2, rows=self.num_of_switches, vgap=4, hgap=4)
+            cols=3, rows=self.num_of_switches, vgap=4, hgap=4)
 
         self.switch_dict = defaultdict(list)
         for switch_name in switch_names:
             switch_id = self.names.query(switch_name)
             initial_switch_state = devices.get_device(switch_id).switch_state
 
-            if initial_switch_state == 1:
-                initial_switch_state_word = "ON"
-                initial_switch_state_colour = (4, 84, 14)
-            elif initial_switch_state == 0:
-                initial_switch_state_word = "OFF"
-                initial_switch_state_colour = (139, 26, 26)
+            # create switch toggle button object with appropriate label
+            switch_toggle_button = wx.ToggleButton(
+                parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"{switch_name}")
+            switch_toggle_button.SetValue(bool(initial_switch_state))
+            # bind switch toggle button to its event
+            self.Bind(wx.EVT_TOGGLEBUTTON,
+                      self.on_switch_toggle_button, switch_toggle_button)
 
             switch_slider_panel = wx.Panel(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, style=wx.BORDER_SUNKEN, size=(90, 30))
             switch_slider_panel_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -673,17 +674,29 @@ class SwitchesPanel(wx.Panel):
             elif initial_switch_state == 0:
                 switch_slider_panel_sizer.Add(switch_slider_button, 0, flag=wx.ALIGN_LEFT, border=5)
 
-            # create switch toggle button object with appropriate label
-            switch_toggle_button = wx.ToggleButton(
-                parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"{switch_name}")
-            switch_toggle_button.SetValue(bool(initial_switch_state))
-            # bind switch toggle button to its event
-            self.Bind(wx.EVT_TOGGLEBUTTON,
-                      self.on_switch_toggle_button, switch_toggle_button)
+            switch_state_indicator_panel = wx.Panel(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, style=wx.BORDER_RAISED, size=(50, 30))
+            switch_state_indicator_panel_sizer = wx.BoxSizer(wx.VERTICAL)
+            switch_state_indicator_panel.SetSizer(switch_state_indicator_panel_sizer)
+
+            if initial_switch_state == 1:
+                switch_state_indicator_panel.SetBackgroundColour(wx.Colour(4, 84, 14))
+                text = wx.StaticText(switch_state_indicator_panel, wx.ID_ANY, "ON", style=wx.ALIGN_LEFT)
+                font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False)
+                text.SetFont(font)
+                text.SetForegroundColour(wx.WHITE)
+                switch_state_indicator_panel_sizer.Add(text, 0, flag=wx.CENTER)
+            elif initial_switch_state == 0:
+                switch_state_indicator_panel.SetBackgroundColour(wx.Colour(139, 26, 26))
+                text = wx.StaticText(switch_state_indicator_panel, wx.ID_ANY, "OFF", style=wx.ALIGN_LEFT)
+                font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False)
+                text.SetFont(font)
+                text.SetForegroundColour(wx.WHITE)
+                switch_state_indicator_panel_sizer.Add(text, 0, flag=wx.CENTER)
 
             # add switch toggle buttons to ScrolledPanel
             self.fgs.Add(switch_toggle_button, 1, flag=wx.ALL, border=10)
             self.fgs.Add(switch_slider_panel, 2, flag=wx.ALL, border=10)
+            self.fgs.Add(switch_state_indicator_panel, 1, flag=wx.ALL, border=10)
 
         # Set sizer of ScrolledPanel
         self.switch_buttons_scrolled_panel.SetSizer(self.fgs)
