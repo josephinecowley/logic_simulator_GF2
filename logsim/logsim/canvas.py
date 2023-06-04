@@ -149,16 +149,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             
         GL.glEnd()
 
-        '''if signal[i] == 0:
-            GL.glColor3f(*color)
-            y = y_pos
-        elif signal[i] == 1:
-            GL.glColor3f(*color)
-            y = y_pos + 25
-        else:
-            GL.glColor3f(1.0, 1.0, 1.0)
-            y = y_pos'''
-
         # draw axis
         y_pos -= 10
         GL.glColor3f(0.0, 0.0, 0.0)  # black
