@@ -834,7 +834,7 @@ class Parser:
         # Check to see if we have an empty connection list
         if self.symbol.type == self.scanner.BRACE_CLOSE:
 
-            # Cycle through each device and chack that there are no inputs.
+            # Loop through each device and check that there are no inputs
             for device in self.devices.devices_list:
 
                 # If there are inputs (ie the dictionaries of each device has a non-zero length), then it is not possible to have an empty connections list.
@@ -845,9 +845,11 @@ class Parser:
         if not is_empty_allowed:
             self.display_error(self.symbol, self.EMPTY_CONNECTION_LIST,
                                display=False, proceed=False, stopping_symbol_types=[11])
+            self.symbol = self.scanner.get_symbol()
             return True
         # If it is possible, return now as not necessary to continue
         else:
+            self.symbol = self.scanner.get_symbol()
             return
 
         # JC! NEED TO ADD ERROR HANDLING FOR EMTPY CONNECTION AND MONITOR LISTS
