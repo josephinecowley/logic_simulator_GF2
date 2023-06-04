@@ -10,16 +10,12 @@ Gui - configures the main window and all the widgets.
 """
 import os
 from io import StringIO
-import sys
 from contextlib import redirect_stdout
 from collections import defaultdict
 
 import wx
-import wx.glcanvas as wxcanvas
 import wx.lib.scrolledpanel as wxscrolledpanel
 import wx.lib.buttons as wxbuttons
-import wx.lib.agw.aquabutton as wxaquabutton
-from OpenGL import GL, GLUT
 
 from names import Names
 from devices import Devices
