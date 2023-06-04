@@ -747,7 +747,7 @@ class Parser:
                                                        proceed=False)
                             else:
                                 self.display_error(self.symbol, self.BINARY_NUMBER_OUT_OF_RANGE,
-                                                   proceed=False)  # JC! you need to change this to it's own own no comma
+                                                   proceed=False)
                         else:
                             self.display_error(self.symbol, self.NO_COMMA,
                                                proceed=False)
