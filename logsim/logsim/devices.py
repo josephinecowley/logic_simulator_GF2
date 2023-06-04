@@ -265,12 +265,16 @@ class Devices:
         device.siggen_signal_list = signal_list
         device.siggen_counter = 0
 
+        self.add_output(device.device_id, output_id=None, signal=signal_list[0])
+
     def make_RC(self, device_id, RC_period):
         """Make a RC device with the specified period. """
         self.add_device(device_id, self.RC)
         device = self.get_device(device_id)
         device.RC_period = RC_period
         device.RC_counter = 0
+
+        self.add_output(device.device_id, output_id=None, signal=1)
 
     def make_gate(self, device_id, device_kind, no_of_inputs):
         """Make logic gates with the specified number of inputs."""
@@ -307,7 +311,7 @@ class Devices:
                                 signal=clock_signal)
                 # Initialise it to a random point in its cycle.
                 device.clock_counter = \
-                    random.randrange(device.clock_half_period)
+                    random.randrange(device.clock_half_period)                
 
     def make_device(self, device_id, device_kind, device_property=None):
         """Create the specified device.
