@@ -73,7 +73,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.last_mouse_y = 0  # previous mouse y position
 
         # Initialise variables for zooming
-        self.zoom = 1
+        self.zoom = 1.0
 
         # Bind events to the canvas
         self.Bind(wx.EVT_PAINT, self.on_paint)
@@ -204,7 +204,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
     def on_key_press(self, event):
         """Handles key press events"""
         keycode = event.GetKeyCode()
-        if keycode == wx.WXK_SPACE:
+        if keycode == ord("c"):
             self.recenter_canvas()
         event.Skip()  # Allow other key events to propagate
 
