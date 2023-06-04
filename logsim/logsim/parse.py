@@ -531,8 +531,8 @@ class Parser:
         Return both device kind (eg AND gate) and the device property (eg number of inputs)."""
 
         # Specify ID numbers of devices
-        [AND_ID, NAND_ID, OR_ID, NOR_ID, XOR_ID, DTYPE_ID, SWITCH_ID, CLK_ID, SIGGEN_ID] = self.names.lookup(
-            ["AND", "NAND", "OR", "NOR", "XOR", "DTYPE",  "SWITCH", "CLOCK", "SIGGEN"])
+        [AND_ID, NAND_ID, OR_ID, NOR_ID, XOR_ID, DTYPE_ID, SWITCH_ID, CLK_ID, SIGGEN_ID, RC_ID] = self.names.lookup(
+            ["AND", "NAND", "OR", "NOR", "XOR", "DTYPE",  "SWITCH", "CLOCK", "SIGGEN", "RC"])
 
         # Specify input ranges
         one_to_sixteen = list(range(1, 17))
@@ -718,11 +718,13 @@ class Parser:
 
                             # Check we get a SIGNAL type
                             if self.symbol.type == self.scanner.SIGNAL:
-                                # do some stuff to get the stuff
                                 signal_string = self.names.get_name_string(
                                     self.symbol.id)
                                 signal = signal_string.strip('][').split(',')
                                 signal = list(map(int, signal))
+
+                                siggen_property = (
+                                    siggen_initial_state, signal)
 
                                 self.symbol = self.scanner.get_symbol()
 
@@ -731,7 +733,7 @@ class Parser:
                                     self.symbol = self.scanner.get_symbol()
 
                                     # Return device kind and the signal list
-                                    return device_kind, signal
+                                    return device_kind, siggen_property
                                 else:
                                     self.display_error(self.symbol, self.NO_BRACKET_CLOSE,
                                                        proceed=False)
@@ -744,6 +746,50 @@ class Parser:
 
                     else:
                         self.display_error(self.symbol, self.BINARY_NUMBER_OUT_OF_RANGE,
+                                           proceed=False)
+                        return None, None
+                else:
+                    self.display_error(self.symbol, self.NO_NUMBER,
+                                       proceed=False)
+                    return None, None
+            else:
+                self.display_error(self.symbol, self.NO_BRACKET_OPEN,
+                                   proceed=False)
+                return None, None
+
+        # Check if symbol is an RC
+        elif self.symbol.id == RC_ID:
+
+            # Save device type ID for network functionality
+            device_kind = self.symbol.id
+
+            self.symbol = self.scanner.get_symbol()
+
+            # Check that the gate is followed by an open bracket symbol
+            if self.symbol.type == self.scanner.BRACKET_OPEN:
+                self.symbol = self.scanner.get_symbol()
+
+                # Check that number of inputs is an integer
+                if self.symbol.type == self.scanner.NUMBER:
+                    number_of_cycles = int(self.names.get_name_string(
+                        self.symbol.id))
+
+                    # Check that input number is positive (this is a semantic check!)
+                    if number_of_cycles > 0:
+                        # Check that the next symbol is a close bracket
+                        self.symbol = self.scanner.get_symbol()
+                        if self.symbol.type == self.scanner.BRACKET_CLOSE:
+                            self.symbol = self.scanner.get_symbol()
+
+                            # Return device kind and the number of cycles as device property
+                            return device_kind, number_of_cycles
+                        else:
+                            self.display_error(
+                                self.symbol, self.NO_BRACKET_CLOSE,
+                                proceed=False)
+                            return None, None
+                    else:
+                        self.display_error(self.symbol, self.CLK_OUT_OF_RANGE,  # JC! change this to its own RC_OUT OF RANGE error
                                            proceed=False)
                         return None, None
                 else:
