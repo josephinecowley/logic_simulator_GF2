@@ -259,7 +259,7 @@ def test_execute_non_xor_gates(new_network, gate_id, switch_outputs,
 def test_execute_non_gates(new_network):
     """Test if execute_network returns the correct output for non-gate devices.
 
-    Tests switches, D-types and clocks.
+    Tests switches, D-types, clocks, SigGens and RCs.
     """
     network = new_network
     devices = network.devices
@@ -269,30 +269,28 @@ def test_execute_non_gates(new_network):
     HIGH = devices.HIGH
 
     # Make different devices
-    [SW1_ID, SW2_ID, SW3_ID, CL_ID, D_ID, SIG_ID, RC_ID] = names.lookup(["Sw1", "Sw2", "Sw3",
-                                                          "Clock1", "D1", "Sig1", "RC1"])
-    devices.make_device(SW1_ID, devices.SWITCH, 1)
-    devices.make_device(SW2_ID, devices.SWITCH, 0)
-    devices.make_device(SW3_ID, devices.SWITCH, 0)
+    [SW1_ID, CL_ID, D_ID, SIG_ID, RC_ID] = names.lookup(["Sw1", "Clock1", "D1", "Sig1", "RC1"])
+    devices.make_device(SW1_ID, devices.SWITCH, 0)
     devices.make_device(CL_ID, devices.CLOCK, 1)
     devices.make_device(D_ID, devices.D_TYPE)
     devices.make_device(SIG_ID, devices.SIGGEN, (1, [1, 2, 3, 4]))
     devices.make_device(RC_ID, devices.RC, 10)
 
     # Make connections
-    network.make_connection(SW1_ID, None, D_ID, devices.DATA_ID)
+    network.make_connection(SIG_ID, None, D_ID, devices.DATA_ID)
     network.make_connection(CL_ID, None, D_ID, devices.CLK_ID)
-    network.make_connection(SW2_ID, None, D_ID, devices.SET_ID)
-    network.make_connection(SW3_ID, None, D_ID, devices.CLEAR_ID)
+    network.make_connection(RC_ID, None, D_ID, devices.SET_ID)
+    network.make_connection(SW1_ID, None, D_ID, devices.CLEAR_ID)
 
     # Get device outputs, the expression is in a string here so that it
     # can be re-evaluated again after executing devices
     sw1_output = "network.get_output_signal(SW1_ID, None)"
-    sw2_output = "network.get_output_signal(SW2_ID, None)"
-    sw3_output = "network.get_output_signal(SW3_ID, None)"
     clock_output = "network.get_output_signal(CL_ID, None)"
+    siggen_output = "network.get_output_signal(SIG_ID, None)"
+    rc_output = "network.get_output_signal(RC_ID, None)"
     dtype_Q = "network.get_output_signal(D_ID, devices.Q_ID)"
     dtype_QBAR = "network.get_output_signal(D_ID, devices.QBAR_ID)"
+
 
     # Execute devices until the clock is LOW at the start of its
     # period
@@ -301,40 +299,27 @@ def test_execute_non_gates(new_network):
     while clock_device.clock_counter != 1 or eval(clock_output) != LOW:
         network.execute_network()
 
-    # The clock is not rising yet, Q could be (randomly) HIGH or LOW
-    assert [eval(sw1_output), eval(sw2_output), eval(sw3_output),
-            eval(clock_output)] == [HIGH, LOW, LOW, LOW]
+    # The clock is not rising yet, Q could be HIGH or LOW
+    assert [eval(sw1_output), eval(rc_output),
+            eval(clock_output)] == [LOW, HIGH, LOW]
 
     assert eval(dtype_Q) in [HIGH, LOW]
     assert eval(dtype_QBAR) == network.invert_signal(eval(dtype_Q))
 
     network.execute_network()  # the clock has risen
-    # While sw1(DATA) is high, Q has now changed to HIGH
-    assert [eval(sw1_output), eval(sw2_output), eval(sw3_output),
-            eval(clock_output), eval(dtype_Q), eval(dtype_QBAR)] == [
-                HIGH, LOW, LOW, HIGH, HIGH, LOW]
-
-    devices.set_switch(SW1_ID, LOW)  # Sw1 is connected to DATA
-    devices.set_switch(SW2_ID, HIGH)  # Sw2 is connected to SET
-    network.execute_network()  # the clock is not rising yet
-    network.execute_network()  # the clock has risen
-    # Even if sw1(DATA) is LOW, and the clock is rising,
-    # sw2(SET) is HIGH, so Q is HIGH
-    assert [eval(sw1_output), eval(sw2_output), eval(sw3_output),
+    # While RC1(SET) is HIGH, Q is HIGH
+    assert [eval(sw1_output), eval(rc_output), eval(siggen_output),
             eval(clock_output), eval(dtype_Q), eval(dtype_QBAR)] == [
                 LOW, HIGH, LOW, HIGH, HIGH, LOW]
 
-    devices.set_switch(SW1_ID, HIGH)  # Sw1 is connected to DATA
-    devices.set_switch(SW2_ID, LOW)  # Sw2 is connected to SET
-    devices.set_switch(SW3_ID, HIGH)  # Sw3 is connected to CLEAR
+    devices.set_switch(SW1_ID, HIGH)  # Sw1 is connected to CLEAR
     network.execute_network()  # the clock is not rising yet
     network.execute_network()  # the clock has risen
-    # Even if sw1(DATA) is HIGH, and the clock is rising,
-    # sw3(CLEAR) is HIGH, so Q is LOW
-    assert [eval(sw1_output), eval(sw2_output), eval(sw3_output),
+    # Even if Sig1(DATA) is HIGH, and the clock is rising,
+    # SW1(CLEAR) is HIGH, so Q is LOW
+    assert [eval(sw1_output), eval(rc_output),
             eval(clock_output), eval(dtype_Q), eval(dtype_QBAR)] == [
-                HIGH, LOW, HIGH, HIGH, LOW, HIGH]
-
+                HIGH, HIGH, HIGH, LOW, HIGH]
 
 def test_oscillating_network(new_network):
     """Test if the execute_network returns False for oscillating networks."""
