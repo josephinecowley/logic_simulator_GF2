@@ -659,17 +659,14 @@ class SwitchesPanel(wx.Panel):
             switch_slider_panel_sizer = wx.BoxSizer(wx.VERTICAL)
             switch_slider_panel.SetSizer(switch_slider_panel_sizer)
 
-            switch_slider_button = wxbuttons.GenButton(parent=switch_slider_panel, id=wx.ID_ANY, label=initial_switch_state_word, name="switch slider")
+            switch_slider_button = wxbuttons.GenButton(parent=switch_slider_panel, id=wx.ID_ANY, label="", name="switch slider")
             switch_slider_id = switch_slider_panel.GetId()
             self.switch_dict[switch_slider_id].extend([switch_id, switch_name, initial_switch_state, switch_slider_panel, switch_slider_panel_sizer])
         
             self.Bind(wx.EVT_BUTTON, self.on_switch_slider_button, switch_slider_button)
-            switch_slider_button.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
             switch_slider_button.SetBezelWidth(5)
             switch_slider_button.SetMinSize((45, 30))
-            switch_slider_button.SetBackgroundColour(wx.Colour(*initial_switch_state_colour))
-            switch_slider_button.SetForegroundColour(wx.WHITE)
-            switch_slider_button.SetToolTip(f"{switch_name} is {initial_switch_state_word}")
+            switch_slider_button.SetBackgroundColour(wx.Colour(112, 112, 112))
         
             if initial_switch_state == 1:
                 switch_slider_panel_sizer.Add(switch_slider_button, 0, flag=wx.ALIGN_RIGHT, border=5)
@@ -758,19 +755,15 @@ class SwitchesPanel(wx.Panel):
 
         if selected_switch_state == 0: # switch is currently OFF
             selected_switch_state = 1 # switch is now ON
-            print(f'new: {selected_switch_state}')
             self.devices.set_switch(selected_switch_id, selected_switch_state)
             self.switch_dict[selected_switch_panel_id][2] = selected_switch_state
 
-            switch_slider_button = wxbuttons.GenButton(parent=selected_switch_panel, id=wx.ID_ANY, label="ON")
+            switch_slider_button = wxbuttons.GenButton(parent=selected_switch_panel, id=wx.ID_ANY, label="")
         
             self.Bind(wx.EVT_BUTTON, self.on_switch_slider_button, switch_slider_button)
-            switch_slider_button.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
             switch_slider_button.SetBezelWidth(5)
             switch_slider_button.SetMinSize((45, 30))
-            switch_slider_button.SetBackgroundColour(wx.Colour((4, 84, 14)))
-            switch_slider_button.SetForegroundColour(wx.WHITE)
-            switch_slider_button.SetToolTip(f"{selected_switch_name} is ON")
+            switch_slider_button.SetBackgroundColour(wx.Colour((112, 112, 112)))
 
             selected_switch_panel_sizer.Add(switch_slider_button, 0, flag=wx.ALIGN_RIGHT, border=5)
             selected_switch_panel.GetSizer().Layout()
@@ -780,19 +773,15 @@ class SwitchesPanel(wx.Panel):
 
         elif selected_switch_state == 1: # switch is currently ON
             selected_switch_state = 0 # switch is now OFF
-            print(f'new: {selected_switch_state}')
             self.devices.set_switch(selected_switch_id, selected_switch_state)
             self.switch_dict[selected_switch_panel_id][2] = selected_switch_state
 
-            switch_slider_button = wxbuttons.GenButton(parent=selected_switch_panel, id=wx.ID_ANY, label="OFF")
+            switch_slider_button = wxbuttons.GenButton(parent=selected_switch_panel, id=wx.ID_ANY, label="")
         
             self.Bind(wx.EVT_BUTTON, self.on_switch_slider_button, switch_slider_button)
-            switch_slider_button.SetFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
             switch_slider_button.SetBezelWidth(5)
             switch_slider_button.SetMinSize((45, 30))
-            switch_slider_button.SetBackgroundColour(wx.Colour((139, 26, 26)))
-            switch_slider_button.SetForegroundColour(wx.WHITE)
-            switch_slider_button.SetToolTip(f"{selected_switch_name} is OFF")
+            switch_slider_button.SetBackgroundColour(wx.Colour((112, 112, 112)))
 
             selected_switch_panel_sizer.Add(switch_slider_button, 0, flag=wx.ALIGN_LEFT, border=5)
             selected_switch_panel.GetSizer().Layout()
