@@ -23,8 +23,8 @@ def devices_with_items():
     new_devices.make_device(AND1_ID, new_devices.AND, 2)
     new_devices.make_device(NOR1_ID, new_devices.NOR, 16)
     new_devices.make_device(SW1_ID, new_devices.SWITCH, 0)
-    new_devices.make_device(SIG_ID, new_devices.SIGGEN, (new_devices.HIGH, [1, 2, 3, 4]) )
-    new_devices.make_device(RC_ID, new_devices.RC, 4)
+    new_devices.make_device(SIG_ID, new_devices.SIGGEN, (1, [1, 2, 3, 4]) )
+    new_devices.make_device(RC_ID, new_devices.RC, 10)
 
     return new_devices
 
@@ -99,7 +99,7 @@ def test_make_device(new_devices):
 
     assert rc_device.outputs == {None: 1}
 
-    assert siggen_device.siggen_signal_list == [1, 2, 3, 4]
+    assert siggen_device.siggen_signal_list == [1, 0, 0, 1, 1, 1, 0, 0, 0, 0]
     assert siggen_device.siggen_counter == 0
     assert rc_device.RC_period == 10
     assert rc_device.RC_counter == 0
@@ -109,9 +109,6 @@ def test_make_device(new_devices):
     assert clock_device.clock_counter in range(5)
     assert dtype_device.dtype_memory in [new_devices.LOW, new_devices.HIGH]
 
-    
-
-
 @pytest.mark.parametrize("function_args, error", [
     ("(AND1_ID, new_devices.AND, 17)", "new_devices.INVALID_QUALIFIER"),
     ("(SW1_ID, new_devices.SWITCH, None)", "new_devices.NO_QUALIFIER"),
@@ -119,6 +116,12 @@ def test_make_device(new_devices):
     ("(D_ID, D_ID, None)", "new_devices.BAD_DEVICE"),
     ("(CL_ID, new_devices.CLOCK, 0)", "new_devices.INVALID_QUALIFIER"),
     ("(CL_ID, new_devices.CLOCK, 10)", "new_devices.NO_ERROR"),
+    ("(SIG_ID, new_devices.SIGGEN, (1, [1, 2, 3, 4]))", "new_devices.NO_ERROR"),
+    ("(SIG_ID, new_devices.SIGGEN, (2, [1, 2, 3, 4]))", "new_devices.INVALID_QUALIFIER"),
+    ("(SIG_ID, new_devices.SIGGEN, None)", "new_devices.NO_QUALIFIER"),
+    ("(RC_ID, new_devices.RC, 10)", "new_devices.NO_ERROR"),
+    ("(RC_ID, new_devices.RC, 0)", "new_devices.INVALID_QUALIFIER"),
+    ("(RC_ID, new_devices.RC, None)", "new_devices.NO_QUALIFIER"),
 
     # Note: XOR device X2_ID will have been made earlier in the function
     ("(X2_ID, new_devices.XOR)", "new_devices.DEVICE_PRESENT"),
@@ -127,7 +130,7 @@ def test_make_device_gives_errors(new_devices, function_args, error):
     """Test if make_device returns the appropriate errors."""
     names = new_devices.names
     [AND1_ID, SW1_ID, CL_ID, D_ID, X1_ID,
-     X2_ID] = names.lookup(["And1", "Sw1", "Clock1", "D1", "Xor1", "Xor2"])
+     X2_ID, SIG_ID, RC_ID] = names.lookup(["And1", "Sw1", "Clock1", "D1", "Xor1", "Xor2", "Sig1", "RC1"])
 
     # Add a XOR device: X2_ID
     new_devices.make_device(X2_ID, new_devices.XOR)
