@@ -307,7 +307,7 @@ class Scanner:
     def get_siggen_signal(self):
         """Assumes current character is '[' and reads string from file until ']' or EOF.
         Returns a string like '[1, 2, 3, 4, 5]'. """
-        signal_string = f"{self.current_character}"
+        signal_string = ""
         self.advance
         while not self.current_character in ["]", ""]:
             signal_string += self.current_character
