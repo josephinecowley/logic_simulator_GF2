@@ -110,7 +110,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glLoadIdentity()
 
         # Adjust the translation values for panning and centering
-        GL.glTranslated(size.width / 2 + self.pan_x, size.height / 2 + self.pan_y, 0.0)
+        GL.glTranslated(self.pan_x , self.pan_y + size.height/2 - self.y_spacing * (len(self.traces) - 1) , 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
 
     def draw_canvas(self):
@@ -205,24 +205,25 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         """Handles key press events"""
         keycode = event.GetKeyCode()
         if keycode == wx.WXK_SPACE:
-            self.recentre_canvas()
+            self.recenter_canvas()
         event.Skip()  # Allow other key events to propagate
 
     def on_right_click(self, event):
         """Handles right click event"""
         self.clear_traces()
 
-    def recentre_canvas(self):
+    def recenter_canvas(self):
         size = self.GetClientSize()
         self.pan_x = 0
         self.pan_y = 0
+        self.zoom = 1.0
 
         # Adjust the translation values for panning and centering
         GL.glMatrixMode(GL.GL_MODELVIEW)
         GL.glLoadIdentity()
-        GL.glTranslated(size.width / 2 - self.pan_x, size.height / 2 - self.pan_y, 0.0)
+        GL.glTranslated(self.pan_x , self.pan_y + size.height/2 - self.y_spacing * (len(self.traces) - 1) , 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
-
+        
         self.Refresh()
     
     def clear_traces(self):
