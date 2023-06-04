@@ -42,7 +42,6 @@ class Device:
         self.switch_state = None
         self.dtype_memory = None
 
-        self.siggen_initial_state = None
         self.siggen_signal_list = None
         self.siggen_counter = None
 
@@ -261,7 +260,6 @@ class Devices:
             signal_list.extend([current_state] * period)
             current_state = 1 - current_state  # Switch the state
 
-        device.siggen_initial_state = initial_state
         device.siggen_signal_list = signal_list
         device.siggen_counter = 0
 
