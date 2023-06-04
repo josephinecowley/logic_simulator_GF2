@@ -392,29 +392,10 @@ class RunSimulationPanel(wx.Panel):
         dlg.Destroy()
 
     def on_help_button(self, event):
-        help_guidelines_text = \
-            """
-Welcome to our Logic Simulator!
-
-To get started you need a valid Logic Description File. This is one which follows our defined language syntax.
-
-Click on the “UPLOAD” button in the bottom right corner of the simulator tab and follow the command prompt to select your logic description file.
-Upon clicking this, if you have uploaded a valid Logic Description File, you should see the y-axis of each monitor you have specified, along with all of the valid switches you have added in your logic circuit.
-
-You can update the number of monitors using the “Add new monitor” and “Zap a monitor” drop down boxes, which provides names of device output ports which you could monitor. Once you have specified the monitor that you want to add or zap, you must press the corresponding “+” (for adding a monitor) or “-” (for zapping a monitor) buttons on the right of these dropdown boxes.
-Upon doing so, you should see the monitors update.
-
-You can also change the initial state of the switches in your circuit by using the toggle buttons. Blue indicates the switch state is ON and grey indicates the switch state is OFF.
-
-Now specify the number of cycles you wish to run by using the spin button in the bottom left corner of the simulator.
-
-Now you can press the large green “RUN” button in the bottom left hand corner.
-
-If successful, you should see the signal traces update for each monitored device.
-
-Note that upon clicking “RUN” this button will change to an orange “CONTINUE” button. Click this if you want to add further simulations. You can always change the number of cycles specified or the switch states or monitors in between each simulation.
-"""
-        dlg = wx.MessageDialog(self, help_guidelines_text,
+        help_dialog_file_path = "logsim/logsim/help_dialog.txt"
+        with open(help_dialog_file_path, "r", encoding="utf8") as help_dialog_file:
+            help_dialog_text = "".join(help_dialog_file.readlines())
+        dlg = wx.MessageDialog(self, help_dialog_text,
                                "Tutorial on GF2 Team 7 Logic Simulator",
                                wx.OK | wx.ICON_INFORMATION
                                # wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL | wx.ICON_INFORMATION
