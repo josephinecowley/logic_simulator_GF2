@@ -60,6 +60,11 @@ class Gui(wx.Frame):
         self.network = network
         self.monitors = monitors
 
+        ldf_title = self.extract_ldf_title()
+
+        # Configure the title of the GUI frame window
+        self.SetTitle(f"GF2 Team 7 Logic Simulator GUI: {ldf_title}")
+
         # Configure the file menu
         fileMenu = wx.Menu()
         menuBar = wx.MenuBar()
@@ -109,6 +114,11 @@ class Gui(wx.Frame):
 
     def on_quit_button(self, event):
         self.Close()
+
+    def extract_ldf_title(self):
+        ldf_title = self.path.split(os.sep)[-1]
+
+        return ldf_title
 
 
 class RunSimulationPanel(wx.Panel):
@@ -702,13 +712,8 @@ class SwitchesPanel(wx.Panel):
 
         # Create and add left panel in switches panel layout
         self.left_panel = wx.Panel(self.switches_panel)
-        # self.test_button = wx.Button(self.left_panel, wx.ID_ANY, "Temp \nbutton \nlocation \nfor \nadd \nnew \ndevice", (50,50))
-        # self.Bind(wx.EVT_BUTTON, self.on_test_button, self.test_button)
         left_panel_vbox = wx.BoxSizer(wx.VERTICAL)
         self.left_panel.SetSizer(left_panel_vbox)
-        # left_panel_vbox.Add(self.test_button, 1, flag=wx.EXPAND)
-        # left_panel_vbox.Add(self.add_new_switch_button, 1, flag=wx.EXPAND)
-        #hbox.Add(self.left_panel, 1, wx.EXPAND)
 
         # Add the ScrolledPanel widget to SwitchesPanel panel
         hbox.Add(self.switch_buttons_scrolled_panel, 3, wx.EXPAND)
@@ -1030,7 +1035,7 @@ class LogicSimApp(wx.App):
         scanner = Scanner(file_path, names)
         parser = Parser(names, devices, network, monitors, scanner)
         parser.parse_network()
-        self.frame = Gui(f"GF2 Team 7 Logic Simulator GUI: {file_path}",
+        self.frame = Gui("GUI",
                          file_path,
                          names,
                          devices,
