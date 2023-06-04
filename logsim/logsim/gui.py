@@ -100,7 +100,6 @@ class Gui(wx.Frame):
 
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
-        print(self.GetSize())
         Id = event.GetId()
         if Id == wx.ID_EXIT:
             self.Close(True)
@@ -662,7 +661,6 @@ class SwitchesPanel(wx.Panel):
 
             switch_slider_button = wxbuttons.GenButton(parent=switch_slider_panel, id=wx.ID_ANY, label="", name="switch slider")
             switch_slider_id = switch_slider_panel.GetId()
-            self.switch_dict[switch_slider_id].extend([switch_id, switch_name, initial_switch_state, switch_slider_panel, switch_slider_panel_sizer])
         
             self.Bind(wx.EVT_BUTTON, self.on_switch_slider_button, switch_slider_button)
             switch_slider_button.SetBezelWidth(5)
@@ -692,6 +690,9 @@ class SwitchesPanel(wx.Panel):
                 text.SetFont(font)
                 text.SetForegroundColour(wx.WHITE)
                 switch_state_indicator_panel_sizer.Add(text, 0, flag=wx.CENTER)
+
+            switch_state_indicator_id = switch_state_indicator_panel.GetId()
+            self.switch_dict[switch_slider_id].extend([switch_id, switch_name, initial_switch_state, switch_slider_panel, switch_slider_panel_sizer, switch_state_indicator_panel, switch_state_indicator_panel_sizer])
 
             # add switch toggle buttons to ScrolledPanel
             self.fgs.Add(switch_toggle_button, 1, flag=wx.ALL, border=10)
@@ -760,11 +761,16 @@ class SwitchesPanel(wx.Panel):
         selected_switch_state = self.switch_dict[selected_switch_panel_id][2]
         selected_switch_panel = self.switch_dict[selected_switch_panel_id][3]
         selected_switch_panel_sizer = self.switch_dict[selected_switch_panel_id][4]
+        selected_switch_state_indicator_panel = self.switch_dict[selected_switch_panel_id][5]
+        selected_switch_state_indicator_panel_sizer = self.switch_dict[selected_switch_panel_id][6]
 
         print(f'original: {selected_switch_state}')
 
-        window = selected_switch_panel_sizer.GetItem(0).GetWindow()
-        window.Destroy()
+        selected_switch_panel_window = selected_switch_panel_sizer.GetItem(0).GetWindow()
+        selected_switch_panel_window.Destroy()
+
+        selected_switch_state_indicator_panel_window = selected_switch_state_indicator_panel_sizer.GetItem(0).GetWindow()
+        selected_switch_state_indicator_panel_window.Destroy()
 
         if selected_switch_state == 0: # switch is currently OFF
             selected_switch_state = 1 # switch is now ON
@@ -776,12 +782,23 @@ class SwitchesPanel(wx.Panel):
             self.Bind(wx.EVT_BUTTON, self.on_switch_slider_button, switch_slider_button)
             switch_slider_button.SetBezelWidth(5)
             switch_slider_button.SetMinSize((45, 30))
-            switch_slider_button.SetBackgroundColour(wx.Colour((112, 112, 112)))
+            switch_slider_button.SetBackgroundColour(wx.Colour(112, 112, 112))
 
             selected_switch_panel_sizer.Add(switch_slider_button, 0, flag=wx.ALIGN_RIGHT, border=5)
             selected_switch_panel.GetSizer().Layout()
             selected_switch_panel.Refresh()
             selected_switch_panel.Update()
+
+            selected_switch_state_indicator_panel.SetBackgroundColour(wx.Colour(4, 84, 14))
+            text = wx.StaticText(parent=selected_switch_state_indicator_panel, id=wx.ID_ANY, label="ON", style=wx.ALIGN_LEFT)
+            font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False)
+            text.SetFont(font)
+            text.SetForegroundColour(wx.WHITE)
+
+            selected_switch_state_indicator_panel_sizer.Add(text, 0, flag=wx.CENTER)
+            selected_switch_state_indicator_panel.GetSizer().Layout()
+            selected_switch_state_indicator_panel.Refresh()
+            selected_switch_state_indicator_panel.Update()
 
 
         elif selected_switch_state == 1: # switch is currently ON
@@ -794,12 +811,23 @@ class SwitchesPanel(wx.Panel):
             self.Bind(wx.EVT_BUTTON, self.on_switch_slider_button, switch_slider_button)
             switch_slider_button.SetBezelWidth(5)
             switch_slider_button.SetMinSize((45, 30))
-            switch_slider_button.SetBackgroundColour(wx.Colour((112, 112, 112)))
+            switch_slider_button.SetBackgroundColour(wx.Colour(112, 112, 112))
 
             selected_switch_panel_sizer.Add(switch_slider_button, 0, flag=wx.ALIGN_LEFT, border=5)
             selected_switch_panel.GetSizer().Layout()
             selected_switch_panel.Refresh()
             selected_switch_panel.Update()
+
+            selected_switch_state_indicator_panel.SetBackgroundColour(wx.Colour(139, 26, 26))
+            text = wx.StaticText(parent=selected_switch_state_indicator_panel, id=wx.ID_ANY, label="OFF", style=wx.ALIGN_LEFT)
+            font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False)
+            text.SetFont(font)
+            text.SetForegroundColour(wx.WHITE)
+
+            selected_switch_state_indicator_panel_sizer.Add(text, 0, flag=wx.CENTER)
+            selected_switch_state_indicator_panel.GetSizer().Layout()
+            selected_switch_state_indicator_panel.Refresh()
+            selected_switch_state_indicator_panel.Update()
 
 
     def on_change_right_panel_colour(self, event):
