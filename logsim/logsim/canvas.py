@@ -132,24 +132,32 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         """Draws trace with axes and ticks"""
 
         # draw trace
+        
         GL.glLineWidth(3.0)
         GL.glColor3f(*color)
         GL.glBegin(GL.GL_LINE_STRIP)
-        for i in range(len(signal)):
+        for i, signal_value in enumerate(signal):
             x = (i * 20) + x_pos
             x_next = (i * 20) + x_pos + 20
-            if signal[i] == 0:
+            if signal_value == 0 or signal_value == 1:
                 GL.glColor3f(*color)
-                y = y_pos
-            elif signal[i] == 1:
-                GL.glColor3f(*color)
-                y = y_pos + 25
-            else:
-                GL.glColor3f(1.0, 1.0, 1.0)
-                y = y_pos
-            GL.glVertex2f(x, y)
-            GL.glVertex2f(x_next, y)
+                y = y_pos + (25 * signal_value)
+                GL.glVertex2f(x, y)
+                GL.glVertex2f(x_next, y)
+                GL.glVertex2f(x, y)
+                GL.glVertex2f(x_next, y)
+            
         GL.glEnd()
+
+        '''if signal[i] == 0:
+            GL.glColor3f(*color)
+            y = y_pos
+        elif signal[i] == 1:
+            GL.glColor3f(*color)
+            y = y_pos + 25
+        else:
+            GL.glColor3f(1.0, 1.0, 1.0)
+            y = y_pos'''
 
         # draw axis
         y_pos -= 10
