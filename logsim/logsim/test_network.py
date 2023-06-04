@@ -269,13 +269,15 @@ def test_execute_non_gates(new_network):
     HIGH = devices.HIGH
 
     # Make different devices
-    [SW1_ID, SW2_ID, SW3_ID, CL_ID, D_ID] = names.lookup(["Sw1", "Sw2", "Sw3",
-                                                          "Clock1", "D1"])
+    [SW1_ID, SW2_ID, SW3_ID, CL_ID, D_ID, SIG_ID, RC_ID] = names.lookup(["Sw1", "Sw2", "Sw3",
+                                                          "Clock1", "D1", "Sig1", "RC1"])
     devices.make_device(SW1_ID, devices.SWITCH, 1)
     devices.make_device(SW2_ID, devices.SWITCH, 0)
     devices.make_device(SW3_ID, devices.SWITCH, 0)
     devices.make_device(CL_ID, devices.CLOCK, 1)
     devices.make_device(D_ID, devices.D_TYPE)
+    devices.make_device(SIG_ID, devices.SIGGEN, (1, [1, 2, 3, 4]))
+    devices.make_device(RC_ID, devices.RC, 10)
 
     # Make connections
     network.make_connection(SW1_ID, None, D_ID, devices.DATA_ID)
