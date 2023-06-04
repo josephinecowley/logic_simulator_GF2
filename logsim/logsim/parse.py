@@ -115,7 +115,7 @@ class Parser:
                               self.NO_BRACE_CLOSE, self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_BRACKET_OPEN, self.NO_BRACKET_CLOSE,
                               self.NO_NUMBER, self.INPUT_OUT_OF_RANGE, self.CLK_OUT_OF_RANGE, self.BINARY_NUMBER_OUT_OF_RANGE, self.UNDEFINED_NAME,
                               self.NO_FULLSTOP, self.NO_SEMICOLON, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE,
-                              self.TERMINATE, self.WRONG_ORDER, self.NO_COMMA, self.EMPTY_DEVICE_LIST] = self.names.unique_error_codes(26)
+                              self.TERMINATE, self.WRONG_ORDER, self.NO_COMMA, self.EMPTY_DEVICE_LIST, self.RC_OUT_OF_RANGE] = self.names.unique_error_codes(27)
 
     # Stopping symbols automatically assigned to semi-colons, braces and keywords
     def display_error(self,  symbol, error_type, display=True, display_marker=True, proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
@@ -277,6 +277,10 @@ class Parser:
             # Syntax error
             print(
                 "Cannot parse an empty device list.\n          Program terminated early as this is an error which cannot be handled.", end="\n \n")
+        elif error_type == self.RC_OUT_OF_RANGE:
+            # Semantic error
+            print(
+                "Input siggen period is out of range. Must be a positive integer", end="\n \n")
         else:
             raise ValueError("Expected a valid error code")
 
@@ -789,7 +793,7 @@ class Parser:
                                 proceed=False)
                             return None, None
                     else:
-                        self.display_error(self.symbol, self.CLK_OUT_OF_RANGE,  # JC! change this to its own RC_OUT OF RANGE error
+                        self.display_error(self.symbol, self.RC_OUT_OF_RANGE,  # JC! change this to its own RC_OUT OF RANGE error
                                            proceed=False)
                         return None, None
                 else:
@@ -801,7 +805,7 @@ class Parser:
                                    proceed=False)
                 return None, None
 
-        # If invalid component
+        # If invalid component entered
         else:
             self.display_error(self.symbol, self.INVALID_COMPONENT,
                                proceed=False)
