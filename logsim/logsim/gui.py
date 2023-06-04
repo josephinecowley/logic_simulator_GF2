@@ -646,14 +646,10 @@ class SwitchesPanel(wx.Panel):
         for switch_name in switch_names:
             switch_id = self.names.query(switch_name)
             initial_switch_state = devices.get_device(switch_id).switch_state
-
-            # create switch toggle button object with appropriate label
-            switch_toggle_button = wx.ToggleButton(
-                parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"{switch_name}")
-            switch_toggle_button.SetValue(bool(initial_switch_state))
-            # bind switch toggle button to its event
-            self.Bind(wx.EVT_TOGGLEBUTTON,
-                      self.on_switch_toggle_button, switch_toggle_button)
+            
+            switch_name_text = wx.StaticText(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"{switch_name}", style=wx.ALIGN_LEFT)
+            font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False)
+            switch_name_text.SetFont(font)
 
             switch_slider_panel = wx.Panel(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, style=wx.BORDER_SUNKEN, size=(90, 30))
             switch_slider_panel_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -691,11 +687,10 @@ class SwitchesPanel(wx.Panel):
                 text.SetForegroundColour(wx.WHITE)
                 switch_state_indicator_panel_sizer.Add(text, 0, flag=wx.CENTER)
 
-            switch_state_indicator_id = switch_state_indicator_panel.GetId()
             self.switch_dict[switch_slider_id].extend([switch_id, switch_name, initial_switch_state, switch_slider_panel, switch_slider_panel_sizer, switch_state_indicator_panel, switch_state_indicator_panel_sizer])
 
             # add switch toggle buttons to ScrolledPanel
-            self.fgs.Add(switch_toggle_button, 1, flag=wx.ALL, border=10)
+            self.fgs.Add(switch_name_text, 0, flag=wx.ALL, border=12)
             self.fgs.Add(switch_slider_panel, 2, flag=wx.ALL, border=10)
             self.fgs.Add(switch_state_indicator_panel, 1, flag=wx.ALL, border=10)
 
