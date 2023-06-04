@@ -841,16 +841,16 @@ class Parser:
                 if len(device.inputs.items()) != 0:
                     is_empty_allowed = False
 
-        # If not possible, throw and error and terminate the program early
-        if not is_empty_allowed:
-            self.display_error(self.symbol, self.EMPTY_CONNECTION_LIST,
-                               display=False, proceed=False, stopping_symbol_types=[11])
-            self.symbol = self.scanner.get_symbol()
-            return True
-        # If it is possible, return now as not necessary to continue
-        else:
-            self.symbol = self.scanner.get_symbol()
-            return
+            # If not possible, throw and error and terminate the program early
+            if not is_empty_allowed:
+                self.display_error(self.symbol, self.EMPTY_CONNECTION_LIST,
+                                   display=False, proceed=False, stopping_symbol_types=[11])
+                self.symbol = self.scanner.get_symbol()
+                return True
+            # If it is possible, return now as not necessary to continue
+            else:
+                self.symbol = self.scanner.get_symbol()
+                return
 
         # JC! NEED TO ADD ERROR HANDLING FOR EMTPY CONNECTION AND MONITOR LISTS
 
@@ -1031,6 +1031,10 @@ class Parser:
         # If catastrophic error occors, and symbol type is now EOF. Also return true to indicate that this needs to terminate early
         if self.symbol.type == self.scanner.EOF:
             return True
+
+        # If monitors list is empty, exit early
+        if self.symbol.type == self.scanner.BRACE_CLOSE:
+            return
 
         # Parse a monitor
         [monitor_device_id, monitor_port_id] = self.output()
