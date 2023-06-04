@@ -61,13 +61,9 @@ class Gui(wx.Frame):
         self.monitors = monitors
 
         # Create a wx.Locale object
-        locale = wx.Locale(wx.LANGUAGE_DEFAULT)
-
-        # Get the system language
-        system_language = locale.GetCanonicalName()
-
-        # Print the system language
-        print("System Language:", system_language)
+        system_language = wx.Locale.GetSystemLanguage()
+        language_name = wx.Locale.GetLanguageName(system_language)
+        print("System Language:", language_name)
 
         # Configure the file menu
         fileMenu = wx.Menu()
