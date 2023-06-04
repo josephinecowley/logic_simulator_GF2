@@ -66,10 +66,16 @@ def test_make_device(new_devices):
     # Clock half period is 5
     new_devices.make_device(CLOCK1_ID, new_devices.CLOCK, 5)
     new_devices.make_device(D1_ID, new_devices.D_TYPE)
+    # siggen sequence [1, 0, 0, 1, 1, 1, 0, 0, 0, 0]
+    new_devices.make_device(SIG_ID, new_devices.SIGGEN, (1, [1, 2, 3, 4]))
+    # rc with drop at t=10
+    new_devices.make_device(RC_ID, new_devices.RC, 10)
 
     nand_device = new_devices.get_device(NAND1_ID)
     clock_device = new_devices.get_device(CLOCK1_ID)
     dtype_device = new_devices.get_device(D1_ID)
+    siggen_device = new_devices.get_device(SIG_ID)
+    rc_device = new_devices.get_device(RC_ID)
 
     assert nand_device.inputs == {I1_ID: None, I2_ID: None}
     assert clock_device.inputs == {}
@@ -77,6 +83,8 @@ def test_make_device(new_devices):
                                    new_devices.SET_ID: None,
                                    new_devices.CLEAR_ID: None,
                                    new_devices.CLK_ID: None}
+    assert siggen_device.inputs == {}
+    assert rc_device.inputs == {}
 
     assert nand_device.outputs == {None: new_devices.LOW}
 
@@ -87,10 +95,21 @@ def test_make_device(new_devices):
     assert dtype_device.outputs == {new_devices.Q_ID: new_devices.LOW,
                                     new_devices.QBAR_ID: new_devices.LOW}
 
+    assert siggen_device.outputs == {None: 1} # initial state is 1
+
+    assert rc_device.outputs == {None: 1}
+
+    assert siggen_device.siggen_signal_list == [1, 2, 3, 4]
+    assert siggen_device.siggen_counter == 0
+    assert rc_device.RC_period == 10
+    assert rc_device.RC_counter == 0
+
     assert clock_device.clock_half_period == 5
     # Clock counter and D-type memory are initially at random states
     assert clock_device.clock_counter in range(5)
     assert dtype_device.dtype_memory in [new_devices.LOW, new_devices.HIGH]
+
+    
 
 
 @pytest.mark.parametrize("function_args, error", [
