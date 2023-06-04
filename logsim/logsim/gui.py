@@ -60,6 +60,15 @@ class Gui(wx.Frame):
         self.network = network
         self.monitors = monitors
 
+        # Create a wx.Locale object
+        locale = wx.Locale(wx.LANGUAGE_DEFAULT)
+
+        # Get the system language
+        system_language = locale.GetCanonicalName()
+
+        # Print the system language
+        print("System Language:", system_language)
+
         # Configure the file menu
         fileMenu = wx.Menu()
         menuBar = wx.MenuBar()
