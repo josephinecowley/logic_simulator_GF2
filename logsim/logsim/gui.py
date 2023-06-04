@@ -12,6 +12,7 @@ import os
 from io import StringIO
 from contextlib import redirect_stdout
 from collections import defaultdict
+from pathlib import Path
 
 import wx
 import wx.lib.scrolledpanel as wxscrolledpanel
@@ -49,9 +50,9 @@ class Gui(wx.Frame):
     on_text_box(self, event): Event handler for when the user enters text.
     """
 
-    def __init__(self, title, path, names, devices, network, monitors, first_init=True):
+    def __init__(self, path, names, devices, network, monitors, first_init=True):
         """Initialise widgets and layout."""
-        super().__init__(parent=None, title=title, size=(1000, 700))
+        super().__init__(parent=None, size=(1000, 700))
 
         # Create instance variables for Gui class
         self.path = path
@@ -64,7 +65,7 @@ class Gui(wx.Frame):
         ldf_title = self.extract_ldf_title()
 
         # Configure the title of the GUI frame window
-        self.SetTitle(f"GF2 Team 7 Logic Simulator GUI: {ldf_title}")
+        self.SetTitle(f"GF2 P2 Team 7 Logic Simulator GUI: {ldf_title}")
 
         # Configure the file menu
         fileMenu = wx.Menu()
@@ -105,7 +106,7 @@ class Gui(wx.Frame):
         self.SetSizer(vbox)
 
         if self.first_init:
-            self.simulation_panel.open_help_dialog()
+            print('SUCCESS')
 
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
@@ -327,12 +328,12 @@ class RunSimulationPanel(wx.Panel):
         parser = Parser(names, devices, network, monitors, scanner)#
         parser.parse_network()
 
-        new_Gui = Gui("GF2 Team 7 Logic Simulator GUI",
-                              file_path,
-                              names,
-                              devices,
-                              network,
-                              monitors)
+        new_Gui = Gui(file_path,
+                      names,
+                      devices,
+                      network,
+                      monitors,
+                      first_init=False)
         new_Gui.Show()
         self.parent.Close()
 
@@ -388,8 +389,7 @@ class RunSimulationPanel(wx.Panel):
             output = captured_print.getvalue()
 
             if parsing_result:
-                new_Gui = Gui("GF2 Team 7 Logic Simulator GUI",
-                              file_path,
+                new_Gui = Gui(file_path,
                               names,
                               devices,
                               network,
@@ -412,7 +412,7 @@ class RunSimulationPanel(wx.Panel):
         self.open_help_dialog()
 
     def open_help_dialog(self):
-        help_dialog_file_path = "logsim/logsim/help_dialog.txt"
+        help_dialog_file_path = Path(__file__).with_name("help_dialog.txt")
         with open(help_dialog_file_path, "r", encoding="utf8") as help_dialog_file:
             help_dialog_text = "".join(help_dialog_file.readlines())
         dlg = wx.MessageDialog(self, help_dialog_text,
@@ -1032,6 +1032,7 @@ class AddDeviceDialog(wx.Dialog):
 
 class LogicSimApp(wx.App):
     def OnInit(self):
+        #file_path = Path(__file__).with_name("example2_logic_description.txt")
         file_path = "logsim\logsim\example2_logic_description.txt"
         with open(file_path) as f:
             print('success')
@@ -1042,8 +1043,7 @@ class LogicSimApp(wx.App):
         scanner = Scanner(file_path, names)
         parser = Parser(names, devices, network, monitors, scanner)
         parser.parse_network()
-        self.frame = Gui("GUI",
-                         file_path,
+        self.frame = Gui(file_path,
                          names,
                          devices,
                          network,
