@@ -115,7 +115,7 @@ class Parser:
                               self.NO_BRACE_CLOSE, self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_BRACKET_OPEN, self.NO_BRACKET_CLOSE,
                               self.NO_NUMBER, self.INPUT_OUT_OF_RANGE, self.CLK_OUT_OF_RANGE, self.BINARY_NUMBER_OUT_OF_RANGE, self.UNDEFINED_NAME,
                               self.NO_FULLSTOP, self.NO_SEMICOLON, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE,
-                              self.TERMINATE, self.WRONG_ORDER, self.NO_COMMA, self.EMPTY_DEVICE_LIST, self.RC_OUT_OF_RANGE] = self.names.unique_error_codes(27)
+                              self.TERMINATE, self.WRONG_ORDER, self.NO_COMMA, self.EMPTY_DEVICE_LIST, self.RC_OUT_OF_RANGE, self.EMPTY_CONNECTION_LIST] = self.names.unique_error_codes(28)
 
     # Stopping symbols automatically assigned to semi-colons, braces and keywords
     def display_error(self,  symbol, error_type, display=True, display_marker=True, proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
@@ -277,6 +277,10 @@ class Parser:
             # Syntax error
             print(
                 "Cannot parse an empty device list.\n          Program terminated early as this is an error which cannot be handled.", end="\n \n")
+        elif error_type == self.EMPTY_CONNECTION_LIST:
+            # Syntax error
+            print(
+                "Cannot parse an empty connections list.\n          Program terminated early as this is an error which cannot be handled.", end="\n \n")
         elif error_type == self.RC_OUT_OF_RANGE:
             # Semantic error
             print(
@@ -332,7 +336,7 @@ class Parser:
             return
 
     def initial_error_checks(self, KEYWORD_ID, missing_error_type):
-        """Check initial symbols for common errors. This function tests for 6 cases:
+        """Check initial symbols for common errors. This function tests for 7 cases:
 
         ... represents the first line of the list. For cases 4 and 6, because it is difficult
         to distinguish between them, we merely skip to the next stopping symbol.
@@ -819,11 +823,34 @@ class Parser:
 
         # Common initial error handling
         self.initial_error_checks(CONNECTIONS_ID, self.NO_CONNECTIONS_KEYWORD)
+
         # If catastrophic error occors, and symbol type is now EOF
         if self.symbol.type == self.scanner.EOF:
             return True
 
-            # JC! NEED TO ADD ERROR HANDLING FOR EMTPY CONNECTION AND MONITOR LISTS
+        # Bool to decide whether it is possible to pass an empty connection list (ie all the devices have no inputs)
+        is_empty_allowed = True
+
+        # Check to see if we have an empty connection list
+        if self.symbol.type == self.scanner.BRACE_CLOSE:
+
+            # Cycle through each device and chack that there are no inputs.
+            for device in self.devices.devices_list:
+
+                # If there are inputs (ie the dictionaries of each device has a non-zero length), then it is not possible to have an empty connections list.
+                if len(device.inputs.items()) != 0:
+                    is_empty_allowed = False
+
+        # If not possible, throw and error and terminate the program early
+        if not is_empty_allowed:
+            self.display_error(self.symbol, self.EMPTY_CONNECTION_LIST,
+                               display=False, proceed=False, stopping_symbol_types=[11])
+            return True
+        # If it is possible, return now as not necessary to continue
+        else:
+            return
+
+        # JC! NEED TO ADD ERROR HANDLING FOR EMTPY CONNECTION AND MONITOR LISTS
 
         # Parse a connection
         self.connection()
@@ -1129,7 +1156,7 @@ class Parser:
                 self.display_error(self.symbol, self.EMPTY_FILE, display=False)
             else:
 
-                if propagated_error != True:
+                if propagated_error != True:  # JC!  Need to make all the fine cases return false such that you can change this to "if not ..."
                     # Parse connection list
                     propagated_error = self.connection_list()
 
