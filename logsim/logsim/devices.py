@@ -263,7 +263,7 @@ class Devices:
 
         device.siggen_initial_state = initial_state
         device.siggen_signal_list = signal_list
-        device.siggen.counter = 0
+        device.siggen_counter = 0
 
     def make_RC(self, device_id, RC_period):
         """Make a RC device with the specified period. """
@@ -363,6 +363,7 @@ class Devices:
                 error_type = self.NO_ERROR
 
         elif device_kind == self.SIGGEN:
+            #breakpoint()
             # Device property is a tuple of the siggen initial state: 0(LOW) or 1(HIGH) and a list of signal periods
             if device_property is None:
                 error_type = self.NO_QUALIFIER

@@ -433,7 +433,7 @@ class Network:
             if device.RC_counter == N:
                 device.outputs[None] = self.devices.FALLING
 
-            device.siggen_counter += 1
+            device.RC_counter += 1
 
     def execute_network(self):
         """Execute all the devices in the network for one simulation cycle.
