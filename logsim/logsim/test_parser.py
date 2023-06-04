@@ -229,7 +229,7 @@ def test_parser_initialisation(scanner_fixture, parser_fixture):
 
     assert parser.error_count == 0
     # Check unique error coes are appended onto existing syntax_errors of which there are 15 from devices, network and monitors initialisation
-    assert parser.syntax_errors == range(15, 39)
+    assert parser.syntax_errors == range(15, 43)
 
 
 def test_parser_display_error_instance_handling(scanner_fixture, parser_fixture):
@@ -307,8 +307,8 @@ def test_parser_display_error_see_error_count_increment_by_one(scanner_fixture, 
      "  Line 2: Input number of gates is out of range. Must be an integer between 1 and 16"),
     ("parser.CLK_OUT_OF_RANGE",
      "  Line 2: Input clock half period is out of range. Must be a positive integer"),
-    ("parser.SWITCH_OUT_OF_RANGE",
-     "  Line 2: Input switch number is out of range. Must be either 1 or 0"),
+    ("parser.BINARY_NUMBER_OUT_OF_RANGE",
+     "  Line 2: Input number is out of range. Must be either 1 or 0"),
     ("parser.UNDEFINED_NAME", "  Line 2: Undefined device name given"),
     ("parser.NO_FULLSTOP", "  Line 2: Expected a full stop"),
     ("parser.NO_SEMICOLON", "  Line 2: Expected a semicolon"),
