@@ -382,6 +382,8 @@ class Devices:
                 error_type = self.NO_QUALIFIER
             elif not isinstance(device_property, int):
                 error_type = self.INVALID_QUALIFIER
+            elif not device_property > 0:
+                error_type = self.INVALID_QUALIFIER
             else:
                 self.make_RC(device_id, device_property)
                 error_type = self.NO_ERROR
