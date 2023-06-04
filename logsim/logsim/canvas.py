@@ -127,7 +127,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             color = color_list[i % len(color_list)]
             self._draw_trace(signal, x_offset, y_offset, label, color)
             y_offset -= self.y_spacing
-        
+
     def _draw_trace(self, signal, x_pos, y_pos, label, color=(0.0, 0.0, 1.0)):
         """Draws trace with axes and ticks"""
 
@@ -163,6 +163,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         # draw axis ticks
         for i in range(len(signal) + 1):
+
             x = (i * 20) + x_pos
             GL.glColor3f(0.0, 0.0, 0.0)  # black
             GL.glBegin(GL.GL_LINES)
@@ -170,11 +171,11 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             GL.glVertex2f(x_pos, y_pos - 4)
             GL.glEnd()
             # Render sizes
-            if self.zoom > 1:
+            if self.zoom >= 1:
                 self.render_text(str(i + self.current_time), x - 5, y_pos - 15)
             elif ((self.zoom < 1) and (i % 5 == 0)):
                 self.render_text(str(i + self.current_time), x - 5, y_pos - 25)
-        
+
         x_pos -= int(20 / 3 * len(label))
         self.render_text(label, x_pos, y_pos + 18)
 
@@ -202,17 +203,16 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     def on_right_click(self, event):
         self.clear_traces()
-    
+
     def clear_traces(self):
         """Updates current time and clears traces"""
-        # update current_time 
-        no_of_cycles = len(self.traces[0][1]) 
+        # update current_time
+        no_of_cycles = len(self.traces[0][1])
         self.current_time += no_of_cycles
 
         # clear monitor traces
         self.monitors.reset_monitors()
         self.update_arguments(self.devices, self.monitors)
-
 
     def on_paint(self, event):
         """Handle the paint event."""
