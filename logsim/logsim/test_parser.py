@@ -153,16 +153,8 @@ def test_parser_fixture(parser_fixture, create_testing_file_to_scan):
     assert isinstance(parser, Parser)
 
     assert parser.names.names_list == \
-        ['AND', 'OR', 'NAND', 'NOR', 'XOR', 'CLOCK', 'SWITCH', 'DTYPE', 'CLK', 'SET', 'CLEAR', 'DATA', 'Q', 'QBAR',
-            'DEVICES', 'CONNECTIONS', 'MONITORS', 'END', 'dtype1', 'dtype2', 'dtype3', 'dtype4', 'clock', '25', 'data', '0']
-
-
-# DEPRECATED
-# @pytest.fixture
-# def old_parser_fixture(names_fixture, old_scanner_fixture):
-#     """Return a new parser instance
-#     DEPRECATED"""
-#     return Parser(names_fixture, old_scanner_fixture)
+        ['AND', 'OR', 'NAND', 'NOR', 'XOR', 'CLOCK', 'SWITCH', 'DTYPE', 'SIGGEN', 'RC', 'CLK', 'SET', 'CLEAR', 'DATA', 'Q',
+            'QBAR', 'DEVICES', 'CONNECTIONS', 'MONITORS', 'END', 'dtype1', 'dtype2', 'dtype3', 'dtype4', 'clock', '25', 'data', '0']
 
 
 @pytest.fixture
@@ -337,8 +329,6 @@ def test_parser_display_error_see_error_count_increment_by_one(scanner_fixture, 
      "  Line 2: Cannot make connection as specified port does not exist"),
     ("parser.network.DEVICE_ABSENT",
      "  Line 2: Cannot make connection as device is undefined in DEVICE list"),
-    # ("parser.FLOATING_INPUT",
-    #  "  Line 2: Cannot make network as not all inputs are connected to an output"),
     ("parser.monitors.MONITOR_PRESENT",
      "  Line 2: Cannot assign more than one monitor to a single device output port")
 
