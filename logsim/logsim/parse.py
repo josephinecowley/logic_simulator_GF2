@@ -115,7 +115,7 @@ class Parser:
                               self.NO_BRACE_CLOSE, self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_BRACKET_OPEN, self.NO_BRACKET_CLOSE,
                               self.NO_NUMBER, self.INPUT_OUT_OF_RANGE, self.CLK_OUT_OF_RANGE, self.BINARY_NUMBER_OUT_OF_RANGE, self.UNDEFINED_NAME,
                               self.NO_FULLSTOP, self.NO_SEMICOLON, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE,
-                              self.TERMINATE, self.WRONG_ORDER, self.NO_COMMA, self.EMPTY_DEVICE_LIST, self.RC_OUT_OF_RANGE, self.EMPTY_CONNECTION_LIST] = self.names.unique_error_codes(28)
+                              self.TERMINATE, self.WRONG_ORDER, self.NO_COMMA, self.EMPTY_DEVICE_LIST, self.RC_OUT_OF_RANGE, self.EMPTY_CONNECTION_LIST, self.NO_SIGNAL_LIST] = self.names.unique_error_codes(29)
 
     # Stopping symbols automatically assigned to semi-colons, braces and keywords
     def display_error(self,  symbol, error_type, display=True, display_marker=True, proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
@@ -284,7 +284,11 @@ class Parser:
         elif error_type == self.RC_OUT_OF_RANGE:
             # Semantic error
             print(
-                "Input siggen period is out of range. Must be a positive integer", end="\n \n")
+                "Input RC period is out of range. Must be a positive integer", end="\n \n")
+        elif error_type == self.NO_SIGNAL_LIST:
+            # Semantic error
+            print(
+                "Siggen signal input is not valid. Must be a list e.g. [1,2,5,3].", end="\n \n")
         else:
             raise ValueError("Expected a valid error code")
 
@@ -746,7 +750,7 @@ class Parser:
                                     self.display_error(self.symbol, self.NO_BRACKET_CLOSE,
                                                        proceed=False)
                             else:
-                                self.display_error(self.symbol, self.BINARY_NUMBER_OUT_OF_RANGE,
+                                self.display_error(self.symbol, self.NO_SIGNAL_LIST,
                                                    proceed=False)
                         else:
                             self.display_error(self.symbol, self.NO_COMMA,
