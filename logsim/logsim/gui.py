@@ -60,11 +60,6 @@ class Gui(wx.Frame):
         self.network = network
         self.monitors = monitors
 
-        # Create a wx.Locale object
-        system_language = wx.Locale.GetSystemLanguage()
-        language_name = wx.Locale.GetLanguageName(system_language)
-        print("System Language:", language_name)
-
         # Configure the file menu
         fileMenu = wx.Menu()
         menuBar = wx.MenuBar()
@@ -100,11 +95,12 @@ class Gui(wx.Frame):
             data_panel, self.simulation_panel, names, devices, network, monitors)
         hbox.Add(self.switches_panel, 1, wx.EXPAND, 0)
 
-        self.SetSizeHints(200, 200)
+        self.SetSizeHints(930, 500)
         self.SetSizer(vbox)
 
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
+        print(self.GetSize())
         Id = event.GetId()
         if Id == wx.ID_EXIT:
             self.Close(True)
@@ -259,8 +255,10 @@ class RunSimulationPanel(wx.Panel):
 
         self.upload_button_panel = wx.Panel(
             self.upload_and_help_buttons_panel, name="upload button panel")
+        #self.upload_and_help_buttons_panel.SetSizeHints(100, 100)
         upload_button_panel_vbox = wx.BoxSizer(wx.VERTICAL)
         self.upload_button_panel.SetSizer(upload_button_panel_vbox)
+        #self.upload_and_help_buttons_panel.SetSizerAndFit(upload_button_panel_vbox)
 
         self.upload_button = wx.Button(
             self.upload_button_panel, wx.ID_ANY, "UPLOAD")
@@ -753,12 +751,15 @@ class SwitchesPanel(wx.Panel):
         selected_switch_panel = self.switch_dict[selected_switch_panel_id][3]
         selected_switch_panel_sizer = self.switch_dict[selected_switch_panel_id][4]
 
+        print(f'original: {selected_switch_state}')
+
         window = selected_switch_panel_sizer.GetItem(0).GetWindow()
         window.Destroy()
 
         if selected_switch_state == 0: # switch is currently OFF
             selected_switch_state = 1 # switch is now ON
-            self.devices.set_switch(selected_switch_id, self.switch_dict[selected_switch_panel_id][2])
+            print(f'new: {selected_switch_state}')
+            self.devices.set_switch(selected_switch_id, selected_switch_state)
             self.switch_dict[selected_switch_panel_id][2] = selected_switch_state
 
             switch_slider_button = wxbuttons.GenButton(parent=selected_switch_panel, id=wx.ID_ANY, label="ON")
@@ -779,7 +780,8 @@ class SwitchesPanel(wx.Panel):
 
         elif selected_switch_state == 1: # switch is currently ON
             selected_switch_state = 0 # switch is now OFF
-            self.devices.set_switch(selected_switch_id, self.switch_dict[selected_switch_panel_id][2])
+            print(f'new: {selected_switch_state}')
+            self.devices.set_switch(selected_switch_id, selected_switch_state)
             self.switch_dict[selected_switch_panel_id][2] = selected_switch_state
 
             switch_slider_button = wxbuttons.GenButton(parent=selected_switch_panel, id=wx.ID_ANY, label="OFF")
