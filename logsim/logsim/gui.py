@@ -49,7 +49,7 @@ class Gui(wx.Frame):
     on_text_box(self, event): Event handler for when the user enters text.
     """
 
-    def __init__(self, title, path, names, devices, network, monitors):
+    def __init__(self, title, path, names, devices, network, monitors, first_init=True):
         """Initialise widgets and layout."""
         super().__init__(parent=None, title=title, size=(1000, 700))
 
@@ -59,6 +59,7 @@ class Gui(wx.Frame):
         self.devices = devices
         self.network = network
         self.monitors = monitors
+        self.first_init = first_init
 
         ldf_title = self.extract_ldf_title()
 
@@ -102,6 +103,9 @@ class Gui(wx.Frame):
 
         self.SetSizeHints(930, 500)
         self.SetSizer(vbox)
+
+        if self.first_init:
+            self.simulation_panel.open_help_dialog()
 
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
@@ -389,7 +393,8 @@ class RunSimulationPanel(wx.Panel):
                               names,
                               devices,
                               network,
-                              monitors)
+                              monitors,
+                              first_init=False)
                 new_Gui.Show()
                 self.parent.Close()
             else:
@@ -404,6 +409,9 @@ class RunSimulationPanel(wx.Panel):
         dlg.Destroy()
 
     def on_help_button(self, event):
+        self.open_help_dialog()
+
+    def open_help_dialog(self):
         help_dialog_file_path = "logsim/logsim/help_dialog.txt"
         with open(help_dialog_file_path, "r", encoding="utf8") as help_dialog_file:
             help_dialog_text = "".join(help_dialog_file.readlines())
@@ -414,7 +422,6 @@ class RunSimulationPanel(wx.Panel):
                                )
         dlg.ShowModal()
         dlg.Destroy()
-
 
 class SignalTrace(wx.ScrolledWindow):
     def __init__(self, parent, names, devices, network, monitors, id=wx.ID_ANY, size=wx.DefaultSize):
