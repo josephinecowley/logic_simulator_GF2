@@ -153,8 +153,8 @@ def test_parser_fixture(parser_fixture, create_testing_file_to_scan):
     assert isinstance(parser, Parser)
 
     assert parser.names.names_list == \
-        ['AND', 'OR', 'NAND', 'NOR', 'XOR', 'CLOCK', 'SWITCH', 'DTYPE', 'SIGGEN', 'RC', 'CLK', 'SET', 'CLEAR', 'DATA', 'Q',
-            'QBAR', 'DEVICES', 'CONNECTIONS', 'MONITORS', 'END', 'dtype1', 'dtype2', 'dtype3', 'dtype4', 'clock', '25', 'data', '0']
+        ['AND', 'OR', 'NAND', 'NOR', 'XOR', 'CLOCK', 'SWITCH', 'DTYPE', 'CLK', 'SET', 'CLEAR', 'DATA', 'Q', 'QBAR',
+            'DEVICES', 'CONNECTIONS', 'MONITORS', 'END', 'dtype1', 'dtype2', 'dtype3', 'dtype4', 'clock', '25', 'data', '0']
 
 
 @pytest.fixture
@@ -185,8 +185,6 @@ def set_scanner_location(scanner_fixture):
 
     return _set_scanner_location
 
-# # DEPRECATED
-
 
 @pytest.fixture
 def symbol_fixture(scanner_fixture, set_scanner_location):
@@ -196,9 +194,6 @@ def symbol_fixture(scanner_fixture, set_scanner_location):
     symbol = scanner.get_symbol()
 
     return symbol
-
-
-# # # DEPRECATED
 
 
 @pytest.fixture
@@ -260,9 +255,6 @@ def test_parser_display_error_instance_handling(scanner_fixture, parser_fixture)
     with pytest.raises(TypeError):
         # Expected bool type argument for proceed
         parser.display_error(symbol, error_type, proceed="not a bool")
-    # with pytest.raises(TypeError):
-    #     # Expected bool type argument for proceed
-    #     parser.display_error(symbol, error_type, syntax_error="not a bool")
 
 
 def test_parser_display_error_see_error_count_increment_by_one(scanner_fixture, parser_fixture):
