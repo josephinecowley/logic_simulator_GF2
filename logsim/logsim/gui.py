@@ -545,7 +545,7 @@ class SignalTracesPanel(wx.Panel):
             self.add_new_monitor_panel_centre, wx.ID_ANY, label="+")
         self.Bind(wx.EVT_BUTTON, self.on_add_new_monitor_button,
                   self.add_new_monitor_button)
-        self.add_new_monitor_button.SetToolTip(_("Add monitor"))
+        self.add_new_monitor_button.SetToolTip(_("Add a monitor"))
         add_new_monitor_panel_centre_fgs.Add(
             self.add_new_monitor_button, 1, flag=wx.CENTER | wx.EXPAND)
 
@@ -576,7 +576,7 @@ class SignalTracesPanel(wx.Panel):
             self.add_new_monitor_panel_centre, wx.ID_ANY, label="-")
         self.Bind(wx.EVT_BUTTON, self.on_zap_existing_monitor,
                   self.zap_existing_monitor_button)
-        self.zap_existing_monitor_button.SetToolTip(_("Zap an existing monitor"))
+        self.zap_existing_monitor_button.SetToolTip(_("Delete an existing monitor"))
         add_new_monitor_panel_centre_fgs.Add(
             self.zap_existing_monitor_button, 1, flag=wx.CENTER | wx.EXPAND)
         

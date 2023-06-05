@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-05 18:10+0100\n"
+"POT-Creation-Date: 2023-06-05 18:32+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -84,70 +84,78 @@ msgstr ""
 msgid "Quit the simulation"
 msgstr ""
 
-#: gui.py:304
+#: gui.py:302
 msgid "UPLOAD"
 msgstr ""
 
-#: gui.py:306
+#: gui.py:304
 msgid "Upload logic description file"
 msgstr ""
 
-#: gui.py:315
+#: gui.py:314
+msgid "SETTINGS"
+msgstr ""
+
+#: gui.py:316
+msgid "Change system settings"
+msgstr ""
+
+#: gui.py:325
 msgid "HELP"
 msgstr ""
 
-#: gui.py:317
+#: gui.py:327
 msgid "Help on running logic simulation"
 msgstr ""
 
-#: gui.py:333
+#: gui.py:344
 msgid "CONTINUE"
 msgstr ""
 
-#: gui.py:335
+#: gui.py:346
 msgid "Continue running the simulation"
 msgstr ""
 
-#: gui.py:370
+#: gui.py:381
 msgid "Error! Network oscillating."
 msgstr ""
 
-#: gui.py:427
+#: gui.py:438
 msgid "An error occurred."
 msgstr ""
 
-#: gui.py:444
+#: gui.py:455
 msgid "Tutorial on GF2 Team 7 Logic Simulator"
 msgstr ""
 
-#: gui.py:503
+#: gui.py:514
 msgid "ADD NEW MONITOR"
 msgstr ""
 
-#: gui.py:521 gui.py:552
+#: gui.py:532 gui.py:563
 msgid "Select output"
 msgstr ""
 
-#: gui.py:537
-msgid "Add monitor"
+#: gui.py:548
+msgid "Add a monitor"
 msgstr ""
 
-#: gui.py:542
+#: gui.py:553
 msgid "DELETE MONITOR"
 msgstr ""
 
-#: gui.py:568
-msgid "Zap an existing monitor"
+#: gui.py:579
+msgid "Delete an existing monitor"
 msgstr ""
 
-#: gui.py:669
+#: gui.py:680
 msgid "INPUTS"
 msgstr ""
 
-#: gui.py:700 gui.py:740 gui.py:840
+#: gui.py:711 gui.py:751 gui.py:851
 msgid "ON"
 msgstr ""
 
-#: gui.py:704 gui.py:753 gui.py:868
+#: gui.py:715 gui.py:764 gui.py:879
 msgid "OFF"
 msgstr ""

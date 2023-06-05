@@ -91,6 +91,14 @@ msgstr "Subir archivo de descripción lógica"
 msgid "HELP"
 msgstr "AYUDE"
 
+#: gui.py:314
+msgid "SETTINGS"
+msgstr "AJUSTES"
+
+#: gui.py:316
+msgid "Change system settings"
+msgstr "Cambiar la configuración del sistema"
+
 #: gui.py:319
 msgid "Help on running logic simulation"
 msgstr "Ayuda para ejecutar la simulación lógica"
@@ -114,6 +122,14 @@ msgstr "AGREGAR NUEVO MONITOR"
 #: gui.py:544
 msgid "DELETE MONITOR"
 msgstr "ELIMINAR MONITOR"
+
+#: gui.py:548
+msgid "Add a monitor"
+msgstr "Añadir un monitor"
+
+#: gui.py:579
+msgid "Delete an existing monitor"
+msgstr "Eliminar un monitor existente"
 
 #: gui.py:672
 msgid "INPUTS"
