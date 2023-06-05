@@ -15,8 +15,6 @@ from network import Network
 from monitors import Monitors
 from scanner import Scanner, Symbol
 
-# JC! signifies a comment to Josephine for later development
-
 
 class Parser:
 
@@ -716,7 +714,7 @@ class Parser:
                 # Check that number of inputs is an integer
                 if self.symbol.type == self.scanner.NUMBER:
 
-                    # Check that number is within range (either 1 or 2)
+                    # Check that number is within range (either 1 or 0)
                     siggen_initial_state = int(
                         self.names.get_name_string(self.symbol.id))
 
@@ -801,7 +799,7 @@ class Parser:
                                 proceed=False)
                             return None, None
                     else:
-                        self.display_error(self.symbol, self.RC_OUT_OF_RANGE,  # JC! change this to its own RC_OUT OF RANGE error
+                        self.display_error(self.symbol, self.RC_OUT_OF_RANGE,
                                            proceed=False)
                         return None, None
                 else:
@@ -855,8 +853,6 @@ class Parser:
             else:
                 self.symbol = self.scanner.get_symbol()
                 return
-
-        # JC! NEED TO ADD ERROR HANDLING FOR EMTPY CONNECTION AND MONITOR LISTS
 
         # Parse a connection
         self.connection()
@@ -1212,12 +1208,6 @@ class Parser:
                             # Parse monitor list. If catastrophic error occurs (ie order of keywords wrong, terminate the program early)
                             propagated_error = self.monitor_list()
 
-                        # This is here for terminal plotting of signals
-                        # Record the signal traces
-                        for i in range(50):
-                            self.network.execute_network()
-                            self.monitors.record_signals()
-
                         # Display the signals to terminal
                         self.monitors.display_signals()
 
@@ -1237,21 +1227,3 @@ class Parser:
                 print(
                     f"Total of {str(self.error_count)} error(s) detected")
                 return False
-
-
-# This is here for terminal plotting of signals
-
-def main():
-    # Check command line arguments
-    file_path = "./example1_logic_description.txt"
-    names = Names()
-    devices = Devices(names)
-    network = Network(names, devices)
-    monitors = Monitors(names, devices, network)
-    scanner = Scanner(file_path, names)
-    parser = Parser(names, devices, network, monitors, scanner)
-    parser.parse_network()
-
-
-if __name__ == "__main__":
-    main()
