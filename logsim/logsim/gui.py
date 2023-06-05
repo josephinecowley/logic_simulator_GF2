@@ -586,7 +586,7 @@ class SignalTracesPanel(wx.Panel):
         #self.add_new_monitor_panel_right.SetBackgroundColour(wx.Colour("RED"))
 
         self.recentre_button = wxbuttons.GenButton(
-            self.add_new_monitor_panel_right, wx.ID_ANY, _("RECENTRE"), name="recentre button")
+            self.add_new_monitor_panel_right, wx.ID_ANY, _("RECENTER"), name="recentre button")
         self.Bind(wx.EVT_BUTTON, self.on_recentre_button, self.recentre_button)
         self.recentre_button.SetFont(wx.Font(
             10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
@@ -594,7 +594,7 @@ class SignalTracesPanel(wx.Panel):
         self.recentre_button.SetMinSize(wx.DefaultSize)
         self.recentre_button.SetBackgroundColour(wx.Colour(85, 26, 139))
         self.recentre_button.SetForegroundColour(wx.WHITE)
-        self.recentre_button.SetToolTip(_("Recentre the signal traces"))
+        self.recentre_button.SetToolTip(_("Recenter the signal traces"))
         add_new_monitor_panel_right_vbox.Add(
             self.recentre_button, 1, flag=wx.EXPAND, border=5)
 

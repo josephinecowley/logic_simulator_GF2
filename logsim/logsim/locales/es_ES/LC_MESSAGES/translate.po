@@ -131,6 +131,14 @@ msgstr "Añadir un monitor"
 msgid "Delete an existing monitor"
 msgstr "Eliminar un monitor existente"
 
+#: gui.py:589
+msgid "RECENTER"
+msgstr "A CENTRAR"
+
+#: gui.py:597
+msgid "Recenter the signal traces"
+msgstr "Vuelva a centrar las trazas de la señal"
+
 #: gui.py:672
 msgid "INPUTS"
 msgstr "ENTRADAS"

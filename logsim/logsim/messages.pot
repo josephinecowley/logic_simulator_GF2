@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-05 18:32+0100\n"
+"POT-Creation-Date: 2023-06-05 19:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -148,14 +148,22 @@ msgstr ""
 msgid "Delete an existing monitor"
 msgstr ""
 
-#: gui.py:680
+#: gui.py:589
+msgid "RECENTER"
+msgstr ""
+
+#: gui.py:597
+msgid "Recenter the signal traces"
+msgstr ""
+
+#: gui.py:700
 msgid "INPUTS"
 msgstr ""
 
-#: gui.py:711 gui.py:751 gui.py:851
+#: gui.py:731 gui.py:771 gui.py:871
 msgid "ON"
 msgstr ""
 
-#: gui.py:715 gui.py:764 gui.py:879
+#: gui.py:735 gui.py:784 gui.py:899
 msgid "OFF"
 msgstr ""
