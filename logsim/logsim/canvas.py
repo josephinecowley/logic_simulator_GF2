@@ -78,7 +78,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_MOUSE_EVENTS, self.on_mouse)
         self.Bind(wx.EVT_RIGHT_DOWN, self.on_right_click)
-        self.Bind(wx.EVT_CHAR, self.on_key_press)
 
         # Initialise trace objects
         self.traces = monitors.get_signals_for_GUI()
@@ -202,13 +201,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # and swap the back buffer to the front
         GL.glFlush()
         self.SwapBuffers()
-
-    def on_key_press(self, event):
-        """Handles key press events"""
-        keycode = event.GetKeyCode()
-        if keycode == ord("c"):
-            self.recenter_canvas()
-        event.Skip()  # Allow other key events to propagate
 
     def on_right_click(self, event):
         """Handles right click event"""
