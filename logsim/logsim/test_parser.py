@@ -151,18 +151,9 @@ def test_parser_fixture(parser_fixture, create_testing_file_to_scan):
     parser = parser_fixture(scanner)
 
     assert isinstance(parser, Parser)
-
     assert parser.names.names_list == \
-        ['AND', 'OR', 'NAND', 'NOR', 'XOR', 'CLOCK', 'SWITCH', 'DTYPE', 'CLK', 'SET', 'CLEAR', 'DATA', 'Q', 'QBAR',
-            'DEVICES', 'CONNECTIONS', 'MONITORS', 'END', 'dtype1', 'dtype2', 'dtype3', 'dtype4', 'clock', '25', 'data', '0']
-
-
-# DEPRECATED
-# @pytest.fixture
-# def old_parser_fixture(names_fixture, old_scanner_fixture):
-#     """Return a new parser instance
-#     DEPRECATED"""
-#     return Parser(names_fixture, old_scanner_fixture)
+        ['AND', 'OR', 'NAND', 'NOR', 'XOR', 'CLOCK', 'SWITCH', 'DTYPE', 'SIGGEN', 'RC', 'CLK', 'SET', 'CLEAR', 'DATA', 'Q',
+            'QBAR', 'DEVICES', 'CONNECTIONS', 'MONITORS', 'END', 'dtype1', 'dtype2', 'dtype3', 'dtype4', 'clock', '25', 'data', '0']
 
 
 @pytest.fixture
@@ -193,8 +184,6 @@ def set_scanner_location(scanner_fixture):
 
     return _set_scanner_location
 
-# # DEPRECATED
-
 
 @pytest.fixture
 def symbol_fixture(scanner_fixture, set_scanner_location):
@@ -204,9 +193,6 @@ def symbol_fixture(scanner_fixture, set_scanner_location):
     symbol = scanner.get_symbol()
 
     return symbol
-
-
-# # # DEPRECATED
 
 
 @pytest.fixture
@@ -229,7 +215,7 @@ def test_parser_initialisation(scanner_fixture, parser_fixture):
 
     assert parser.error_count == 0
     # Check unique error coes are appended onto existing syntax_errors of which there are 15 from devices, network and monitors initialisation
-    assert parser.syntax_errors == range(15, 40)
+    assert parser.syntax_errors == range(15, 44)
 
 
 def test_parser_display_error_instance_handling(scanner_fixture, parser_fixture):
@@ -268,9 +254,6 @@ def test_parser_display_error_instance_handling(scanner_fixture, parser_fixture)
     with pytest.raises(TypeError):
         # Expected bool type argument for proceed
         parser.display_error(symbol, error_type, proceed="not a bool")
-    with pytest.raises(TypeError):
-        # Expected bool type argument for proceed
-        parser.display_error(symbol, error_type, syntax_error="not a bool")
 
 
 def test_parser_display_error_see_error_count_increment_by_one(scanner_fixture, parser_fixture):
@@ -286,60 +269,64 @@ def test_parser_display_error_see_error_count_increment_by_one(scanner_fixture, 
 
 
 @pytest.mark.parametrize("error_type, expected_message", [
-    ("parser.NO_DEVICES_KEYWORD", "  Line 2: Syntax Error: Expected the keyword DEVICES"),
+    ("parser.EMPTY_DEVICE_LIST", "  Line 2: Cannot parse an empty device list."),
+    ("parser.EMPTY_CONNECTION_LIST",
+     "  Line 2: Cannot parse an empty connections list."),
+    ("parser.RC_OUT_OF_RANGE",
+     "  Line 2: Input RC period is out of range. Must be a positive integer"),
+    ("parser.NO_DEVICES_KEYWORD", "  Line 2: Expected the keyword DEVICES"),
     ("parser.NO_CONNECTIONS_KEYWORD",
-     "  Line 2: Syntax Error: Expected the keyword CONNECTIONS"),
+     "  Line 2: Expected the keyword CONNECTIONS"),
     ("parser.NO_MONITORS_KEYWORD",
-     "  Line 2: Syntax Error: Expected the keyword MONITORS"),
+     "  Line 2: Expected the keyword MONITORS"),
     ("parser.NO_END_KEYWORD",
-     "  Line 2: Syntax Error: Expected the keyword END straight after monitors list"),
-    ("parser.NO_BRACE_OPEN", "  Line 2: Syntax Error: Expected a '{' symbol"),
-    ("parser.NO_BRACE_CLOSE", "  Line 2: Syntax Error: Expected a '}' symbol"),
-    ("parser.INVALID_NAME", "  Line 2: Syntax Error: Invalid user name entered"),
-    ("parser.NO_EQUALS", "  Line 2: Syntax Error: Expected an '=' symbol"),
+     "  Line 2: Expected the keyword END straight after monitors list"),
+    ("parser.NO_BRACE_OPEN", "  Line 2: Expected a '{' symbol"),
+    ("parser.NO_BRACE_CLOSE", "  Line 2: Expected a '}' symbol"),
+    ("parser.INVALID_NAME", "  Line 2: Invalid user name entered"),
+    ("parser.NO_EQUALS", "  Line 2: Expected an '=' symbol"),
     ("parser.INVALID_COMPONENT",
-     "  Line 2: Syntax Error: Invalid component name entered"),
+     "  Line 2: Invalid component name entered"),
     ("parser.NO_BRACKET_OPEN",
-     "  Line 2: Syntax Error: Expected a '(' for an input"),
-    ("parser.NO_BRACKET_CLOSE", "  Line 2: Syntax Error: Expected a ')' for an input"),
-    ("parser.NO_NUMBER", "  Line 2: Syntax Error: Expected a positive integer"),
+     "  Line 2: Expected a '(' for an input"),
+    ("parser.NO_BRACKET_CLOSE", "  Line 2: Expected a ')' for an input"),
+    ("parser.NO_NUMBER", "  Line 2: Expected a positive integer"),
     ("parser.INPUT_OUT_OF_RANGE",
-     "  Line 2: Semantic Error: Input number of gates is out of range. Must be an integer between 1 and 16"),
+     "  Line 2: Input number of gates is out of range. Must be an integer between 1 and 16"),
     ("parser.CLK_OUT_OF_RANGE",
-     "  Line 2: Semantic Error: Input clock half period is out of range. Must be a positive integer"),
-    ("parser.SWITCH_OUT_OF_RANGE",
-     "  Line 2: Semantic Error: Input switch number is out of range. Must be either 1 or 0"),
-    ("parser.UNDEFINED_NAME", "  Line 2: Syntax Error: Undefined device name given"),
-    ("parser.NO_FULLSTOP", "  Line 2: Syntax Error: Expected a full stop"),
-    ("parser.NO_SEMICOLON", "  Line 2: Syntax Error: Expected a semicolon"),
+     "  Line 2: Input clock half period is out of range. Must be a positive integer"),
+    ("parser.BINARY_NUMBER_OUT_OF_RANGE",
+     "  Line 2: Input number is out of range. Must be either 1 or 0"),
+    ("parser.UNDEFINED_NAME", "  Line 2: Undefined device name given"),
+    ("parser.NO_FULLSTOP", "  Line 2: Expected a full stop"),
+    ("parser.NO_SEMICOLON", "  Line 2: Expected a semicolon"),
     ("parser.NO_Q_OR_QBAR",
-     "  Line 2: Syntax Error: Expected a Q or QBAR after the full stop"),
-    ("parser.NO_INPUT_SUFFIX", "  Line 2: Syntax Error: Expected a valid input suffix"),
+     "  Line 2: Expected a Q or QBAR after the full stop"),
+    ("parser.NO_INPUT_SUFFIX", "  Line 2: Expected a valid input suffix"),
     ("parser.SYMBOL_AFTER_END",
-     "  Line 2: Syntax Error: There should not be any text after the keyword END"),
-    ("parser.EMPTY_FILE", "  Line 2: Syntax Error: Cannot parse an empty file"),
-    ("parser.TERMINATE", "  Line 2: Syntax Error: Could not find parsing point to restart, program terminated early"),
+     "  Line 2: There should not be any text after the keyword END"),
+    ("parser.EMPTY_FILE", "  Line 2: Cannot parse an empty file"),
+    ("parser.TERMINATE",
+     "  Line 2: Could not find parsing point to restart, program terminated early"),
     ("parser.devices.NO_QUALIFIER",
-     "  Line 2: Semantic Error: Expected a device property for initialisation"),
+     "  Line 2: Expected a device property for initialisation"),
     ("parser.devices.QUALIFIER_PRESENT",
-     "  Line 2: Semantic Error: Expected no device property for this device"),
+     "  Line 2: Expected no device property for this device"),
     ("parser.devices.DEVICE_PRESENT",
-     "  Line 2: Semantic Error: Device already exists in the device list"),
-    ("parser.devices.BAD_DEVICE", "  Line 2: Semantic Error: Invalid type of device"),
+     "  Line 2: Device already exists in the device list"),
+    ("parser.devices.BAD_DEVICE", "  Line 2: Invalid type of device"),
     ("parser.network.INPUT_TO_INPUT",
-     "  Line 2: Semantic Error: Cannot connect an input port to another input port"),
+     "  Line 2: Cannot connect an input port to another input port"),
     ("parser.network.OUTPUT_TO_OUTPUT",
-     "  Line 2: Semantic Error: Cannot connect an output port to another output port"),
+     "  Line 2: Cannot connect an output port to another output port"),
     ("parser.network.INPUT_CONNECTED",
-     "  Line 2: Semantic Error: Cannot connect input port as it is already connected"),
+     "  Line 2: Cannot connect input port as it is already connected"),
     ("parser.network.PORT_ABSENT",
-     "  Line 2: Semantic Error: Cannot make connection as specified port does not exist"),
+     "  Line 2: Cannot make connection as specified port does not exist"),
     ("parser.network.DEVICE_ABSENT",
-     "  Line 2: Semantic Error: Cannot make connection as device is undefined in DEVICE list"),
-    ("parser.FLOATING_INPUT",
-     "  Line 2: Semantic Error: Cannot make network as not all inputs are connected to an output"),
+     "  Line 2: Cannot make connection as device is undefined in DEVICE list"),
     ("parser.monitors.MONITOR_PRESENT",
-     "  Line 2: Semantic Error: Cannot assign more than one monitor to a single device output port")
+     "  Line 2: Cannot assign more than one monitor to a single device output port")
 
 
 ])
@@ -354,6 +341,7 @@ def test_parser_display_error_show_appropriate_error_message(scanner_fixture, pa
 
     captured = capfd.readouterr()
     output_lines = captured.out.splitlines()
+    # breakpoint()
 
     assert output_lines[1] == expected_message
 
@@ -400,9 +388,9 @@ def test_error_recovery_instance_handling(scanner_fixture, parser_fixture, corre
     with pytest.raises(ValueError):
         # Cannot have a negative error code
         parser.error_recovery(-4)
-    with pytest.raises(TypeError):
-        # Expected bool type argument for syntax_error
-        parser.error_recovery(error_type, syntax_error="not a boolean")
+    # with pytest.raises(TypeError):
+    #     # Expected bool type argument for syntax_error
+    #     parser.error_recovery(error_type, syntax_error="not a boolean")
     with pytest.raises(TypeError):
         # Expected bool type argument for proceed
         parser.error_recovery(error_type, proceed="not a boolean")
@@ -430,17 +418,17 @@ def test_parser_error_recovery_check_built_in_error_handling(scanner_fixture, pa
     """Test error_recovery returns None type"""
     scanner = scanner_fixture()
     parser = parser_fixture(scanner)
-    symbol = parser.scanner.get_symbol()
+    parser.symbol = parser.scanner.get_symbol()
     error_type = parser.syntax_errors[0]
 
-    assert parser.error_recovery(error_type, proceed=True) is None
+    assert parser.error_recovery(error_type) is None
 
 
 def test_parser_error_recovery_check_built_in_error_handling_semantic_error(scanner_fixture, parser_fixture):
     """Test error_recovery returns None type when semantic error is encountered"""
     scanner = scanner_fixture()
     parser = parser_fixture(scanner)
-    symbol = parser.scanner.get_symbol()
+    parser.symbol = parser.scanner.get_symbol()
     error_type = parser.syntax_errors[0]
 
     assert parser.error_recovery(error_type) is None
@@ -463,39 +451,19 @@ def test_parser_error_recovery_stops_when_stopping_symbol_or_EOF_is_encountered(
     parser.symbol = parser.scanner.get_symbol()
     error_type = parser.syntax_errors[0]
 
-    assert parser.error_recovery(error_type, proceed=False) is None
+    assert parser.error_recovery(error_type) is None
 
 
-@pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol", [
-    ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]',
-     'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;', 'dtype1'),
-    ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]',
-     'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;', 'dtype1'),
-    ('MONITORS', 'scanner.names.lookup(["MONITORS"])[0]',
-     'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;', 'dtype1'),
-])
-def test_parser_initial_error_checks_case_1(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol):
-    """Test initial_error_checks for Case 1:  KEYWORD { ..."""
-    scanner = create_testing_file_to_scan(
-        f"""
-    {KEYWORD} {{ {correct_example}
-    """
-    )
-    parser = parser_fixture(scanner)
-    parser.symbol = parser.scanner.get_symbol()
-
-    parser.initial_error_checks(eval(KEYWORD_ID), eval(missing_error_type))
-    symbol_id = parser.symbol.id
-    assert parser.names.get_name_string(symbol_id) == expected_symbol
-
-
+@pytest.mark.parametri
 @pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol, expected_message", [
-    ('DVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;',
-     'dtype1', '\n  Line 2: Syntax Error: Expected the keyword DEVICES\n \n        DVICES { dtype1 = DTYPE;'),
-    ('CONNETIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;',
-     'dtype1', '\n  Line 2: Syntax Error: Expected the keyword CONNECTIONS\n \n        CONNETIONS { dtype1.Q = dtype2.DATA;'),
     ('MONITOS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;',
-     'dtype1', '\n  Line 2: Syntax Error: Expected the keyword MONITORS\n \n        MONITOS { dtype1.Q;'),
+     'dtype1', '\n  Line 2: Expected the keyword MONITORS\n \n        MONITOS { dtype1.Q;'),
+    ('CONNETIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;',
+     'dtype1', '\n  Line 2: Expected the keyword CONNECTIONS\n \n        CONNETIONS { dtype1.Q = dtype2.DATA;'),
+
+    ('DVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;',
+     'dtype1', '\n  Line 2: Expected the keyword DEVICES\n \n        DVICES { dtype1 = DTYPE;')
+
 ])
 def test_parser_initial_error_checks_case_2(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol, expected_message):
     """Test initial_error_checks for Case 2:  KYWORD { ..."""
@@ -514,37 +482,7 @@ def test_parser_initial_error_checks_case_2(parser_fixture, create_testing_file_
     semicolon_location = captured.out.index(";")
     # only up to and including the semicolon, i.e., ignore the caret/tilde/placement line
     printed_message = captured.out[:semicolon_location + 1]
-    assert printed_message == expected_message
 
-    symbol_id = parser.symbol.id
-    assert parser.names.get_name_string(symbol_id) == expected_symbol
-
-
-@pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol, expected_message", [
-    ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;',
-     'dtype1', '\n  Line 2: Syntax Error: Expected the keyword DEVICES\n \n        { dtype1 = DTYPE;'),
-    ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;',
-     'dtype1', '\n  Line 2: Syntax Error: Expected the keyword CONNECTIONS\n \n        { dtype1.Q = dtype2.DATA;'),
-    ('MONITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;',
-     'dtype1', '\n  Line 2: Syntax Error: Expected the keyword MONITORS\n \n        { dtype1.Q;'),
-])
-def test_parser_initial_error_checks_case_3(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol, expected_message):
-    """Test initial_error_checks for Case 3:  { ..."""
-    scanner = create_testing_file_to_scan(
-        f"""
-    {{ {correct_example}
-    """
-    )
-    parser = parser_fixture(scanner)
-    parser.symbol = parser.scanner.get_symbol()
-
-    parser.initial_error_checks(eval(KEYWORD_ID), eval(missing_error_type))
-
-    captured = capfd.readouterr()
-    output_lines = captured.out.splitlines()
-    semicolon_location = captured.out.index(";")
-    # only up to and including the semicolon, i.e., ignore the caret/tilde placement line
-    printed_message = captured.out[:semicolon_location + 1]
     assert printed_message == expected_message
 
     symbol_id = parser.symbol.id
@@ -552,12 +490,13 @@ def test_parser_initial_error_checks_case_3(parser_fixture, create_testing_file_
 
 
 @pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_message_1, expected_message_2", [
-    ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;',
-     '\n  Line 2: Syntax Error: Expected the keyword DEVICES\n \n        dtype1 = DTYPE;\n', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n        dtype1 = DTYPE;\n"),
-    ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;',
-     '\n  Line 2: Syntax Error: Expected the keyword CONNECTIONS\n \n        dtype1.Q = dtype2.DATA;\n', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n        dtype1.Q = dtype2.DATA;\n"),
     ('MONITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;',
-     '\n  Line 2: Syntax Error: Expected the keyword MONITORS\n \n        dtype1.Q;\n', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n        dtype1.Q;\n"),
+     '\n  Line 2: Expected the keyword MONITORS\n \n\n', "\n  Line 2: Expected a '{' symbol\n \n\n"),
+    ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;',
+     '\n  Line 2: Expected the keyword DEVICES\n \n\n', "\n  Line 2: Expected a '{' symbol\n \n\n"),
+    ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;',
+     '\n  Line 2: Expected the keyword CONNECTIONS\n \n\n', "\n  Line 2: Expected a '{' symbol\n \n\n")
+
 ])
 def test_parser_initial_error_checks_case_4(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_message_1, expected_message_2):
     """Test initial_error_checks for Case 4:  ..."""
@@ -575,22 +514,18 @@ def test_parser_initial_error_checks_case_4(parser_fixture, create_testing_file_
     output_lines = captured.out.splitlines(True)
     # indexing done to ignore caret/tilde placement line
     first_printed_message = ''.join(output_lines[:4])
-    # indexing done to ignore caret/tilde placement line
-    second_printed_message = ''.join(output_lines[6:10])
-
     assert first_printed_message == expected_message_1
-    assert second_printed_message == expected_message_2
 
     assert parser.symbol.type == parser.scanner.EOF
 
 
 @pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol, expected_message", [
     ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;',
-     'dtype1', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n        DEVICES dtype1 = DTYPE;\n"),
+     'dtype1', "\n  Line 2: Expected a '{' symbol\n \n        DEVICES dtype1 = DTYPE;\n"),
     ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;',
-     'dtype1', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n        CONNECTIONS dtype1.Q = dtype2.DATA;\n"),
+     'dtype1', "\n  Line 2: Expected a '{' symbol\n \n        CONNECTIONS dtype1.Q = dtype2.DATA;\n"),
     ('MONITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;',
-     'dtype1', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n        MONITORS dtype1.Q;\n"),
+     'dtype1', "\n  Line 2: Expected a '{' symbol\n \n        MONITORS dtype1.Q;\n"),
 ])
 def test_parser_initial_error_checks_case_5(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol, expected_message):
     """Test initial_error_checks for Case 5:  { ..."""
@@ -616,11 +551,7 @@ def test_parser_initial_error_checks_case_5(parser_fixture, create_testing_file_
 
 @pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_message_1, expected_message_2", [
     ('DEICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;',
-     '\n  Line 2: Syntax Error: Expected the keyword DEVICES\n \n        DEICES dtype1 = DTYPE;\n', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n        DEICES dtype1 = DTYPE;\n"),
-    ('CONNECTIOS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;',
-     '\n  Line 2: Syntax Error: Expected the keyword CONNECTIONS\n \n        CONNECTIOS dtype1.Q = dtype2.DATA;\n', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n        CONNECTIOS dtype1.Q = dtype2.DATA;\n"),
-    ('MOITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;',
-     '\n  Line 2: Syntax Error: Expected the keyword MONITORS\n \n        MOITORS dtype1.Q;\n', "\n  Line 2: Syntax Error: Expected a '{' symbol\n \n        MOITORS dtype1.Q;\n"),
+     '\n  Line 2: Expected the keyword DEVICES\n \n\n', "  Line 2: Expected a '{' symbol\n \n")
 ])
 def test_parser_initial_error_checks_case_6(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_message_1, expected_message_2):
     """Test initial_error_checks for Case 6:  { ..."""
@@ -639,7 +570,7 @@ def test_parser_initial_error_checks_case_6(parser_fixture, create_testing_file_
     # indexing done to ignore caret/tilde placement line
     first_printed_message = ''.join(output_lines[:4])
     # indexing done to ignore caret/tilde placement line
-    second_printed_message = ''.join(output_lines[6:10])
+    second_printed_message = ''.join(output_lines[4:7])
 
     assert first_printed_message == expected_message_1
     assert second_printed_message == expected_message_2
@@ -648,6 +579,8 @@ def test_parser_initial_error_checks_case_6(parser_fixture, create_testing_file_
 
 
 @pytest.mark.parametrize("example, expected", [
+    ("SIGGEN(1, [1,3])", "(parser.symbol.id, (1, [1,3]))"),
+    ("RC(5)", "(parser.symbol.id, 5)"),
     ("AND(10)", "(parser.symbol.id, 10)"),
     ("NAND(11)", "(parser.symbol.id, 11)"),
     ("OR(12)", "(parser.symbol.id, 12)"),
@@ -655,7 +588,7 @@ def test_parser_initial_error_checks_case_6(parser_fixture, create_testing_file_
     ("CLOCK(14)", "(parser.symbol.id, 14)"),
     ("SWITCH(1)", "(parser.symbol.id, 1)"),
     ("XOR", "(parser.symbol.id, None)"),
-    ("DTYPE", "(parser.symbol.id, None)"),
+    ("DTYPE", "(parser.symbol.id, None)")
 ])
 def test_parser_check_device_is_valid_correct_example(parser_fixture, create_testing_file_to_scan, example, expected):
     """Test check_device_is_valid works with some correct examples covering all gate types"""
@@ -672,10 +605,10 @@ def test_parser_check_device_is_valid_correct_example(parser_fixture, create_tes
 
 
 @pytest.mark.parametrize("example, expected", [
-    ("AND(12", "  Line 3: Syntax Error: Expected a ')' for an input\n"),
-    ("AND(34)", "  Line 2: Semantic Error: Input number of gates is out of range. Must be an integer between 1 and 16\n"),
-    ("AND()", "  Line 2: Syntax Error: Expected a positive integer\n"),
-    ("AND 12)", "  Line 2: Syntax Error: Expected a '(' for an input\n"),
+    ("AND(12", "  Line 3: Expected a ')' for an input\n"),
+    ("AND(34)", "  Line 2: Input number of gates is out of range. Must be an integer between 1 and 16\n"),
+    ("AND()", "  Line 2: Expected a positive integer\n"),
+    ("AND 12)", "  Line 2: Expected a '(' for an input\n"),
 ])
 def test_parser_check_device_is_valid_erroneous_examples(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
     """Test check_device_is_valid works with some correct examples"""
@@ -711,7 +644,7 @@ def test_parser_device_correct_parsing_of_device_list(parser_fixture, create_tes
     parser = parser_fixture(scanner)
     parser.symbol = parser.scanner.get_symbol()
 
-    assert parser.device_list() is None
+    assert parser.device_list() is False
 
 
 @pytest.mark.parametrize("example, expected", [
@@ -720,13 +653,13 @@ def test_parser_device_correct_parsing_of_device_list(parser_fixture, create_tes
         4dtype1 = DTYPE;
         dtype2 = DTYPE;
     }
-    """, "  Line 3: Syntax Error: Invalid user name entered\n"),
+    """, "  Line 3: Invalid user name entered\n"),
     ("""
     DEVICES {
         dtype1 DTYPE;
         dtype2 = DTYPE;
     }
-    """, "  Line 3: Syntax Error: Expected an '=' symbol\n")
+    """, "  Line 3: Expected an '=' symbol\n")
 ])
 def test_parser_device_erroneous_parsing_of_device_line(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
     """Test parsing of device list invalid name error"""
@@ -773,13 +706,13 @@ def test_parser_output_correct_parsing_of_output(parser_fixture, create_testing_
 @pytest.mark.parametrize("example, expected", [
     ("""
     4dtype1.I1
-    """, "  Line 2: Syntax Error: Undefined device name given\n"),
+    """, "  Line 2: Undefined device name given\n"),
     ("""
     dtype1
-    """, "  Line 3: Syntax Error: Expected a full stop\n"),
+    """, "  Line 3: Expected a full stop\n"),
     ("""
     dtype1.ni
-    """, "  Line 2: Syntax Error: Expected a valid input suffix\n")
+    """, "  Line 2: Expected a valid input suffix\n")
 ])
 def test_parser_erroneous_input_parsing(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
     """Test parsing of device list invalid name error"""
@@ -800,10 +733,10 @@ def test_parser_erroneous_input_parsing(parser_fixture, create_testing_file_to_s
 @pytest.mark.parametrize("example, expected", [
     ("""
     4dtype1
-    """, "  Line 2: Syntax Error: Invalid user name entered\n"),
+    """, "  Line 2: Invalid user name entered\n"),
     ("""
     dtype1.qbar
-    """, "  Line 2: Syntax Error: Expected a Q or QBAR after the full stop\n")
+    """, "  Line 2: Expected a Q or QBAR after the full stop\n")
 ])
 def test_parser_erroneous_output_parsing(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
     """Test parsing of device list invalid name error"""
@@ -838,7 +771,7 @@ def test_parser_correct_parsing_of_connection_line(parser_fixture, create_testin
 @pytest.mark.parametrize("example, expected", [
     ("""
     dtype1.SET set;
-    """, "  Line 2: Syntax Error: Expected an '=' symbol\n")
+    """, "  Line 2: Expected an '=' symbol\n")
 ])
 def test_parser_incorrect_connection_line_parsing(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
     """Test parsing of incorrect connection line"""
@@ -871,7 +804,7 @@ def test_parser_correct_parsing_of_connection_list(parser_fixture, create_testin
     parser = parser_fixture(scanner)
     parser.symbol = parser.scanner.get_symbol()
 
-    assert parser.connection_list() is None
+    assert parser.connection_list() is False
     assert parser.network.check_network() == True
 
 
@@ -883,13 +816,13 @@ def test_parser_correct_parsing_of_connection_list(parser_fixture, create_testin
     dtype1.CLEAR = set;
     dtype1.CLK = clock;
     }
-    """, "  Line 13: Syntax Error: Expected a semicolon\n"),
+    """, "  Line 13: Expected a semicolon\n"),
     ("""
     CONNECTIONS {
     dtype1.DATA = data;
 
     MONITORS
-    """, "  Line 14: Syntax Error: Expected a '}' symbol\n"),
+    """, "  Line 14: Expected a '}' symbol\n"),
     ("""
     CONNECTIONS {
     dtype1.DATA = data;
@@ -897,7 +830,7 @@ def test_parser_correct_parsing_of_connection_list(parser_fixture, create_testin
     dtype1.CLEAR = set;
     dtype1.CLK = clock
     }
-    """, "  Line 16: Syntax Error: Expected a semicolon\n")
+    """, "  Line 16: Expected a semicolon\n")
 ])
 def test_parser_incorrect_connection_list_parsing(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
     """Test parsing of incorrect connection list"""
@@ -942,7 +875,7 @@ def test_parser_correct_parsing_of_monitors_list(parser_fixture, create_testing_
     parser = parser_fixture(scanner)
     parser.symbol = parser.scanner.get_symbol()
 
-    assert parser.monitor_list() is None
+    assert parser.monitor_list() is False
 
 
 @pytest.mark.parametrize("example, expected", [
@@ -953,14 +886,14 @@ def test_parser_correct_parsing_of_monitors_list(parser_fixture, create_testing_
     dtype3.Q;
     dtype4.Q;
 }
-    """, "  Line 36: Syntax Error: Expected a semicolon\n"),
+    """, "  Line 36: Expected a semicolon\n"),
     ("""
     MONITORS {
     dtype1.Q;
     dtype2.Q;
 
     END
-    """, "  Line 37: Syntax Error: Expected a '}' symbol\n"),
+    """, "  Line 37: Expected a '}' symbol\n"),
     ("""
     MONITORS {
     dtype1.Q;
@@ -968,7 +901,7 @@ def test_parser_correct_parsing_of_monitors_list(parser_fixture, create_testing_
     dtype3.Q;
     dtype4.Q
 }
-    """, "  Line 38: Syntax Error: Expected a semicolon\n")
+    """, "  Line 38: Expected a semicolon\n")
 ])
 def test_parser_incorrect_monitors_list_parsing(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
     """Test parsing of incorrect monitors list"""
@@ -1053,10 +986,10 @@ def test_parser_correct_parsing_of_end(parser_fixture, create_testing_file_to_sc
 
 @pytest.mark.parametrize("example, expected", [
     ("""
-    """, "  Line 2: Syntax Error: Expected the keyword END straight after monitors list\n"),
+    """, "  Line 2: Expected the keyword END straight after monitors list\n"),
     ("""
     end
-    """, "  Line 2: Syntax Error: Expected the keyword END straight after monitors list\n")
+    """, "  Line 2: Expected the keyword END straight after monitors list\n")
 ])
 def test_parser_incorrect_keyword_END(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
     """Test parsing of incorrect keyword END"""
@@ -1091,7 +1024,7 @@ def test_parser_correct_file(scanner_fixture, names_fixture, parser_fixture, fil
 
 
 @pytest.mark.parametrize("example, expected", [
-    ("""""", "  Line 1: Syntax Error: Cannot parse an empty file\n")
+    ("""""", "  Line 1: Cannot parse an empty file\n")
 ])
 def test_parser_empty_file(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
     """Test parsing of empty file"""

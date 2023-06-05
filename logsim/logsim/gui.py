@@ -1057,8 +1057,9 @@ class AddDeviceDialog(wx.Dialog):
 
 class LogicSimApp(wx.App):
     def OnInit(self):
-        #file_path = Path(__file__).with_name("example2_logic_description.txt")
-        file_path = "logsim\logsim\example2_logic_description.txt"
+      
+        file_path = "logsim/logsim/example1_logic_description.txt"
+
         with open(file_path) as f:
             print('success')
         names = Names()
