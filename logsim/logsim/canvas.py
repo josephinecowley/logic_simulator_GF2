@@ -27,7 +27,19 @@ class MyGLCanvas(wxcanvas.GLCanvas):
     --------------
     init_gl(self): Configures the OpenGL context.
 
-    render(self, text): Handles all drawing operations.
+    draw_canvas(self): Iterates through each trace and draws it on the canvas with an offset.
+
+    draw_trace(self, signal, x_pos, y_pos, label, color: tuple): Draws trace with axes and ticks.
+
+    render(self): Handles all drawing operations.
+
+    on_key_press(self, event): Handles key press event.
+
+    on_right_click(self, event): Handles right click event.
+
+    recenter_canvas(self): Translates and re-zooms the canvas to where it started.
+
+    clear_traces(self): Updates current time and clears traces.
 
     on_paint(self, event): Handles the paint event.
 
@@ -35,8 +47,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     on_mouse(self, event): Handles mouse events.
 
-    render_text(self, text, x_pos, y_pos, small: bool): Handles text drawing
-                                           operations.
+    render_text(self, text, x_pos, y_pos, small: bool): Handles text drawing operations.
+
+    update_arguments(self, devices, monitors): Update the devices and monitors with new arguments.
+    
     """
 
     def __init__(self, parent, devices, monitors, current_time=None):
@@ -111,10 +125,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             signal = trace[1]
             label = trace[0]
             color = color_list[i % len(color_list)]
-            self._draw_trace(signal, x_offset, y_offset, label, color)
+            self.draw_trace(signal, x_offset, y_offset, label, color)
             y_offset -= self.y_spacing
         
-    def _draw_trace(self, signal, x_pos, y_pos, label, color=(0.0, 0.0, 1.0)):
+    def draw_trace(self, signal, x_pos, y_pos, label, color=(0.0, 0.0, 1.0)):
         """Draws trace with axes and ticks"""
 
         # draw trace
@@ -192,6 +206,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.clear_traces()
 
     def recenter_canvas(self):
+        """Translates and re-zooms the canvas to where it started"""
         size = self.GetClientSize()
         self.pan_x = 0
         self.pan_y = 0
@@ -283,7 +298,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                 GLUT.glutBitmapCharacter(font, ord(character))
 
     def update_arguments(self, devices, monitors):
-        # Update the devices and monitors with new arguments
+        """Update the devices and monitors with new arguments"""
         self.devices = devices
         self.monitors = monitors
         self.traces = self.monitors.get_signals_for_GUI()
