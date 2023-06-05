@@ -287,18 +287,16 @@ class RunSimulationPanel(wx.Panel):
         centre_panel_bottom_padding_right_vbox.Add(
             self.quit_button, 1, flag=wx.ALIGN_RIGHT, border=5)
 
-        self.upload_and_help_buttons_panel = wx.Panel(
+        self.right_buttons_panel = wx.Panel(
             self, name="upload and help buttons panel")
-        upload_and_help_buttons_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
-        self.upload_and_help_buttons_panel.SetSizer(
-            upload_and_help_buttons_panel_hbox)
+        right_buttons_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
+        self.right_buttons_panel.SetSizer(
+            right_buttons_panel_hbox)
 
         self.upload_button_panel = wx.Panel(
-            self.upload_and_help_buttons_panel, name="upload button panel")
-        #self.upload_and_help_buttons_panel.SetSizeHints(100, 100)
+            self.right_buttons_panel, name="upload button panel")
         upload_button_panel_vbox = wx.BoxSizer(wx.VERTICAL)
         self.upload_button_panel.SetSizer(upload_button_panel_vbox)
-        #self.upload_and_help_buttons_panel.SetSizerAndFit(upload_button_panel_vbox)
 
         self.upload_button = wx.Button(
             self.upload_button_panel, wx.ID_ANY, _("UPLOAD"))
@@ -308,7 +306,7 @@ class RunSimulationPanel(wx.Panel):
             self.upload_button, 1, flag=wx.ALIGN_CENTER)
 
         self.help_button_panel = wx.Panel(
-            self.upload_and_help_buttons_panel, name="help button panel")
+            self.right_buttons_panel, name="help button panel")
         help_button_panel_vbox = wx.BoxSizer(wx.VERTICAL)
         self.help_button_panel.SetSizer(help_button_panel_vbox)
 
@@ -317,12 +315,12 @@ class RunSimulationPanel(wx.Panel):
         self.help_button.SetToolTip(_("Help on running logic simulation"))
         help_button_panel_vbox.Add(self.help_button, 1, flag=wx.ALIGN_CENTER)
 
-        upload_and_help_buttons_panel_hbox.Add(
+        right_buttons_panel_hbox.Add(
             self.upload_button_panel, 1, flag=wx.EXPAND)
-        upload_and_help_buttons_panel_hbox.Add(
+        right_buttons_panel_hbox.Add(
             self.help_button_panel, 1, flag=wx.EXPAND)
 
-        hbox.Add(self.upload_and_help_buttons_panel, 1, flag=wx.EXPAND)
+        hbox.Add(self.right_buttons_panel, 1, flag=wx.EXPAND)
 
         # Set sizer of RunSimulationPanel
         self.SetSizer(hbox)
