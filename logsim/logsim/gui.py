@@ -728,25 +728,41 @@ class SwitchesPanel(wx.Panel):
             if initial_switch_state == 1:
                 switch_slider_panel_sizer.Add(switch_slider_button, 0, flag=wx.ALIGN_RIGHT, border=5)
             elif initial_switch_state == 0:
-                switch_slider_panel_sizer.Add(switch_slider_button, 0, flag=wx.ALIGN_LEFT, border=5)
-
-            switch_state_indicator_panel = wx.Panel(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, style=wx.BORDER_RAISED, size=(50, 30))
-            switch_state_indicator_panel_sizer = wx.BoxSizer(wx.VERTICAL)
-            switch_state_indicator_panel.SetSizer(switch_state_indicator_panel_sizer)
+                switch_slider_panel_sizer.Add(switch_slider_button, 0, flag=wx.ALIGN_LEFT, border=5)            
 
             if initial_switch_state == 1:
+                switch_state_indicator_panel = wx.Panel(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, style=wx.BORDER_RAISED, size=(50, 30))
                 switch_state_indicator_panel.SetBackgroundColour(wx.Colour(4, 84, 14))
+                switch_state_indicator_panel_sizer = wx.BoxSizer(wx.VERTICAL)
+                switch_state_indicator_panel.SetSizer(switch_state_indicator_panel_sizer)
+
                 text = wx.StaticText(switch_state_indicator_panel, wx.ID_ANY, _("ON"), style=wx.ALIGN_LEFT)
                 font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False)
-                text.SetFont(font)
+                dc = wx.ScreenDC()
+                dc.SetFont(font)
                 text.SetForegroundColour(wx.WHITE)
+                text_width, text_height = dc.GetTextExtent(_("ON"))
+                switch_state_indicator_panel.SetMinSize((text_width, 30))
+                switch_state_indicator_panel.Refresh()
+                switch_state_indicator_panel.Update()
+
                 switch_state_indicator_panel_sizer.Add(text, 0, flag=wx.CENTER)
             elif initial_switch_state == 0:
+                switch_state_indicator_panel = wx.Panel(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, style=wx.BORDER_RAISED, size=(50, 30))
                 switch_state_indicator_panel.SetBackgroundColour(wx.Colour(139, 26, 26))
+                switch_state_indicator_panel_sizer = wx.BoxSizer(wx.VERTICAL)
+                switch_state_indicator_panel.SetSizer(switch_state_indicator_panel_sizer)
+
                 text = wx.StaticText(switch_state_indicator_panel, wx.ID_ANY, _("OFF"), style=wx.ALIGN_LEFT)
-                font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False)
-                text.SetFont(font)
+                font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False)
+                dc = wx.ScreenDC()
+                dc.SetFont(font)
                 text.SetForegroundColour(wx.WHITE)
+                text_width, text_height = dc.GetTextExtent(_("OFF"))
+                switch_state_indicator_panel.SetMinSize((text_width, 30))
+                switch_state_indicator_panel.Refresh()
+                switch_state_indicator_panel.Update()
+
                 switch_state_indicator_panel_sizer.Add(text, 0, flag=wx.CENTER)
 
             self.switch_dict[switch_slider_id].extend([switch_id, switch_name, initial_switch_state, switch_slider_panel, switch_slider_panel_sizer, switch_state_indicator_panel, switch_state_indicator_panel_sizer])
@@ -829,10 +845,14 @@ class SwitchesPanel(wx.Panel):
             selected_switch_panel.Update()
 
             selected_switch_state_indicator_panel.SetBackgroundColour(wx.Colour(4, 84, 14))
-            text = wx.StaticText(parent=selected_switch_state_indicator_panel, id=wx.ID_ANY, label=_("ON"), style=wx.ALIGN_LEFT)
+            text = wx.StaticText(selected_switch_state_indicator_panel, wx.ID_ANY, _("ON"), style=wx.ALIGN_LEFT)
             font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False)
-            text.SetFont(font)
+            font.MakeBold()
+            dc = wx.ScreenDC()
+            dc.SetFont(font)
             text.SetForegroundColour(wx.WHITE)
+            text_width, text_height = dc.GetTextExtent(_("ON"))
+            selected_switch_state_indicator_panel.SetMinSize((text_width, 30))
 
             selected_switch_state_indicator_panel_sizer.Add(text, 0, flag=wx.CENTER)
             selected_switch_state_indicator_panel.GetSizer().Layout()
@@ -858,10 +878,14 @@ class SwitchesPanel(wx.Panel):
             selected_switch_panel.Update()
 
             selected_switch_state_indicator_panel.SetBackgroundColour(wx.Colour(139, 26, 26))
-            text = wx.StaticText(parent=selected_switch_state_indicator_panel, id=wx.ID_ANY, label=_("OFF"), style=wx.ALIGN_LEFT)
+            text = wx.StaticText(selected_switch_state_indicator_panel, wx.ID_ANY, _("OFF"), style=wx.ALIGN_LEFT)
             font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False)
-            text.SetFont(font)
+            font.MakeBold()
+            dc = wx.ScreenDC()
+            dc.SetFont(font)
             text.SetForegroundColour(wx.WHITE)
+            text_width, text_height = dc.GetTextExtent(_("OFF"))
+            selected_switch_state_indicator_panel.SetMinSize((text_width, 30))
 
             selected_switch_state_indicator_panel_sizer.Add(text, 0, flag=wx.CENTER)
             selected_switch_state_indicator_panel.GetSizer().Layout()
