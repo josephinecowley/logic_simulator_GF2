@@ -34,8 +34,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     render(self): Handles all drawing operations.
 
-    on_key_press(self, event): Handles key press event.
-
     on_right_click(self, event): Handles right click event.
 
     recenter_canvas(self): Translates and re-zooms the canvas to where it started.
@@ -51,7 +49,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
     render_text(self, text, x_pos, y_pos, small: bool): Handles text drawing operations.
 
     update_arguments(self, devices, monitors): Update the devices and monitors with new arguments.
-
     """
 
     def __init__(self, parent, devices, monitors, current_time=None):
@@ -87,7 +84,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.devices = devices
         self.monitors = monitors
 
-        # self.current_time initialised as 0 and then takes future args for current_time
+        # self.current_time initialised as 0 and then takes future args for
+        # current_time
         if current_time is None:
             self.current_time = 0
         else:
@@ -112,7 +110,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glScaled(self.zoom, self.zoom, self.zoom)
 
     def draw_canvas(self):
-        """Iterates through each trace and draws it on the canvas with an offset"""
+        """Iterates through each trace and draws it on the canvas with an offset."""
         # Initialise offset parameters for each canvas instance
         x_offset = 150
         y_offset = 400
@@ -134,7 +132,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             y_offset -= self.y_spacing
 
     def draw_trace(self, signal, x_pos, y_pos, label, color=(0.0, 0.0, 1.0)):
-        """Draws trace with axes and ticks"""
+        """Draws trace with axes and ticks."""
 
         # draw trace
         GL.glLineWidth(3.0)
@@ -203,11 +201,11 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.SwapBuffers()
 
     def on_right_click(self, event):
-        """Handles right click event"""
+        """Handles right click event."""
         self.clear_traces()
 
     def recenter_canvas(self):
-        """Translates and re-zooms the canvas to where it started"""
+        """Translates and re-zooms the canvas to where it started."""
         size = self.GetClientSize()
 
         # Reset canvas attributes
@@ -225,7 +223,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         self.Refresh()
 
     def clear_traces(self):
-        """Updates current time and clears traces"""
+        """Updates current time and clears traces."""
         # update current_time
         no_of_cycles = len(self.traces[0][1])
         self.current_time += no_of_cycles
@@ -267,7 +265,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self.pan_y -= event.GetY() - self.last_mouse_y
 
             if self.pan_x > 0:
-                self.pan_x = 0 
+                self.pan_x = 0
 
             self.last_mouse_x = event.GetX()
             self.last_mouse_y = event.GetY()
@@ -305,7 +303,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                 GLUT.glutBitmapCharacter(font, ord(character))
 
     def update_arguments(self, devices, monitors):
-        """Update the devices and monitors with new arguments"""
+        """Update the devices and monitors with new arguments."""
         self.devices = devices
         self.monitors = monitors
         self.traces = self.monitors.get_signals_for_GUI()
