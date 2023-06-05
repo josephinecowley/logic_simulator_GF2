@@ -167,7 +167,7 @@ class RunSimulationPanel(wx.Panel):
         cycles_and_left_buttons_panel_top_padding_vbox.Add(self.cycles_panel, 1, flag=wx.TOP)
 
         # Create and add number of cycles text to cycles panel
-        str = "No. Cycles"
+        str = "NO. CYCLES"
         text = wx.StaticText(self.cycles_panel, wx.ID_ANY,
                              str, style=wx.ALIGN_LEFT)
         font = wx.Font(15, wx.FONTFAMILY_SWISS,
@@ -489,7 +489,7 @@ class SignalTracesPanel(wx.Panel):
         add_new_monitor_panel_hbox.Add(self.add_new_monitor_panel_centre, 5, flag=wx.EXPAND)
 
         # Create and add "Add new monitor" text to add new monitor panel
-        str = "Add new monitor"
+        str = "ADD NEW MONITOR"
         text = wx.StaticText(self.add_new_monitor_panel_centre, wx.ID_ANY, str)
         font = wx.Font(15, wx.FONTFAMILY_SWISS,
                        wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, faceName="Arial")
@@ -528,7 +528,7 @@ class SignalTracesPanel(wx.Panel):
             self.add_new_monitor_button, 1, flag=wx.CENTER | wx.EXPAND)
 
         # Create and add "Zap a monitor" text to add new monitor panel
-        str = "Delete monitor"
+        str = "DELETE MONITOR"
         text = wx.StaticText(self.add_new_monitor_panel_centre, wx.ID_ANY, str)
         font = wx.Font(15, wx.FONTFAMILY_SWISS,
                        wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
