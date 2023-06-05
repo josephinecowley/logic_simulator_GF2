@@ -6,28 +6,30 @@ from names import Names
 
 @pytest.fixture
 def path_fixture():
-    """returns the required relative path of the file to read"""
+    """Returns the required relative path of the file to read."""
     return "logsim/logsim/test_scanner_example1_logic_description.txt"
 
 
 @pytest.fixture
 def names_fixture():
-    """initialises a Names() instance"""
+    """Initialises a Names() instance."""
     names = Names()
     return names
 
 
 @pytest.fixture
 def scanner_fixture(path_fixture, names_fixture):
-    """initialises a Scanner() instance using the path and names objects"""
+    """Initialises a Scanner() instance using the path and names objects."""
     return Scanner(path_fixture, names_fixture)
 
 
 @pytest.fixture
 def set_scanner_location(scanner_fixture):
-    """Used to place the file pointer to specific locations in file for testing. 
-    Takes a tuple - (line_number, one-based position index) - and moves the open() object's 
-    pointer to this location. self.current_character becomes the character at this location."""
+    """Used to place the file pointer to specific locations in file for testing.
+
+    Takes a tuple - (line_number, one-based position index) - and moves the open() object's
+    pointer to this location. self.current_character becomes the character at this location.
+    """
     def _set_scanner_location(target_location):
         target_line_number, target_position = target_location
         scanner = scanner_fixture  # call scanner instance
@@ -58,7 +60,7 @@ def set_scanner_location(scanner_fixture):
 # Test Symbol class
 
 def test_symbol_initialization():
-    """Check initial symbol attributes"""
+    """Check initial symbol attributes."""
     symbol = Symbol()
     assert symbol.type is None
     assert symbol.id is None
@@ -69,7 +71,7 @@ def test_symbol_initialization():
 # Test Scanner class
 
 def test_scanner_initialisation(scanner_fixture, names_fixture):
-    """Check initial scanner attributes"""
+    """Check initial scanner attributes."""
     scanner = scanner_fixture
     assert scanner.file is not None
     assert scanner.line_number == 1
@@ -86,7 +88,8 @@ def test_scanner_initialisation(scanner_fixture, names_fixture):
 
 
 def test_scanner_open_file(scanner_fixture, names_fixture):
-    """Check that the file has been opened and also check that a ValueError is raised when trying to open a nonexistent file"""
+    """Check that the file has been opened and also check that a ValueError is raised
+    when trying to open a nonexistent file."""
     # Test with an existing file
     scanner = scanner_fixture
     assert scanner.file is not None
@@ -98,7 +101,7 @@ def test_scanner_open_file(scanner_fixture, names_fixture):
 
 
 def test_scanner_load_scanner_data(scanner_fixture):
-    """Checks that scanner location gets copied to symbol correctly"""
+    """Checks that scanner location gets copied to symbol correctly."""
     scanner = scanner_fixture
     symbol = Symbol()
     scanner.line_number = 10
@@ -108,13 +111,18 @@ def test_scanner_load_scanner_data(scanner_fixture):
     assert symbol.start_position == 20
 
 
-@pytest.mark.parametrize("location, expected_character, expected_line, expected_position", [
-    ((1, 9), "\n", 1, 10),
-    ((3, 11), "=", 3, 12),
-    ((6, 5), "l", 6, 6),
-])
-def test_scanner_advance(scanner_fixture, set_scanner_location, location, expected_character, expected_line, expected_position):
-    """Checks that advance() increments position by one and gets new current_character"""
+@pytest.mark.parametrize(
+    "location, expected_character, expected_line, expected_position", [
+        ((1, 9), "\n", 1, 10), ((3, 11), "=", 3, 12), ((6, 5), "l", 6, 6), ])
+def test_scanner_advance(
+        scanner_fixture,
+        set_scanner_location,
+        location,
+        expected_character,
+        expected_line,
+        expected_position):
+    """Checks that advance() increments position by one and gets new
+    current_character."""
     scanner = scanner_fixture
     set_scanner_location(location)
     scanner.advance()
@@ -129,8 +137,18 @@ def test_scanner_advance(scanner_fixture, set_scanner_location, location, expect
     ((3, 11), "=", 3, 12),
     ((6, 1), "c", 6, 5),
 ])
-def test_scanner_skip_spaces(scanner_fixture, set_scanner_location, location, expected_character, expected_line, expected_position):
-    """Given a whitespace character. Checks that skip_spaces() puts the next non-whitespace character in current_character."""
+def test_scanner_skip_spaces(
+        scanner_fixture,
+        set_scanner_location,
+        location,
+        expected_character,
+        expected_line,
+        expected_position):
+    """Given a whitespace character.
+
+    Checks that skip_spaces() puts the next non-whitespace character in
+    current_character.
+    """
     scanner = scanner_fixture
     set_scanner_location(location)
     scanner.skip_spaces()
@@ -145,8 +163,12 @@ def test_scanner_skip_spaces(scanner_fixture, set_scanner_location, location, ex
     ((11, 19), "DATA"),
     ((5, 5), "dtype4"),
 ])
-def test_scanner_get_name(scanner_fixture, set_scanner_location, location, expected_name):
-    """Given the first character of a name. Checks the entire name is returned."""
+def test_scanner_get_name(
+        scanner_fixture, set_scanner_location, location, expected_name):
+    """Given the first character of a name.
+
+    Checks the entire name is returned.
+    """
     scanner = scanner_fixture
     set_scanner_location(location)
     name = scanner.get_name()
@@ -154,7 +176,8 @@ def test_scanner_get_name(scanner_fixture, set_scanner_location, location, expec
 
 
 def test_scanner_get_number(scanner_fixture, set_scanner_location):
-    """Given the first digit in a two-digit number and checks that the entire number is returned."""
+    """Given the first digit in a two-digit number and checks that the entire number is
+    returned."""
     location = (6, 17)  # to '25'
     scanner = scanner_fixture
     set_scanner_location(location)
@@ -169,8 +192,18 @@ def test_scanner_get_number(scanner_fixture, set_scanner_location):
     ((7, 19), "        data = SWITCH(0);", "                      ^  "),
 
 ])
-def test_scanner_display_line_and_marker(scanner_fixture, set_scanner_location, capfd, location, expected_line1, expected_line2):
-    """Given a symbol instance. Checks thats a the current line text and a marker under the symbol are correctly placed."""
+def test_scanner_display_line_and_marker(
+        scanner_fixture,
+        set_scanner_location,
+        capfd,
+        location,
+        expected_line1,
+        expected_line2):
+    """Given a symbol instance.
+
+    Checks thats a the current line text and a marker under the symbol are correctly
+    placed.
+    """
     scanner = scanner_fixture
     set_scanner_location(location)
     symbol = scanner.get_symbol()
@@ -197,10 +230,20 @@ def test_scanner_display_line_and_marker(scanner_fixture, set_scanner_location, 
     ((11, 2), "data", 10, 11, 5),
     ((22, 12), "Q", 10, 22, 12),
 ])
-def test_get_symbol_names(names_fixture, scanner_fixture, set_scanner_location, location, expected_name,
-                          expected_type, expected_line_number, expected_start_position):
-    """Place the pointer in various locations in file and checks that get_symbol() returns the correct proceeding symbol object 
-    for KEYWORDs, NAMEs, and NUMBERs. Looks up the name string for their ids and checks they are as expected."""
+def test_get_symbol_names(
+        names_fixture,
+        scanner_fixture,
+        set_scanner_location,
+        location,
+        expected_name,
+        expected_type,
+        expected_line_number,
+        expected_start_position):
+    """Place the pointer in various locations in file and checks that get_symbol()
+    returns the correct proceeding symbol object for KEYWORDs, NAMEs, and NUMBERs.
+
+    Looks up the name string for their ids and checks they are as expected.
+    """
     names = names_fixture  # names class instance
     scanner = scanner_fixture
     set_scanner_location(location)
@@ -222,24 +265,39 @@ def test_get_symbol_names(names_fixture, scanner_fixture, set_scanner_location, 
     ((2, 19), 6, 2, 19),
     ((2, 11), 7, 2, 12),
 ])
-def test_get_symbol_punctuation(scanner_fixture, set_scanner_location, location,
-                                expected_type, expected_line_number, expected_start_position):
-    """Place the pointer in various locations in file and checks that get_symbol() returns the correct punctuation symbol object."""
+def test_get_symbol_punctuation(
+        scanner_fixture,
+        set_scanner_location,
+        location,
+        expected_type,
+        expected_line_number,
+        expected_start_position):
+    """Place the pointer in various locations in file and checks that get_symbol()
+    returns the correct punctuation symbol object."""
     scanner = scanner_fixture
     set_scanner_location(location)
     symbol = scanner.get_symbol()
-    assert symbol.id == None  # check that symbol_ids are all None
+    assert symbol.id is None  # check that symbol_ids are all None
     assert symbol.type == expected_type
     assert symbol.line_number == expected_line_number
     assert symbol.start_position == expected_start_position
 
 
-@pytest.mark.parametrize("location, expected_character, expected_line_number, expected_position", [
-    ((2, 21), "d", 3, 5),
-    ((9, 1), "C", 10, 1),
-])
-def test_skip_comment(scanner_fixture, set_scanner_location, location, expected_character, expected_line_number, expected_position):
-    """Given a comment opener. Checks that skip_comment() puts the next non-comment character into current_character."""
+@pytest.mark.parametrize(
+    "location, expected_character, expected_line_number, expected_position", [
+        ((2, 21), "d", 3, 5), ((9, 1), "C", 10, 1), ])
+def test_skip_comment(
+        scanner_fixture,
+        set_scanner_location,
+        location,
+        expected_character,
+        expected_line_number,
+        expected_position):
+    """Given a comment opener.
+
+    Checks that skip_comment() puts the next non-comment character into
+    current_character.
+    """
     scanner = scanner_fixture
     set_scanner_location(location)
     assert scanner.line_number == location[0]
@@ -252,7 +310,10 @@ def test_skip_comment(scanner_fixture, set_scanner_location, location, expected_
 
 
 def test_EOF(scanner_fixture, set_scanner_location):
-    """Retrives the END keyword and then calls get_symbol again. Checks that this next symbol is EOF."""
+    """Retrives the END keyword and then calls get_symbol again.
+
+    Checks that this next symbol is EOF.
+    """
     location = (28, 1)
     scanner = scanner_fixture
     set_scanner_location(location)
@@ -260,8 +321,9 @@ def test_EOF(scanner_fixture, set_scanner_location):
     symbol = scanner.get_symbol()  # call again to get to EOF
     assert symbol.type == scanner.EOF
 
+
 def test_get_siggen_signal(scanner_fixture, set_scanner_location):
-    location = (27,1)
+    location = (27, 1)
     scanner = scanner_fixture
     set_scanner_location(location)
     signal_string = scanner.get_siggen_signal()
