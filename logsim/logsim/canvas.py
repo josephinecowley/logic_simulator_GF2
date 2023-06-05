@@ -1,32 +1,15 @@
-"""Implement the graphical user interface for the Logic Simulator.
+"""Implement the canvas for the Logic Simulator.
 
-Used in the Logic Simulator project to enable the user to run the simulation
-or adjust the network properties.
+Used in the Logic Simulator project to display the simulation monitors.
 
 Classes:
 --------
 MyGLCanvas - handles all canvas drawing operations.
-Gui - configures the main window and all the widgets.
 """
-import os
-from io import StringIO
-import sys
-from contextlib import redirect_stdout
 
 import wx
 import wx.glcanvas as wxcanvas
-import wx.lib.scrolledpanel as wxscrolledpanel
-import wx.lib.buttons as wxbuttons
-import wx.lib.agw.aquabutton as wxaquabutton
 from OpenGL import GL, GLUT
-
-from names import Names
-from devices import Devices
-from network import Network
-from monitors import Monitors
-from scanner import Scanner
-from parse import Parser
-
 
 class MyGLCanvas(wxcanvas.GLCanvas):
     """Handle all drawing operations.
@@ -52,7 +35,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     on_mouse(self, event): Handles mouse events.
 
-    render_text(self, text, x_pos, y_pos): Handles text drawing
+    render_text(self, text, x_pos, y_pos, small: bool): Handles text drawing
                                            operations.
     """
 
