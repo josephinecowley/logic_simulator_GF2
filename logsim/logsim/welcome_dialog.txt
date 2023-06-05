@@ -1,0 +1,5 @@
+Welcome to the GF2 P2 Team 7 Logic Simulator!
+
+Developed by Josephine Cowley (jhmdc2), Tom Hill (th621), Khalid Omar (ko366)
+
+To get started you need a valid Logic Description File. This is one which follows our defined language syntax.

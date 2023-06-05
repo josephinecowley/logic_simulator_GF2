@@ -10,15 +10,13 @@ Gui - configures the main window and all the widgets.
 """
 import os
 from io import StringIO
-import sys
 from contextlib import redirect_stdout
+from collections import defaultdict
+from pathlib import Path
 
 import wx
-import wx.glcanvas as wxcanvas
 import wx.lib.scrolledpanel as wxscrolledpanel
 import wx.lib.buttons as wxbuttons
-import wx.lib.agw.aquabutton as wxaquabutton
-from OpenGL import GL, GLUT
 
 from names import Names
 from devices import Devices
@@ -52,9 +50,9 @@ class Gui(wx.Frame):
     on_text_box(self, event): Event handler for when the user enters text.
     """
 
-    def __init__(self, title, path, names, devices, network, monitors):
+    def __init__(self, path, names, devices, network, monitors, first_init=True):
         """Initialise widgets and layout."""
-        super().__init__(parent=None, title=title, size=(1000, 700))
+        super().__init__(parent=None, size=(1030, 700))
 
         # Create instance variables for Gui class
         self.path = path
@@ -62,6 +60,12 @@ class Gui(wx.Frame):
         self.devices = devices
         self.network = network
         self.monitors = monitors
+        self.first_init = first_init
+
+        ldf_title = self.extract_ldf_title()
+
+        # Configure the title of the GUI frame window
+        self.SetTitle(f"GF2 P2 Team 7 Logic Simulator GUI: {ldf_title}")
 
         # Configure the file menu
         fileMenu = wx.Menu()
@@ -84,25 +88,29 @@ class Gui(wx.Frame):
         data_panel.SetSizer(hbox)
 
         # Instantiate SignalTracesPanel widget and add to Frame
-        signal_traces_panel = SignalTracesPanel(
+        self.signal_traces_panel = SignalTracesPanel(
             data_panel, names, devices, network, monitors)
-        hbox.Add(signal_traces_panel, 3, wx.EXPAND, 0)
+        hbox.Add(self.signal_traces_panel, 3, wx.EXPAND, 0)
 
         # Instantiate RunSimulationPanel widget and add to Frame
-        simulation_panel = RunSimulationPanel(
-            self, signal_traces_panel, names, devices, network, monitors)
-        vbox.Add(simulation_panel, 1, wx.EXPAND)
+        self.simulation_panel = RunSimulationPanel(
+            self, self.signal_traces_panel, names, devices, network, monitors)
+        vbox.Add(self.simulation_panel, 1, wx.EXPAND)
 
         # Instantiate SwitchesPanel widget and add to Frame
-        switches_panel = SwitchesPanel(
-            data_panel, simulation_panel, names, devices, network, monitors)
-        hbox.Add(switches_panel, 1, wx.EXPAND, 0)
+        self.switches_panel = SwitchesPanel(
+            data_panel, self.simulation_panel, names, devices, network, monitors)
+        hbox.Add(self.switches_panel, 1, wx.EXPAND, 0)
 
-        self.SetSizeHints(200, 200)
+        self.SetSizeHints(930, 500)
         self.SetSizer(vbox)
+
+        if self.first_init:
+            print('SUCCESS')
 
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
+        print(self.GetSize())
         Id = event.GetId()
         if Id == wx.ID_EXIT:
             self.Close(True)
@@ -112,6 +120,11 @@ class Gui(wx.Frame):
 
     def on_quit_button(self, event):
         self.Close()
+
+    def extract_ldf_title(self):
+        ldf_title = self.path.split(os.sep)[-1]
+
+        return ldf_title
 
 
 class RunSimulationPanel(wx.Panel):
@@ -134,17 +147,24 @@ class RunSimulationPanel(wx.Panel):
         self.cycles_and_left_buttons_panel = wx.Panel(self)
         self.cycles_and_left_buttons_panel.SetSizer(vbox)
 
+        self.cycles_and_left_buttons_panel_top_padding = wx.Panel(self.cycles_and_left_buttons_panel)
+        cycles_and_left_buttons_panel_top_padding_vbox = wx.BoxSizer(wx.VERTICAL)
+        self.cycles_and_left_buttons_panel_top_padding.SetSizer(cycles_and_left_buttons_panel_top_padding_vbox)
+        vbox.Add(self.cycles_and_left_buttons_panel_top_padding, 1, flag=wx.EXPAND)
+
+        self.cycles_and_left_buttons_panel_centre_padding = wx.Panel(self.cycles_and_left_buttons_panel)
+        vbox.Add(self.cycles_and_left_buttons_panel_centre_padding, 1, flag=wx.EXPAND)
+
+        self.cycles_and_left_buttons_panel_bottom_padding = wx.Panel(self.cycles_and_left_buttons_panel)
+        cycles_and_left_buttons_panel_bottom_padding_vbox = wx.BoxSizer(wx.VERTICAL)
+        self.cycles_and_left_buttons_panel_bottom_padding.SetSizer(cycles_and_left_buttons_panel_bottom_padding_vbox)
+        vbox.Add(self.cycles_and_left_buttons_panel_bottom_padding, 2, flag=wx.EXPAND)
+
         # Create, configure, set and add cycles panel to overall cycles + left buttons panel
-        self.cycles_panel = wx.Panel(self.cycles_and_left_buttons_panel)
+        self.cycles_panel = wx.Panel(self.cycles_and_left_buttons_panel_top_padding)
         cycles_hbox = wx.BoxSizer(wx.HORIZONTAL)
         self.cycles_panel.SetSizer(cycles_hbox)
-        vbox.Add(self.cycles_panel)
-
-        # Create, configure, set and add left buttons panel to overall cycles + left buttons panel
-        self.left_buttons_panel = wx.Panel(self.cycles_and_left_buttons_panel)
-        left_buttons_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
-        self.left_buttons_panel.SetSizer(left_buttons_panel_hbox)
-        vbox.Add(self.left_buttons_panel)
+        cycles_and_left_buttons_panel_top_padding_vbox.Add(self.cycles_panel, 1, flag=wx.TOP)
 
         # Create and add number of cycles text to cycles panel
         str = "No. Cycles"
@@ -161,9 +181,20 @@ class RunSimulationPanel(wx.Panel):
         self.Bind(wx.EVT_SPINCTRL, self.on_spin, self.cycles_spin_control)
         cycles_hbox.Add(self.cycles_spin_control, 0, flag=wx.LEFT, border=10)
 
-        # Create, bind running simulation event to and add the "Run simulation" button
+        # Create, configure, set and add left buttons panel to overall cycles + left buttons panel
+        self.left_buttons_panel = wx.Panel(self.cycles_and_left_buttons_panel_bottom_padding)
+        left_buttons_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
+        self.left_buttons_panel.SetSizer(left_buttons_panel_hbox)
+        cycles_and_left_buttons_panel_bottom_padding_vbox.Add(self.left_buttons_panel, 1, flag=wx.BOTTOM)
+
+        # Create, bind running simulation event to and add the "RUN" button to the RUN button panel in left buttons panel
+        self.run_button_panel = wx.Panel(self.left_buttons_panel)
+        run_buttons_panel_vbox = wx.BoxSizer(wx.VERTICAL)
+        self.run_button_panel.SetSizer(run_buttons_panel_vbox)
+        left_buttons_panel_hbox.Add(self.run_button_panel)
+
         self.run_button = wxbuttons.GenButton(
-            self.left_buttons_panel, wx.ID_ANY, "RUN", name="run button")
+            self.run_button_panel, wx.ID_ANY, "RUN", name="run button")
         self.Bind(wx.EVT_BUTTON, self.on_run_button, self.run_button)
         self.run_button.SetFont(wx.Font(
             20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
@@ -172,12 +203,67 @@ class RunSimulationPanel(wx.Panel):
         self.run_button.SetBackgroundColour(wx.Colour(4, 84, 14))
         self.run_button.SetForegroundColour(wx.WHITE)
         self.run_button.SetToolTip("Begin running the simulation")
+        run_buttons_panel_vbox.Add(
+            self.run_button, 1, flag=wx.BOTTOM, border=0)
+        
+        # Create, bind clearing signal traces event to and add the "CLEAR" button
+        self.clear_button = wxbuttons.GenButton(
+            self.left_buttons_panel, wx.ID_ANY, "CLEAR", name="clear button")
+        self.Bind(wx.EVT_BUTTON, self.on_clear_button, self.clear_button)
+        self.clear_button.SetFont(wx.Font(
+            20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
+        self.clear_button.SetBezelWidth(5)
+        self.clear_button.SetMinSize(wx.DefaultSize)
+        self.clear_button.SetBackgroundColour(wx.Colour(0, 0, 205))
+        self.clear_button.SetForegroundColour(wx.WHITE)
+        self.clear_button.SetToolTip("Clear all signal traces")
         left_buttons_panel_hbox.Add(
-            self.run_button, 1, flag=wx.ALIGN_LEFT, border=5)
+            self.clear_button, 1, flag=wx.BOTTOM, border=0)
+        
+        # Create, bind resetting signal traces event to and add the "RESET" button
+        self.reset_button = wxbuttons.GenButton(
+            self.left_buttons_panel, wx.ID_ANY, "RESET", name="reset button")
+        self.Bind(wx.EVT_BUTTON, self.on_reset_button, self.reset_button)
+        self.reset_button.SetFont(wx.Font(
+            20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
+        self.reset_button.SetBezelWidth(5)
+        self.reset_button.SetMinSize(wx.DefaultSize)
+        self.reset_button.SetBackgroundColour(wx.Colour(205, 102, 29))
+        self.reset_button.SetForegroundColour(wx.WHITE)
+        self.reset_button.SetToolTip("Reset the simulation from initialisation")
+        left_buttons_panel_hbox.Add(
+            self.reset_button, 1, flag=wx.BOTTOM, border=0)
+
+        # Create and add cycles + left buttons panel to RunSimulationPanel
+        hbox.Add(self.cycles_and_left_buttons_panel, 1, flag=wx.ALIGN_LEFT)
+
+        self.centre_panel = wx.Panel(self)
+        centre_panel_vbox = wx.BoxSizer(wx.VERTICAL)
+        self.centre_panel.SetSizer(centre_panel_vbox)
+        hbox.Add(self.centre_panel, 2, flag=wx.EXPAND)
+
+        self.centre_panel_top_padding = wx.Panel(self.centre_panel)
+        centre_panel_vbox.Add(self.centre_panel_top_padding, 1, flag=wx.EXPAND)
+
+        self.centre_panel_bottom_padding = wx.Panel(self.centre_panel)
+        centre_panel_bottom_padding_hbox = wx.BoxSizer(wx.HORIZONTAL)
+        self.centre_panel_bottom_padding.SetSizer(centre_panel_bottom_padding_hbox)
+        centre_panel_vbox.Add(self.centre_panel_bottom_padding, 1, flag=wx.EXPAND)
+
+        self.centre_panel_bottom_padding_left = wx.Panel(self.centre_panel_bottom_padding)
+        centre_panel_bottom_padding_hbox.Add(self.centre_panel_bottom_padding_left, 1, flag=wx.EXPAND)
+
+        self.centre_panel_bottom_padding_centre = wx.Panel(self.centre_panel_bottom_padding)
+        centre_panel_bottom_padding_hbox.Add(self.centre_panel_bottom_padding_centre, 2, flag=wx.EXPAND)
+
+        self.centre_panel_bottom_padding_right = wx.Panel(self.centre_panel_bottom_padding)
+        centre_panel_bottom_padding_right_vbox = wx.BoxSizer(wx.VERTICAL)
+        self.centre_panel_bottom_padding_right.SetSizer(centre_panel_bottom_padding_right_vbox)
+        centre_panel_bottom_padding_hbox.Add(self.centre_panel_bottom_padding_right, 1, flag=wx.EXPAND)
 
         # Create, bind quitting event to and add the "Quit simulation" button
         self.quit_button = wxbuttons.GenButton(
-            self.left_buttons_panel, wx.ID_ANY, "QUIT", name="quit button")
+            self.centre_panel_bottom_padding_right, wx.ID_ANY, "QUIT", name="quit button")
         self.Bind(wx.EVT_BUTTON, parent.on_quit_button, self.quit_button)
         self.quit_button.SetFont(wx.Font(
             20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
@@ -186,15 +272,8 @@ class RunSimulationPanel(wx.Panel):
         self.quit_button.SetBackgroundColour(wx.Colour(139, 26, 26))
         self.quit_button.SetForegroundColour(wx.WHITE)
         self.quit_button.SetToolTip("Quit the simulation")
-        left_buttons_panel_hbox.Add(
-            self.quit_button, 1, flag=wx.ALIGN_LEFT, border=5)
-
-        # Create and add cycles + left buttons panel to RunSimulationPanel
-        hbox.Add(self.cycles_and_left_buttons_panel, 1, flag=wx.ALIGN_LEFT)
-
-        self.centre_panel = wx.Panel(self)
-        centre_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
-        hbox.Add(self.centre_panel, 2, flag=wx.EXPAND)
+        centre_panel_bottom_padding_right_vbox.Add(
+            self.quit_button, 1, flag=wx.ALIGN_RIGHT, border=5)
 
         self.upload_and_help_buttons_panel = wx.Panel(
             self, name="upload and help buttons panel")
@@ -204,8 +283,10 @@ class RunSimulationPanel(wx.Panel):
 
         self.upload_button_panel = wx.Panel(
             self.upload_and_help_buttons_panel, name="upload button panel")
+        #self.upload_and_help_buttons_panel.SetSizeHints(100, 100)
         upload_button_panel_vbox = wx.BoxSizer(wx.VERTICAL)
         self.upload_button_panel.SetSizer(upload_button_panel_vbox)
+        #self.upload_and_help_buttons_panel.SetSizerAndFit(upload_button_panel_vbox)
 
         self.upload_button = wx.Button(
             self.upload_button_panel, wx.ID_ANY, "UPLOAD")
@@ -246,6 +327,29 @@ class RunSimulationPanel(wx.Panel):
         no_of_cycles = self.cycles_spin_control.GetValue()
         self.run_network(no_of_cycles)
         self.update_canvas()
+
+    def on_clear_button(self, event):
+        self.parent.signal_traces_panel.canvas.clear_traces()
+
+
+    def on_reset_button(self, event):
+        file_path = self.parent.path
+        names = Names()
+        devices = Devices(names)
+        network = Network(names, devices)
+        monitors = Monitors(names, devices, network)
+        scanner = Scanner(file_path, names)
+        parser = Parser(names, devices, network, monitors, scanner)#
+        parser.parse_network()
+
+        new_Gui = Gui(file_path,
+                      names,
+                      devices,
+                      network,
+                      monitors,
+                      first_init=False)
+        new_Gui.Show()
+        self.parent.Close()
 
     def run_network(self, cycles):
         for _ in range(cycles):
@@ -299,12 +403,12 @@ class RunSimulationPanel(wx.Panel):
             output = captured_print.getvalue()
 
             if parsing_result:
-                new_Gui = Gui("GF2 Team 7 Logic Simulator GUI",
-                              file_path,
+                new_Gui = Gui(file_path,
                               names,
                               devices,
                               network,
-                              monitors)
+                              monitors,
+                              first_init=False)
                 new_Gui.Show()
                 self.parent.Close()
             else:
@@ -319,36 +423,19 @@ class RunSimulationPanel(wx.Panel):
         dlg.Destroy()
 
     def on_help_button(self, event):
-        help_guidelines_text = \
-            """
-Welcome to our Logic Simulator!
+        self.open_help_dialog()
 
-To get started you need a valid Logic Description File. This is one which follows our defined language syntax.
-
-Click on the “UPLOAD” button in the bottom right corner of the simulator tab and follow the command prompt to select your logic description file.
-Upon clicking this, if you have uploaded a valid Logic Description File, you should see the y-axis of each monitor you have specified, along with all of the valid switches you have added in your logic circuit.
-
-You can update the number of monitors using the “Add new monitor” and “Zap a monitor” drop down boxes, which provides names of device output ports which you could monitor. Once you have specified the monitor that you want to add or zap, you must press the corresponding “+” (for adding a monitor) or “-” (for zapping a monitor) buttons on the right of these dropdown boxes.
-Upon doing so, you should see the monitors update.
-
-You can also change the initial state of the switches in your circuit by using the toggle buttons. Blue indicates the switch state is ON and grey indicates the switch state is OFF.
-
-Now specify the number of cycles you wish to run by using the spin button in the bottom left corner of the simulator.
-
-Now you can press the large green “RUN” button in the bottom left hand corner.
-
-If successful, you should see the signal traces update for each monitored device.
-
-Note that upon clicking “RUN” this button will change to an orange “CONTINUE” button. Click this if you want to add further simulations. You can always change the number of cycles specified or the switch states or monitors in between each simulation.
-"""
-        dlg = wx.MessageDialog(self, help_guidelines_text,
+    def open_help_dialog(self):
+        help_dialog_file_path = Path(__file__).with_name("help_dialog.txt")
+        with open(help_dialog_file_path, "r", encoding="utf8") as help_dialog_file:
+            help_dialog_text = "".join(help_dialog_file.readlines())
+        dlg = wx.MessageDialog(self, help_dialog_text,
                                "Tutorial on GF2 Team 7 Logic Simulator",
                                wx.OK | wx.ICON_INFORMATION
                                # wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL | wx.ICON_INFORMATION
                                )
         dlg.ShowModal()
         dlg.Destroy()
-
 
 class SignalTrace(wx.ScrolledWindow):
     def __init__(self, parent, names, devices, network, monitors, id=wx.ID_ANY, size=wx.DefaultSize):
@@ -372,7 +459,7 @@ class SignalTrace(wx.ScrolledWindow):
 class SignalTracesPanel(wx.Panel):
     def __init__(self, parent, names, devices, network, monitors):
         super(SignalTracesPanel, self).__init__(
-            parent, size=wx.DefaultSize, style=wx.SUNKEN_BORDER)
+            parent, size=wx.DefaultSize, style=wx.BORDER_SUNKEN)
 
         self.names = names
         self.devices = devices
@@ -387,19 +474,27 @@ class SignalTracesPanel(wx.Panel):
         signal_traces_panel_vbox = wx.BoxSizer(wx.VERTICAL)
         self.signal_traces_panel.SetSizer(signal_traces_panel_vbox)
 
-        self.add_new_monitor_panel = wx.Panel(
-            self, name="add new monitor panel")
-        add_new_monitor_panel_fgs = wx.FlexGridSizer(
+        self.add_new_monitor_panel = wx.Panel(self, name="add new monitor panel")
+        add_new_monitor_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
+        self.add_new_monitor_panel.SetSizer(add_new_monitor_panel_hbox)
+
+        self.add_new_monitor_panel_left = wx.Panel(self.add_new_monitor_panel, name="add new monitor panel left")
+        add_new_monitor_panel_hbox.Add(self.add_new_monitor_panel_left, 1, flag=wx.EXPAND)
+
+        self.add_new_monitor_panel_centre = wx.Panel(
+            self.add_new_monitor_panel, name="add new monitor panel centre")
+        add_new_monitor_panel_centre_fgs = wx.FlexGridSizer(
             cols=3, rows=3, vgap=4, hgap=50)
-        self.add_new_monitor_panel.SetSizer(add_new_monitor_panel_fgs)
+        self.add_new_monitor_panel_centre.SetSizer(add_new_monitor_panel_centre_fgs)
+        add_new_monitor_panel_hbox.Add(self.add_new_monitor_panel_centre, 5, flag=wx.EXPAND)
 
         # Create and add "Add new monitor" text to add new monitor panel
         str = "Add new monitor"
-        text = wx.StaticText(self.add_new_monitor_panel, wx.ID_ANY, str)
+        text = wx.StaticText(self.add_new_monitor_panel_centre, wx.ID_ANY, str)
         font = wx.Font(15, wx.FONTFAMILY_SWISS,
-                       wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+                       wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, faceName="Arial")
         text.SetFont(font)
-        add_new_monitor_panel_fgs.Add(text, 0, flag=wx.ALIGN_CENTER)
+        add_new_monitor_panel_centre_fgs.Add(text, 0, flag=wx.ALIGN_CENTER)
 
         # Get the ids and user-defined names of all monitored and (as-of-yet) unmonitored devices
         self.monitored_devices_names = self.monitors.get_signal_names()[0]
@@ -412,7 +507,7 @@ class SignalTracesPanel(wx.Panel):
         # Create and add the dropdown menu for the as-of-yet unmonitored devices, ready to be monitored
         self.selected_signal_to_monitor = None
         self.monitor_output_list = self.unmonitored_devices_names
-        self.select_monitor_combo_box = wx.ComboBox(self.add_new_monitor_panel, wx.ID_ANY, "Select output", (90, 50),
+        self.select_monitor_combo_box = wx.ComboBox(self.add_new_monitor_panel_centre, wx.ID_ANY, "Select output", (90, 50),
                                                     (160, -1), self.monitor_output_list,
                                                     wx.CB_DROPDOWN
                                                     # | wx.TE_PROCESS_ENTER
@@ -420,30 +515,30 @@ class SignalTracesPanel(wx.Panel):
                                                     )
         self.Bind(wx.EVT_COMBOBOX, self.on_select_new_monitor,
                   self.select_monitor_combo_box)
-        add_new_monitor_panel_fgs.Add(
+        add_new_monitor_panel_centre_fgs.Add(
             self.select_monitor_combo_box, 0, flag=wx.ALIGN_CENTER | wx.LEFT, border=30)
 
         # Create and add the "Add a new monitor" button to show the newly monitored device's signal trace on SignalTraces panel
         self.add_new_monitor_button = wx.Button(
-            self.add_new_monitor_panel, wx.ID_ANY, label="+")
+            self.add_new_monitor_panel_centre, wx.ID_ANY, label="+")
         self.Bind(wx.EVT_BUTTON, self.on_add_new_monitor_button,
                   self.add_new_monitor_button)
-        self.add_new_monitor_button.SetToolTip("Add a new monitor")
-        add_new_monitor_panel_fgs.Add(
+        self.add_new_monitor_button.SetToolTip("Add monitor")
+        add_new_monitor_panel_centre_fgs.Add(
             self.add_new_monitor_button, 1, flag=wx.CENTER | wx.EXPAND)
 
         # Create and add "Zap a monitor" text to add new monitor panel
-        str = "Zap a monitor"
-        text = wx.StaticText(self.add_new_monitor_panel, wx.ID_ANY, str)
+        str = "Delete monitor"
+        text = wx.StaticText(self.add_new_monitor_panel_centre, wx.ID_ANY, str)
         font = wx.Font(15, wx.FONTFAMILY_SWISS,
                        wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         text.SetFont(font)
-        add_new_monitor_panel_fgs.Add(text, 0, flag=wx.ALIGN_CENTER)
+        add_new_monitor_panel_centre_fgs.Add(text, 0, flag=wx.ALIGN_LEFT)
 
         # Create and add the dropdown menu for the currently monitored devices, ready to be zapped
         self.selected_signal_to_zap = None
         self.monitor_output_list = self.monitored_devices_names
-        self.zap_monitor_combo_box = wx.ComboBox(self.add_new_monitor_panel, wx.ID_ANY, "Select output", (90, 50),
+        self.zap_monitor_combo_box = wx.ComboBox(self.add_new_monitor_panel_centre, wx.ID_ANY, "Select output", (90, 50),
                                                  (160, -1), self.monitor_output_list,
                                                  wx.CB_DROPDOWN
                                                  # | wx.TE_PROCESS_ENTER
@@ -451,17 +546,20 @@ class SignalTracesPanel(wx.Panel):
                                                  )
         self.Bind(wx.EVT_COMBOBOX, self.on_select_zap_monitor,
                   self.zap_monitor_combo_box)
-        add_new_monitor_panel_fgs.Add(
+        add_new_monitor_panel_centre_fgs.Add(
             self.zap_monitor_combo_box, 0, flag=wx.ALIGN_CENTER | wx.LEFT, border=30)
 
         # Create and add the "Zap an existing monitor" button to remove a currently monitored device's signal trace on SignalTraces panel
         self.zap_existing_monitor_button = wx.Button(
-            self.add_new_monitor_panel, wx.ID_ANY, label="-")
+            self.add_new_monitor_panel_centre, wx.ID_ANY, label="-")
         self.Bind(wx.EVT_BUTTON, self.on_zap_existing_monitor,
                   self.zap_existing_monitor_button)
         self.zap_existing_monitor_button.SetToolTip("Zap an existing monitor")
-        add_new_monitor_panel_fgs.Add(
+        add_new_monitor_panel_centre_fgs.Add(
             self.zap_existing_monitor_button, 1, flag=wx.CENTER | wx.EXPAND)
+        
+        self.add_new_monitor_panel_right = wx.Panel(self.add_new_monitor_panel, name="add new monitor panel right")
+        add_new_monitor_panel_hbox.Add(self.add_new_monitor_panel_right, 1, flag=wx.EXPAND)
 
         # Canvas for drawing signals
         self.canvas = MyGLCanvas(self.signal_traces_panel, devices, monitors)
@@ -584,20 +682,59 @@ class SwitchesPanel(wx.Panel):
         # Configure sizer of ScrolledPanel
         self.num_of_switches = len(switch_names)
         self.fgs = wx.FlexGridSizer(
-            cols=1, rows=self.num_of_switches, vgap=4, hgap=4)
+            cols=3, rows=self.num_of_switches, vgap=4, hgap=4)
 
-        for switch in switch_names:
-            switch_id = self.names.query(switch)
+        self.switch_dict = defaultdict(list)
+        for switch_name in switch_names:
+            switch_id = self.names.query(switch_name)
             initial_switch_state = devices.get_device(switch_id).switch_state
-            # create switch toggle button object with appropriate label
-            switch_toggle_button = wx.ToggleButton(
-                parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"{switch}")
-            switch_toggle_button.SetValue(bool(initial_switch_state))
-            # bind switch toggle button to its event
-            self.Bind(wx.EVT_TOGGLEBUTTON,
-                      self.on_switch_toggle_button, switch_toggle_button)
+            
+            switch_name_text = wx.StaticText(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, label=f"{switch_name}", style=wx.ALIGN_LEFT)
+            font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False)
+            switch_name_text.SetFont(font)
+
+            switch_slider_panel = wx.Panel(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, style=wx.BORDER_SUNKEN, size=(90, 30))
+            switch_slider_panel_sizer = wx.BoxSizer(wx.VERTICAL)
+            switch_slider_panel.SetSizer(switch_slider_panel_sizer)
+
+            switch_slider_button = wxbuttons.GenButton(parent=switch_slider_panel, id=wx.ID_ANY, label="", name="switch slider")
+            switch_slider_id = switch_slider_panel.GetId()
+        
+            self.Bind(wx.EVT_BUTTON, self.on_switch_slider_button, switch_slider_button)
+            switch_slider_button.SetBezelWidth(5)
+            switch_slider_button.SetMinSize((45, 30))
+            switch_slider_button.SetBackgroundColour(wx.Colour(112, 112, 112))
+        
+            if initial_switch_state == 1:
+                switch_slider_panel_sizer.Add(switch_slider_button, 0, flag=wx.ALIGN_RIGHT, border=5)
+            elif initial_switch_state == 0:
+                switch_slider_panel_sizer.Add(switch_slider_button, 0, flag=wx.ALIGN_LEFT, border=5)
+
+            switch_state_indicator_panel = wx.Panel(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, style=wx.BORDER_RAISED, size=(50, 30))
+            switch_state_indicator_panel_sizer = wx.BoxSizer(wx.VERTICAL)
+            switch_state_indicator_panel.SetSizer(switch_state_indicator_panel_sizer)
+
+            if initial_switch_state == 1:
+                switch_state_indicator_panel.SetBackgroundColour(wx.Colour(4, 84, 14))
+                text = wx.StaticText(switch_state_indicator_panel, wx.ID_ANY, "ON", style=wx.ALIGN_LEFT)
+                font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False)
+                text.SetFont(font)
+                text.SetForegroundColour(wx.WHITE)
+                switch_state_indicator_panel_sizer.Add(text, 0, flag=wx.CENTER)
+            elif initial_switch_state == 0:
+                switch_state_indicator_panel.SetBackgroundColour(wx.Colour(139, 26, 26))
+                text = wx.StaticText(switch_state_indicator_panel, wx.ID_ANY, "OFF", style=wx.ALIGN_LEFT)
+                font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False)
+                text.SetFont(font)
+                text.SetForegroundColour(wx.WHITE)
+                switch_state_indicator_panel_sizer.Add(text, 0, flag=wx.CENTER)
+
+            self.switch_dict[switch_slider_id].extend([switch_id, switch_name, initial_switch_state, switch_slider_panel, switch_slider_panel_sizer, switch_state_indicator_panel, switch_state_indicator_panel_sizer])
+
             # add switch toggle buttons to ScrolledPanel
-            self.fgs.Add(switch_toggle_button, 1, flag=wx.ALL, border=10)
+            self.fgs.Add(switch_name_text, 0, flag=wx.ALL, border=12)
+            self.fgs.Add(switch_slider_panel, 2, flag=wx.ALL, border=10)
+            self.fgs.Add(switch_state_indicator_panel, 1, flag=wx.ALL, border=10)
 
         # Set sizer of ScrolledPanel
         self.switch_buttons_scrolled_panel.SetSizer(self.fgs)
@@ -607,20 +744,15 @@ class SwitchesPanel(wx.Panel):
 
         # Create and add left panel in switches panel layout
         self.left_panel = wx.Panel(self.switches_panel)
-        # self.test_button = wx.Button(self.left_panel, wx.ID_ANY, "Temp \nbutton \nlocation \nfor \nadd \nnew \ndevice", (50,50))
-        # self.Bind(wx.EVT_BUTTON, self.on_test_button, self.test_button)
         left_panel_vbox = wx.BoxSizer(wx.VERTICAL)
         self.left_panel.SetSizer(left_panel_vbox)
-        # left_panel_vbox.Add(self.test_button, 1, flag=wx.EXPAND)
-        # left_panel_vbox.Add(self.add_new_switch_button, 1, flag=wx.EXPAND)
-        hbox.Add(self.left_panel, 1, wx.EXPAND)
 
         # Add the ScrolledPanel widget to SwitchesPanel panel
-        hbox.Add(self.switch_buttons_scrolled_panel, 2, wx.EXPAND)
+        hbox.Add(self.switch_buttons_scrolled_panel, 3, wx.EXPAND)
 
         # Create and add right panel in switches panel layout
         self.right_panel = wx.Panel(self.switches_panel)
-        hbox.Add(self.right_panel, 1, wx.EXPAND)
+        #hbox.Add(self.right_panel, 1, wx.EXPAND)
 
         self.add_switch_panel = wx.Panel(self)
         add_switch_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
@@ -653,6 +785,82 @@ class SwitchesPanel(wx.Panel):
         # successfully switched the state of switch
         if self.devices.set_switch(switch_id, int(switch_state)):
             pass
+
+    def on_switch_slider_button(self, event):
+        selected_switch_panel_id = event.GetEventObject().GetParent().GetId()
+        selected_switch_id = self.switch_dict[selected_switch_panel_id][0]
+        selected_switch_name = self.switch_dict[selected_switch_panel_id][1]
+        selected_switch_state = self.switch_dict[selected_switch_panel_id][2]
+        selected_switch_panel = self.switch_dict[selected_switch_panel_id][3]
+        selected_switch_panel_sizer = self.switch_dict[selected_switch_panel_id][4]
+        selected_switch_state_indicator_panel = self.switch_dict[selected_switch_panel_id][5]
+        selected_switch_state_indicator_panel_sizer = self.switch_dict[selected_switch_panel_id][6]
+
+        print(f'original: {selected_switch_state}')
+
+        selected_switch_panel_window = selected_switch_panel_sizer.GetItem(0).GetWindow()
+        selected_switch_panel_window.Destroy()
+
+        selected_switch_state_indicator_panel_window = selected_switch_state_indicator_panel_sizer.GetItem(0).GetWindow()
+        selected_switch_state_indicator_panel_window.Destroy()
+
+        if selected_switch_state == 0: # switch is currently OFF
+            selected_switch_state = 1 # switch is now ON
+            self.devices.set_switch(selected_switch_id, selected_switch_state)
+            self.switch_dict[selected_switch_panel_id][2] = selected_switch_state
+
+            switch_slider_button = wxbuttons.GenButton(parent=selected_switch_panel, id=wx.ID_ANY, label="")
+        
+            self.Bind(wx.EVT_BUTTON, self.on_switch_slider_button, switch_slider_button)
+            switch_slider_button.SetBezelWidth(5)
+            switch_slider_button.SetMinSize((45, 30))
+            switch_slider_button.SetBackgroundColour(wx.Colour(112, 112, 112))
+
+            selected_switch_panel_sizer.Add(switch_slider_button, 0, flag=wx.ALIGN_RIGHT, border=5)
+            selected_switch_panel.GetSizer().Layout()
+            selected_switch_panel.Refresh()
+            selected_switch_panel.Update()
+
+            selected_switch_state_indicator_panel.SetBackgroundColour(wx.Colour(4, 84, 14))
+            text = wx.StaticText(parent=selected_switch_state_indicator_panel, id=wx.ID_ANY, label="ON", style=wx.ALIGN_LEFT)
+            font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False)
+            text.SetFont(font)
+            text.SetForegroundColour(wx.WHITE)
+
+            selected_switch_state_indicator_panel_sizer.Add(text, 0, flag=wx.CENTER)
+            selected_switch_state_indicator_panel.GetSizer().Layout()
+            selected_switch_state_indicator_panel.Refresh()
+            selected_switch_state_indicator_panel.Update()
+
+
+        elif selected_switch_state == 1: # switch is currently ON
+            selected_switch_state = 0 # switch is now OFF
+            self.devices.set_switch(selected_switch_id, selected_switch_state)
+            self.switch_dict[selected_switch_panel_id][2] = selected_switch_state
+
+            switch_slider_button = wxbuttons.GenButton(parent=selected_switch_panel, id=wx.ID_ANY, label="")
+        
+            self.Bind(wx.EVT_BUTTON, self.on_switch_slider_button, switch_slider_button)
+            switch_slider_button.SetBezelWidth(5)
+            switch_slider_button.SetMinSize((45, 30))
+            switch_slider_button.SetBackgroundColour(wx.Colour(112, 112, 112))
+
+            selected_switch_panel_sizer.Add(switch_slider_button, 0, flag=wx.ALIGN_LEFT, border=5)
+            selected_switch_panel.GetSizer().Layout()
+            selected_switch_panel.Refresh()
+            selected_switch_panel.Update()
+
+            selected_switch_state_indicator_panel.SetBackgroundColour(wx.Colour(139, 26, 26))
+            text = wx.StaticText(parent=selected_switch_state_indicator_panel, id=wx.ID_ANY, label="OFF", style=wx.ALIGN_LEFT)
+            font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False)
+            text.SetFont(font)
+            text.SetForegroundColour(wx.WHITE)
+
+            selected_switch_state_indicator_panel_sizer.Add(text, 0, flag=wx.CENTER)
+            selected_switch_state_indicator_panel.GetSizer().Layout()
+            selected_switch_state_indicator_panel.Refresh()
+            selected_switch_state_indicator_panel.Update()
+
 
     def on_change_right_panel_colour(self, event):
         self.right_panel.SetBackgroundColour("GREEN")
@@ -849,7 +1057,9 @@ class AddDeviceDialog(wx.Dialog):
 
 class LogicSimApp(wx.App):
     def OnInit(self):
+      
         file_path = "logsim/logsim/example1_logic_description.txt"
+
         with open(file_path) as f:
             print('success')
         names = Names()
@@ -859,8 +1069,7 @@ class LogicSimApp(wx.App):
         scanner = Scanner(file_path, names)
         parser = Parser(names, devices, network, monitors, scanner)
         parser.parse_network()
-        self.frame = Gui("GF2 Team 7 Logic Simulator GUI",
-                         file_path,
+        self.frame = Gui(file_path,
                          names,
                          devices,
                          network,
