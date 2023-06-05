@@ -644,7 +644,7 @@ def test_parser_device_correct_parsing_of_device_list(parser_fixture, create_tes
     parser = parser_fixture(scanner)
     parser.symbol = parser.scanner.get_symbol()
 
-    assert parser.device_list() is None
+    assert parser.device_list() is False
 
 
 @pytest.mark.parametrize("example, expected", [
@@ -804,7 +804,7 @@ def test_parser_correct_parsing_of_connection_list(parser_fixture, create_testin
     parser = parser_fixture(scanner)
     parser.symbol = parser.scanner.get_symbol()
 
-    assert parser.connection_list() is None
+    assert parser.connection_list() is False
     assert parser.network.check_network() == True
 
 
@@ -875,7 +875,7 @@ def test_parser_correct_parsing_of_monitors_list(parser_fixture, create_testing_
     parser = parser_fixture(scanner)
     parser.symbol = parser.scanner.get_symbol()
 
-    assert parser.monitor_list() is None
+    assert parser.monitor_list() is False
 
 
 @pytest.mark.parametrize("example, expected", [
