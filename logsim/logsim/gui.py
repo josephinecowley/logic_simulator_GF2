@@ -52,7 +52,7 @@ class Gui(wx.Frame):
 
     def __init__(self, path, names, devices, network, monitors, first_init=True):
         """Initialise widgets and layout."""
-        super().__init__(parent=None, size=(1000, 700))
+        super().__init__(parent=None, size=(1030, 700))
 
         # Create instance variables for Gui class
         self.path = path
@@ -110,6 +110,7 @@ class Gui(wx.Frame):
 
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
+        print(self.GetSize())
         Id = event.GetId()
         if Id == wx.ID_EXIT:
             self.Close(True)
@@ -146,11 +147,24 @@ class RunSimulationPanel(wx.Panel):
         self.cycles_and_left_buttons_panel = wx.Panel(self)
         self.cycles_and_left_buttons_panel.SetSizer(vbox)
 
+        self.cycles_and_left_buttons_panel_top_padding = wx.Panel(self.cycles_and_left_buttons_panel)
+        cycles_and_left_buttons_panel_top_padding_vbox = wx.BoxSizer(wx.VERTICAL)
+        self.cycles_and_left_buttons_panel_top_padding.SetSizer(cycles_and_left_buttons_panel_top_padding_vbox)
+        vbox.Add(self.cycles_and_left_buttons_panel_top_padding, 1, flag=wx.EXPAND)
+
+        self.cycles_and_left_buttons_panel_centre_padding = wx.Panel(self.cycles_and_left_buttons_panel)
+        vbox.Add(self.cycles_and_left_buttons_panel_centre_padding, 1, flag=wx.EXPAND)
+
+        self.cycles_and_left_buttons_panel_bottom_padding = wx.Panel(self.cycles_and_left_buttons_panel)
+        cycles_and_left_buttons_panel_bottom_padding_vbox = wx.BoxSizer(wx.VERTICAL)
+        self.cycles_and_left_buttons_panel_bottom_padding.SetSizer(cycles_and_left_buttons_panel_bottom_padding_vbox)
+        vbox.Add(self.cycles_and_left_buttons_panel_bottom_padding, 2, flag=wx.EXPAND)
+
         # Create, configure, set and add cycles panel to overall cycles + left buttons panel
-        self.cycles_panel = wx.Panel(self.cycles_and_left_buttons_panel)
+        self.cycles_panel = wx.Panel(self.cycles_and_left_buttons_panel_top_padding)
         cycles_hbox = wx.BoxSizer(wx.HORIZONTAL)
         self.cycles_panel.SetSizer(cycles_hbox)
-        vbox.Add(self.cycles_panel)
+        cycles_and_left_buttons_panel_top_padding_vbox.Add(self.cycles_panel, 1, flag=wx.TOP)
 
         # Create and add number of cycles text to cycles panel
         str = "No. Cycles"
@@ -168,10 +182,10 @@ class RunSimulationPanel(wx.Panel):
         cycles_hbox.Add(self.cycles_spin_control, 0, flag=wx.LEFT, border=10)
 
         # Create, configure, set and add left buttons panel to overall cycles + left buttons panel
-        self.left_buttons_panel = wx.Panel(self.cycles_and_left_buttons_panel)
+        self.left_buttons_panel = wx.Panel(self.cycles_and_left_buttons_panel_bottom_padding)
         left_buttons_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
         self.left_buttons_panel.SetSizer(left_buttons_panel_hbox)
-        vbox.Add(self.left_buttons_panel)
+        cycles_and_left_buttons_panel_bottom_padding_vbox.Add(self.left_buttons_panel, 1, flag=wx.BOTTOM)
 
         # Create, bind running simulation event to and add the "RUN" button to the RUN button panel in left buttons panel
         self.run_button_panel = wx.Panel(self.left_buttons_panel)
@@ -190,7 +204,7 @@ class RunSimulationPanel(wx.Panel):
         self.run_button.SetForegroundColour(wx.WHITE)
         self.run_button.SetToolTip("Begin running the simulation")
         run_buttons_panel_vbox.Add(
-            self.run_button, 1, flag=wx.ALIGN_LEFT, border=5)
+            self.run_button, 1, flag=wx.BOTTOM, border=0)
         
         # Create, bind clearing signal traces event to and add the "CLEAR" button
         self.clear_button = wxbuttons.GenButton(
@@ -204,7 +218,7 @@ class RunSimulationPanel(wx.Panel):
         self.clear_button.SetForegroundColour(wx.WHITE)
         self.clear_button.SetToolTip("Clear all signal traces")
         left_buttons_panel_hbox.Add(
-            self.clear_button, 1, flag=wx.ALIGN_LEFT, border=5)
+            self.clear_button, 1, flag=wx.BOTTOM, border=0)
         
         # Create, bind resetting signal traces event to and add the "RESET" button
         self.reset_button = wxbuttons.GenButton(
@@ -218,7 +232,7 @@ class RunSimulationPanel(wx.Panel):
         self.reset_button.SetForegroundColour(wx.WHITE)
         self.reset_button.SetToolTip("Reset the simulation from initialisation")
         left_buttons_panel_hbox.Add(
-            self.reset_button, 1, flag=wx.ALIGN_LEFT, border=5)
+            self.reset_button, 1, flag=wx.BOTTOM, border=0)
 
         # Create and add cycles + left buttons panel to RunSimulationPanel
         hbox.Add(self.cycles_and_left_buttons_panel, 1, flag=wx.ALIGN_LEFT)
@@ -234,7 +248,7 @@ class RunSimulationPanel(wx.Panel):
         self.centre_panel_bottom_padding = wx.Panel(self.centre_panel)
         centre_panel_bottom_padding_hbox = wx.BoxSizer(wx.HORIZONTAL)
         self.centre_panel_bottom_padding.SetSizer(centre_panel_bottom_padding_hbox)
-        centre_panel_vbox.Add(self.centre_panel_bottom_padding, 2, flag=wx.EXPAND)
+        centre_panel_vbox.Add(self.centre_panel_bottom_padding, 1, flag=wx.EXPAND)
 
         self.centre_panel_bottom_padding_left = wx.Panel(self.centre_panel_bottom_padding)
         centre_panel_bottom_padding_hbox.Add(self.centre_panel_bottom_padding_left, 1, flag=wx.EXPAND)
@@ -460,19 +474,27 @@ class SignalTracesPanel(wx.Panel):
         signal_traces_panel_vbox = wx.BoxSizer(wx.VERTICAL)
         self.signal_traces_panel.SetSizer(signal_traces_panel_vbox)
 
-        self.add_new_monitor_panel = wx.Panel(
-            self, name="add new monitor panel")
-        add_new_monitor_panel_fgs = wx.FlexGridSizer(
+        self.add_new_monitor_panel = wx.Panel(self, name="add new monitor panel")
+        add_new_monitor_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
+        self.add_new_monitor_panel.SetSizer(add_new_monitor_panel_hbox)
+
+        self.add_new_monitor_panel_left = wx.Panel(self.add_new_monitor_panel, name="add new monitor panel left")
+        add_new_monitor_panel_hbox.Add(self.add_new_monitor_panel_left, 1, flag=wx.EXPAND)
+
+        self.add_new_monitor_panel_centre = wx.Panel(
+            self.add_new_monitor_panel, name="add new monitor panel centre")
+        add_new_monitor_panel_centre_fgs = wx.FlexGridSizer(
             cols=3, rows=3, vgap=4, hgap=50)
-        self.add_new_monitor_panel.SetSizer(add_new_monitor_panel_fgs)
+        self.add_new_monitor_panel_centre.SetSizer(add_new_monitor_panel_centre_fgs)
+        add_new_monitor_panel_hbox.Add(self.add_new_monitor_panel_centre, 5, flag=wx.EXPAND)
 
         # Create and add "Add new monitor" text to add new monitor panel
         str = "Add new monitor"
-        text = wx.StaticText(self.add_new_monitor_panel, wx.ID_ANY, str)
+        text = wx.StaticText(self.add_new_monitor_panel_centre, wx.ID_ANY, str)
         font = wx.Font(15, wx.FONTFAMILY_SWISS,
-                       wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+                       wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, faceName="Arial")
         text.SetFont(font)
-        add_new_monitor_panel_fgs.Add(text, 0, flag=wx.ALIGN_CENTER)
+        add_new_monitor_panel_centre_fgs.Add(text, 0, flag=wx.ALIGN_CENTER)
 
         # Get the ids and user-defined names of all monitored and (as-of-yet) unmonitored devices
         self.monitored_devices_names = self.monitors.get_signal_names()[0]
@@ -485,7 +507,7 @@ class SignalTracesPanel(wx.Panel):
         # Create and add the dropdown menu for the as-of-yet unmonitored devices, ready to be monitored
         self.selected_signal_to_monitor = None
         self.monitor_output_list = self.unmonitored_devices_names
-        self.select_monitor_combo_box = wx.ComboBox(self.add_new_monitor_panel, wx.ID_ANY, "Select output", (90, 50),
+        self.select_monitor_combo_box = wx.ComboBox(self.add_new_monitor_panel_centre, wx.ID_ANY, "Select output", (90, 50),
                                                     (160, -1), self.monitor_output_list,
                                                     wx.CB_DROPDOWN
                                                     # | wx.TE_PROCESS_ENTER
@@ -493,30 +515,30 @@ class SignalTracesPanel(wx.Panel):
                                                     )
         self.Bind(wx.EVT_COMBOBOX, self.on_select_new_monitor,
                   self.select_monitor_combo_box)
-        add_new_monitor_panel_fgs.Add(
+        add_new_monitor_panel_centre_fgs.Add(
             self.select_monitor_combo_box, 0, flag=wx.ALIGN_CENTER | wx.LEFT, border=30)
 
         # Create and add the "Add a new monitor" button to show the newly monitored device's signal trace on SignalTraces panel
         self.add_new_monitor_button = wx.Button(
-            self.add_new_monitor_panel, wx.ID_ANY, label="+")
+            self.add_new_monitor_panel_centre, wx.ID_ANY, label="+")
         self.Bind(wx.EVT_BUTTON, self.on_add_new_monitor_button,
                   self.add_new_monitor_button)
         self.add_new_monitor_button.SetToolTip("Add monitor")
-        add_new_monitor_panel_fgs.Add(
+        add_new_monitor_panel_centre_fgs.Add(
             self.add_new_monitor_button, 1, flag=wx.CENTER | wx.EXPAND)
 
         # Create and add "Zap a monitor" text to add new monitor panel
         str = "Delete monitor"
-        text = wx.StaticText(self.add_new_monitor_panel, wx.ID_ANY, str)
+        text = wx.StaticText(self.add_new_monitor_panel_centre, wx.ID_ANY, str)
         font = wx.Font(15, wx.FONTFAMILY_SWISS,
                        wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         text.SetFont(font)
-        add_new_monitor_panel_fgs.Add(text, 0, flag=wx.ALIGN_CENTER)
+        add_new_monitor_panel_centre_fgs.Add(text, 0, flag=wx.ALIGN_LEFT)
 
         # Create and add the dropdown menu for the currently monitored devices, ready to be zapped
         self.selected_signal_to_zap = None
         self.monitor_output_list = self.monitored_devices_names
-        self.zap_monitor_combo_box = wx.ComboBox(self.add_new_monitor_panel, wx.ID_ANY, "Select output", (90, 50),
+        self.zap_monitor_combo_box = wx.ComboBox(self.add_new_monitor_panel_centre, wx.ID_ANY, "Select output", (90, 50),
                                                  (160, -1), self.monitor_output_list,
                                                  wx.CB_DROPDOWN
                                                  # | wx.TE_PROCESS_ENTER
@@ -524,17 +546,20 @@ class SignalTracesPanel(wx.Panel):
                                                  )
         self.Bind(wx.EVT_COMBOBOX, self.on_select_zap_monitor,
                   self.zap_monitor_combo_box)
-        add_new_monitor_panel_fgs.Add(
+        add_new_monitor_panel_centre_fgs.Add(
             self.zap_monitor_combo_box, 0, flag=wx.ALIGN_CENTER | wx.LEFT, border=30)
 
         # Create and add the "Zap an existing monitor" button to remove a currently monitored device's signal trace on SignalTraces panel
         self.zap_existing_monitor_button = wx.Button(
-            self.add_new_monitor_panel, wx.ID_ANY, label="-")
+            self.add_new_monitor_panel_centre, wx.ID_ANY, label="-")
         self.Bind(wx.EVT_BUTTON, self.on_zap_existing_monitor,
                   self.zap_existing_monitor_button)
         self.zap_existing_monitor_button.SetToolTip("Zap an existing monitor")
-        add_new_monitor_panel_fgs.Add(
+        add_new_monitor_panel_centre_fgs.Add(
             self.zap_existing_monitor_button, 1, flag=wx.CENTER | wx.EXPAND)
+        
+        self.add_new_monitor_panel_right = wx.Panel(self.add_new_monitor_panel, name="add new monitor panel right")
+        add_new_monitor_panel_hbox.Add(self.add_new_monitor_panel_right, 1, flag=wx.EXPAND)
 
         # Canvas for drawing signals
         self.canvas = MyGLCanvas(self.signal_traces_panel, devices, monitors)
