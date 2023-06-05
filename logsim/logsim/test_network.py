@@ -55,7 +55,7 @@ def test_get_connected_output(network_with_devices):
 
 
 def test_get_input_signal(network_with_devices):
-    """Test if the signal at a given input port is correct"""
+    """Test if the signal at a given input port is correct."""
     network = network_with_devices
     devices = network.devices
     names = devices.names
@@ -269,7 +269,8 @@ def test_execute_non_gates(new_network):
     HIGH = devices.HIGH
 
     # Make different devices
-    [SW1_ID, CL_ID, D_ID, SIG_ID, RC_ID] = names.lookup(["Sw1", "Clock1", "D1", "Sig1", "RC1"])
+    [SW1_ID, CL_ID, D_ID, SIG_ID, RC_ID] = names.lookup(
+        ["Sw1", "Clock1", "D1", "Sig1", "RC1"])
     devices.make_device(SW1_ID, devices.SWITCH, 0)
     devices.make_device(CL_ID, devices.CLOCK, 1)
     devices.make_device(D_ID, devices.D_TYPE)
@@ -290,7 +291,6 @@ def test_execute_non_gates(new_network):
     rc_output = "network.get_output_signal(RC_ID, None)"
     dtype_Q = "network.get_output_signal(D_ID, devices.Q_ID)"
     dtype_QBAR = "network.get_output_signal(D_ID, devices.QBAR_ID)"
-
 
     # Execute devices until the clock is LOW at the start of its
     # period
@@ -320,6 +320,7 @@ def test_execute_non_gates(new_network):
     assert [eval(sw1_output), eval(rc_output),
             eval(clock_output), eval(dtype_Q), eval(dtype_QBAR)] == [
                 HIGH, HIGH, HIGH, LOW, HIGH]
+
 
 def test_oscillating_network(new_network):
     """Test if the execute_network returns False for oscillating networks."""
