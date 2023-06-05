@@ -103,7 +103,7 @@ class Gui(wx.Frame):
         # Instantiate SignalTracesPanel widget and add to Frame
         self.signal_traces_panel = SignalTracesPanel(
             data_panel, names, devices, network, monitors)
-        hbox.Add(self.signal_traces_panel, 3, wx.EXPAND, 0)
+        hbox.Add(self.signal_traces_panel, 2, wx.EXPAND, 0)
 
         # Instantiate RunSimulationPanel widget and add to Frame
         self.simulation_panel = RunSimulationPanel(
@@ -115,7 +115,7 @@ class Gui(wx.Frame):
             data_panel, self.simulation_panel, names, devices, network, monitors)
         hbox.Add(self.switches_panel, 1, wx.EXPAND, 0)
 
-        self.SetSizeHints(1150, 700)
+        self.SetSizeHints(1150 + self.switches_panel.text_width, 700)
         self.SetSizer(vbox)
 
         if self.first_init:
@@ -703,6 +703,16 @@ class SwitchesPanel(wx.Panel):
         self.num_of_switches = len(switch_names)
         self.fgs = wx.FlexGridSizer(
             cols=3, rows=self.num_of_switches, vgap=4, hgap=4)
+        
+        on_dc = wx.ScreenDC()
+        on_dc.SetFont(font)
+        on_text_width, on_text_height = on_dc.GetTextExtent(_("ON"))
+
+        off_dc = wx.ScreenDC()
+        off_dc.SetFont(font)
+        off_text_width, off_text_height = off_dc.GetTextExtent(_("OFF"))
+
+        self.text_width = off_text_width if off_text_width > on_text_width else on_text_width  
 
         self.switch_dict = defaultdict(list)
         for switch_name in switch_names:
@@ -728,17 +738,7 @@ class SwitchesPanel(wx.Panel):
             if initial_switch_state == 1:
                 switch_slider_panel_sizer.Add(switch_slider_button, 0, flag=wx.ALIGN_RIGHT, border=5)
             elif initial_switch_state == 0:
-                switch_slider_panel_sizer.Add(switch_slider_button, 0, flag=wx.ALIGN_LEFT, border=5)
-
-            on_dc = wx.ScreenDC()
-            on_dc.SetFont(font)
-            on_text_width, on_text_height = on_dc.GetTextExtent(_("ON"))
-
-            off_dc = wx.ScreenDC()
-            off_dc.SetFont(font)
-            off_text_width, off_text_height = off_dc.GetTextExtent(_("OFF"))
-
-            self.text_width = off_text_width if off_text_width > on_text_width else on_text_width           
+                switch_slider_panel_sizer.Add(switch_slider_button, 0, flag=wx.ALIGN_LEFT, border=5)         
 
             if initial_switch_state == 1:
                 switch_state_indicator_panel = wx.Panel(parent=self.switch_buttons_scrolled_panel, id=wx.ID_ANY, style=wx.BORDER_RAISED, size=(50, 30))
