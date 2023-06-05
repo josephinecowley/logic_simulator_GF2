@@ -754,31 +754,17 @@ class SwitchesPanel(wx.Panel):
         self.switch_buttons_scrolled_panel.SetupScrolling(
             scroll_x=True, scroll_y=True, rate_x=20, rate_y=20, scrollToTop=True, scrollIntoView=True)
 
-        # Create and add left panel in switches panel layout
-        self.left_panel = wx.Panel(self.switches_panel)
-        left_panel_vbox = wx.BoxSizer(wx.VERTICAL)
-        self.left_panel.SetSizer(left_panel_vbox)
 
         # Add the ScrolledPanel widget to SwitchesPanel panel
         hbox.Add(self.switch_buttons_scrolled_panel, 3, wx.EXPAND)
-
-        # Create and add right panel in switches panel layout
-        self.right_panel = wx.Panel(self.switches_panel)
-        #hbox.Add(self.right_panel, 1, wx.EXPAND)
 
         self.add_switch_panel = wx.Panel(self)
         add_switch_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
         self.add_switch_panel.SetSizer(add_switch_panel_hbox)
 
-        self.add_switch_panel_left = wx.Panel(self.add_switch_panel)
-        add_switch_panel_hbox.Add(self.add_switch_panel_left, 1, wx.EXPAND)
-
         self.add_switch_panel_centre = wx.Panel(self.add_switch_panel)
         add_switch_panel_centre_vbox = wx.BoxSizer(wx.VERTICAL)
         add_switch_panel_hbox.Add(self.add_switch_panel_centre, 2, wx.EXPAND)
-
-        self.add_switch_panel_right = wx.Panel(self.add_switch_panel)
-        add_switch_panel_hbox.Add(self.add_switch_panel_right, 1, wx.EXPAND)
 
         vbox.Add(self.add_switch_panel, 1, wx.EXPAND)
 
