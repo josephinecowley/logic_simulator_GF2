@@ -216,7 +216,7 @@ class RunSimulationPanel(wx.Panel):
         self.run_button.SetMinSize(wx.DefaultSize)
         self.run_button.SetBackgroundColour(wx.Colour(4, 84, 14))
         self.run_button.SetForegroundColour(wx.WHITE)
-        self.run_button.SetToolTip("Begin running the simulation")
+        self.run_button.SetToolTip(_("Begin running the simulation"))
         run_buttons_panel_vbox.Add(
             self.run_button, 1, flag=wx.ALIGN_BOTTOM, border=0)
         
@@ -230,7 +230,7 @@ class RunSimulationPanel(wx.Panel):
         self.clear_button.SetMinSize(wx.DefaultSize)
         self.clear_button.SetBackgroundColour(wx.Colour(0, 0, 205))
         self.clear_button.SetForegroundColour(wx.WHITE)
-        self.clear_button.SetToolTip("Clear all signal traces")
+        self.clear_button.SetToolTip(_("Clear all signal traces"))
         left_buttons_panel_hbox.Add(
             self.clear_button, 1, flag=wx.ALIGN_BOTTOM, border=0)
         
@@ -244,7 +244,7 @@ class RunSimulationPanel(wx.Panel):
         self.reset_button.SetMinSize(wx.DefaultSize)
         self.reset_button.SetBackgroundColour(wx.Colour(205, 102, 29))
         self.reset_button.SetForegroundColour(wx.WHITE)
-        self.reset_button.SetToolTip("Reset the simulation from initialisation")
+        self.reset_button.SetToolTip(_("Reset the simulation from initialisation"))
         left_buttons_panel_hbox.Add(
             self.reset_button, 1, flag=wx.ALIGN_BOTTOM, border=0)
 
@@ -285,7 +285,7 @@ class RunSimulationPanel(wx.Panel):
         self.quit_button.SetMinSize(wx.DefaultSize)
         self.quit_button.SetBackgroundColour(wx.Colour(139, 26, 26))
         self.quit_button.SetForegroundColour(wx.WHITE)
-        self.quit_button.SetToolTip("Quit the simulation")
+        self.quit_button.SetToolTip(_("Quit the simulation"))
         centre_panel_bottom_padding_right_vbox.Add(
             self.quit_button, 1, flag=wx.ALIGN_RIGHT, border=5)
 
@@ -305,7 +305,7 @@ class RunSimulationPanel(wx.Panel):
         self.upload_button = wx.Button(
             self.upload_button_panel, wx.ID_ANY, _("UPLOAD"))
         self.Bind(wx.EVT_BUTTON, self.on_upload_button, self.upload_button)
-        self.upload_button.SetToolTip("Upload logic description file")
+        self.upload_button.SetToolTip(_("Upload logic description file"))
         upload_button_panel_vbox.Add(
             self.upload_button, 1, flag=wx.ALIGN_CENTER)
 
@@ -316,7 +316,7 @@ class RunSimulationPanel(wx.Panel):
 
         self.help_button = wx.Button(self.help_button_panel, wx.ID_ANY, _("HELP"))
         self.Bind(wx.EVT_BUTTON, self.on_help_button, self.help_button)
-        self.help_button.SetToolTip("Help on running logic simulation")
+        self.help_button.SetToolTip(_("Help on running logic simulation"))
         help_button_panel_vbox.Add(self.help_button, 1, flag=wx.ALIGN_CENTER)
 
         upload_and_help_buttons_panel_hbox.Add(
@@ -331,11 +331,11 @@ class RunSimulationPanel(wx.Panel):
 
     def on_run_button(self, event):
         """Handle the event when the user clicks the run button."""
+        _ = wx.GetTranslation
         run_button_pressed = event.GetEventObject()
-        text = f"{run_button_pressed.GetLabel()} simulation button pressed."
-        run_button_pressed.SetLabel("CONTINUE")
+        run_button_pressed.SetLabel(_("CONTINUE"))
         run_button_pressed.SetBackgroundColour(wx.Colour(181, 150, 27))
-        run_button_pressed.SetToolTip("Continue running the simulation")
+        run_button_pressed.SetToolTip(_("Continue running the simulation"))
         self.GetSizer().Layout()
 
         no_of_cycles = self.cycles_spin_control.GetValue()
@@ -366,11 +366,12 @@ class RunSimulationPanel(wx.Panel):
         self.parent.Close()
 
     def run_network(self, cycles):
+        _ = wx.GetTranslation
         for _ in range(cycles):
             if self.network.execute_network():
                 self.monitors.record_signals()
             else:
-                print("Error! Network oscillating.")
+                print(_("Error! Network oscillating."))
                 return False
         self.monitors.display_signals()
         return True
@@ -384,6 +385,7 @@ class RunSimulationPanel(wx.Panel):
 
     def on_upload_button(self, event):
         """Handle the event when the user clicks the upload button."""
+        _ = wx.GetTranslation
         dlg = wx.FileDialog(
             self, message="Choose a file",
             defaultDir=os.getcwd(),
@@ -427,7 +429,7 @@ class RunSimulationPanel(wx.Panel):
                 self.parent.Close()
             else:
                 dlg = wx.MessageDialog(self, output,
-                                       "An error occurred.",
+                                       _("An error occurred."),
                                        wx.OK | wx.ICON_INFORMATION
                                        # wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL | wx.ICON_INFORMATION
                                        )
@@ -540,7 +542,7 @@ class SignalTracesPanel(wx.Panel):
             self.add_new_monitor_panel_centre, wx.ID_ANY, label="+")
         self.Bind(wx.EVT_BUTTON, self.on_add_new_monitor_button,
                   self.add_new_monitor_button)
-        self.add_new_monitor_button.SetToolTip("Add monitor")
+        self.add_new_monitor_button.SetToolTip(_("Add monitor"))
         add_new_monitor_panel_centre_fgs.Add(
             self.add_new_monitor_button, 1, flag=wx.CENTER | wx.EXPAND)
 
@@ -571,7 +573,7 @@ class SignalTracesPanel(wx.Panel):
             self.add_new_monitor_panel_centre, wx.ID_ANY, label="-")
         self.Bind(wx.EVT_BUTTON, self.on_zap_existing_monitor,
                   self.zap_existing_monitor_button)
-        self.zap_existing_monitor_button.SetToolTip("Zap an existing monitor")
+        self.zap_existing_monitor_button.SetToolTip(_("Zap an existing monitor"))
         add_new_monitor_panel_centre_fgs.Add(
             self.zap_existing_monitor_button, 1, flag=wx.CENTER | wx.EXPAND)
         

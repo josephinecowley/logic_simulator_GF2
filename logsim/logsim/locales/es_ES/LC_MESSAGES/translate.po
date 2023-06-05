@@ -37,21 +37,41 @@ msgstr "NO. CICLOS"
 msgid "RUN"
 msgstr "CORRA"
 
+#: gui.py:219
+msgid "Begin running the simulation"
+msgstr "Comenzar a ejecutar la simulación"
+
 #: gui.py:222
 msgid "CLEAR"
 msgstr "ACLARE"
+
+#: gui.py:233
+msgid "Clear all signal traces"
+msgstr "Borrar todos los rastros de señal"
 
 #: gui.py:236
 msgid "RESET"
 msgstr "REINICIE"
 
+#: gui.py:247
+msgid "Reset the simulation from initialisation"
+msgstr "Restablecer la simulación desde la inicialización"
+
 #: gui.py:277
 msgid "QUIT"
 msgstr "SALGA"
 
+#: gui.py:288
+msgid "Quit the simulation"
+msgstr "Salir de la simulación"
+
 #: gui.py:303
 msgid "UPLOAD"
 msgstr "SUBE"
+
+#: gui.py:308
+msgid "Upload logic description file"
+msgstr "Subir archivo de descripción lógica"
 
 #: gui.py:314
 msgid "HELP"
