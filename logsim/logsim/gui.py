@@ -64,6 +64,18 @@ class Gui(wx.Frame):
 
         ldf_title = self.extract_ldf_title()
 
+        locale = wx.Locale(wx.LANGUAGE_DEFAULT)
+
+        system_language = locale.GetSystemLanguage()
+        language_name = locale.GetLanguageName(system_language)
+
+        print("Language:", language_name)
+
+        locale.AddCatalog("english_to_spanish_translation")
+        translated_word = wx.GetTranslation("Hello")
+
+        print("Translated word:", translated_word)
+
         # Configure the title of the GUI frame window
         self.SetTitle(f"GF2 P2 Team 7 Logic Simulator GUI: {ldf_title}")
 
@@ -102,7 +114,7 @@ class Gui(wx.Frame):
             data_panel, self.simulation_panel, names, devices, network, monitors)
         hbox.Add(self.switches_panel, 1, wx.EXPAND, 0)
 
-        self.SetSizeHints(930, 500)
+        self.SetSizeHints(1150, 700)
         self.SetSizer(vbox)
 
         if self.first_init:
@@ -167,7 +179,7 @@ class RunSimulationPanel(wx.Panel):
         cycles_and_left_buttons_panel_top_padding_vbox.Add(self.cycles_panel, 1, flag=wx.TOP)
 
         # Create and add number of cycles text to cycles panel
-        str = "No. Cycles"
+        str = "NO. CYCLES"
         text = wx.StaticText(self.cycles_panel, wx.ID_ANY,
                              str, style=wx.ALIGN_LEFT)
         font = wx.Font(15, wx.FONTFAMILY_SWISS,
@@ -191,7 +203,7 @@ class RunSimulationPanel(wx.Panel):
         self.run_button_panel = wx.Panel(self.left_buttons_panel)
         run_buttons_panel_vbox = wx.BoxSizer(wx.VERTICAL)
         self.run_button_panel.SetSizer(run_buttons_panel_vbox)
-        left_buttons_panel_hbox.Add(self.run_button_panel)
+        left_buttons_panel_hbox.Add(self.run_button_panel, flag=wx.ALIGN_BOTTOM, border=0)
 
         self.run_button = wxbuttons.GenButton(
             self.run_button_panel, wx.ID_ANY, "RUN", name="run button")
@@ -204,7 +216,7 @@ class RunSimulationPanel(wx.Panel):
         self.run_button.SetForegroundColour(wx.WHITE)
         self.run_button.SetToolTip("Begin running the simulation")
         run_buttons_panel_vbox.Add(
-            self.run_button, 1, flag=wx.BOTTOM, border=0)
+            self.run_button, 1, flag=wx.ALIGN_BOTTOM, border=0)
         
         # Create, bind clearing signal traces event to and add the "CLEAR" button
         self.clear_button = wxbuttons.GenButton(
@@ -218,7 +230,7 @@ class RunSimulationPanel(wx.Panel):
         self.clear_button.SetForegroundColour(wx.WHITE)
         self.clear_button.SetToolTip("Clear all signal traces")
         left_buttons_panel_hbox.Add(
-            self.clear_button, 1, flag=wx.BOTTOM, border=0)
+            self.clear_button, 1, flag=wx.ALIGN_BOTTOM, border=0)
         
         # Create, bind resetting signal traces event to and add the "RESET" button
         self.reset_button = wxbuttons.GenButton(
@@ -232,7 +244,7 @@ class RunSimulationPanel(wx.Panel):
         self.reset_button.SetForegroundColour(wx.WHITE)
         self.reset_button.SetToolTip("Reset the simulation from initialisation")
         left_buttons_panel_hbox.Add(
-            self.reset_button, 1, flag=wx.BOTTOM, border=0)
+            self.reset_button, 1, flag=wx.ALIGN_BOTTOM, border=0)
 
         # Create and add cycles + left buttons panel to RunSimulationPanel
         hbox.Add(self.cycles_and_left_buttons_panel, 1, flag=wx.ALIGN_LEFT)
@@ -489,7 +501,7 @@ class SignalTracesPanel(wx.Panel):
         add_new_monitor_panel_hbox.Add(self.add_new_monitor_panel_centre, 5, flag=wx.EXPAND)
 
         # Create and add "Add new monitor" text to add new monitor panel
-        str = "Add new monitor"
+        str = "ADD NEW MONITOR"
         text = wx.StaticText(self.add_new_monitor_panel_centre, wx.ID_ANY, str)
         font = wx.Font(15, wx.FONTFAMILY_SWISS,
                        wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, faceName="Arial")
@@ -528,7 +540,7 @@ class SignalTracesPanel(wx.Panel):
             self.add_new_monitor_button, 1, flag=wx.CENTER | wx.EXPAND)
 
         # Create and add "Zap a monitor" text to add new monitor panel
-        str = "Delete monitor"
+        str = "DELETE MONITOR"
         text = wx.StaticText(self.add_new_monitor_panel_centre, wx.ID_ANY, str)
         font = wx.Font(15, wx.FONTFAMILY_SWISS,
                        wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
@@ -1058,7 +1070,7 @@ class AddDeviceDialog(wx.Dialog):
 class LogicSimApp(wx.App):
     def OnInit(self):
       
-        file_path = "logsim/logsim/example1_logic_description.txt"
+        file_path = "example2_logic_description.txt"
 
         with open(file_path) as f:
             print('success')
