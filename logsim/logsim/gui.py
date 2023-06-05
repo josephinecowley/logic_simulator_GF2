@@ -581,7 +581,24 @@ class SignalTracesPanel(wx.Panel):
             self.zap_existing_monitor_button, 1, flag=wx.CENTER | wx.EXPAND)
         
         self.add_new_monitor_panel_right = wx.Panel(self.add_new_monitor_panel, name="add new monitor panel right")
-        add_new_monitor_panel_hbox.Add(self.add_new_monitor_panel_right, 1, flag=wx.EXPAND)
+        add_new_monitor_panel_right_vbox = wx.BoxSizer(wx.VERTICAL)
+        self.add_new_monitor_panel_right.SetSizer(add_new_monitor_panel_right_vbox)
+        #self.add_new_monitor_panel_right.SetBackgroundColour(wx.Colour("RED"))
+
+        self.recentre_button = wxbuttons.GenButton(
+            self.add_new_monitor_panel_right, wx.ID_ANY, _("RECENTRE"), name="recentre button")
+        #self.Bind(wx.EVT_BUTTON, parent.on_recentre_button, self.quit_button)
+        self.recentre_button.SetFont(wx.Font(
+            10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
+        self.recentre_button.SetBezelWidth(5)
+        self.recentre_button.SetMinSize(wx.DefaultSize)
+        self.recentre_button.SetBackgroundColour(wx.Colour(85, 26, 139))
+        self.recentre_button.SetForegroundColour(wx.WHITE)
+        self.recentre_button.SetToolTip(_("Recentre the signal traces"))
+        add_new_monitor_panel_right_vbox.Add(
+            self.recentre_button, 1, flag=wx.EXPAND, border=5)
+
+        add_new_monitor_panel_hbox.Add(self.add_new_monitor_panel_right, 1, flag=wx.ALL|wx.EXPAND, border=10)
 
         # Canvas for drawing signals
         self.canvas = MyGLCanvas(self.signal_traces_panel, devices, monitors)
