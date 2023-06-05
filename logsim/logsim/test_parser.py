@@ -151,10 +151,9 @@ def test_parser_fixture(parser_fixture, create_testing_file_to_scan):
     parser = parser_fixture(scanner)
 
     assert isinstance(parser, Parser)
-
     assert parser.names.names_list == \
-        ['AND', 'OR', 'NAND', 'NOR', 'XOR', 'CLOCK', 'SWITCH', 'DTYPE', 'CLK', 'SET', 'CLEAR', 'DATA', 'Q', 'QBAR',
-            'DEVICES', 'CONNECTIONS', 'MONITORS', 'END', 'dtype1', 'dtype2', 'dtype3', 'dtype4', 'clock', '25', 'data', '0']
+        ['AND', 'OR', 'NAND', 'NOR', 'XOR', 'CLOCK', 'SWITCH', 'DTYPE', 'SIGGEN', 'RC', 'CLK', 'SET', 'CLEAR', 'DATA', 'Q',
+            'QBAR', 'DEVICES', 'CONNECTIONS', 'MONITORS', 'END', 'dtype1', 'dtype2', 'dtype3', 'dtype4', 'clock', '25', 'data', '0']
 
 
 @pytest.fixture
