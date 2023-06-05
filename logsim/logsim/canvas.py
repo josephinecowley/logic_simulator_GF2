@@ -273,6 +273,10 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         if event.Dragging():
             self.pan_x += event.GetX() - self.last_mouse_x
             self.pan_y -= event.GetY() - self.last_mouse_y
+
+            if self.pan_x > 0:
+                self.pan_x = 0 
+
             self.last_mouse_x = event.GetX()
             self.last_mouse_y = event.GetY()
             self.init = False
