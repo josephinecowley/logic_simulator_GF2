@@ -191,7 +191,7 @@ class RunSimulationPanel(wx.Panel):
         self.run_button_panel = wx.Panel(self.left_buttons_panel)
         run_buttons_panel_vbox = wx.BoxSizer(wx.VERTICAL)
         self.run_button_panel.SetSizer(run_buttons_panel_vbox)
-        left_buttons_panel_hbox.Add(self.run_button_panel)
+        left_buttons_panel_hbox.Add(self.run_button_panel, flag=wx.ALIGN_BOTTOM, border=0)
 
         self.run_button = wxbuttons.GenButton(
             self.run_button_panel, wx.ID_ANY, "RUN", name="run button")
@@ -204,7 +204,7 @@ class RunSimulationPanel(wx.Panel):
         self.run_button.SetForegroundColour(wx.WHITE)
         self.run_button.SetToolTip("Begin running the simulation")
         run_buttons_panel_vbox.Add(
-            self.run_button, 1, flag=wx.BOTTOM, border=0)
+            self.run_button, 1, flag=wx.ALIGN_BOTTOM, border=0)
         
         # Create, bind clearing signal traces event to and add the "CLEAR" button
         self.clear_button = wxbuttons.GenButton(
@@ -218,7 +218,7 @@ class RunSimulationPanel(wx.Panel):
         self.clear_button.SetForegroundColour(wx.WHITE)
         self.clear_button.SetToolTip("Clear all signal traces")
         left_buttons_panel_hbox.Add(
-            self.clear_button, 1, flag=wx.BOTTOM, border=0)
+            self.clear_button, 1, flag=wx.ALIGN_BOTTOM, border=0)
         
         # Create, bind resetting signal traces event to and add the "RESET" button
         self.reset_button = wxbuttons.GenButton(
@@ -232,7 +232,7 @@ class RunSimulationPanel(wx.Panel):
         self.reset_button.SetForegroundColour(wx.WHITE)
         self.reset_button.SetToolTip("Reset the simulation from initialisation")
         left_buttons_panel_hbox.Add(
-            self.reset_button, 1, flag=wx.BOTTOM, border=0)
+            self.reset_button, 1, flag=wx.ALIGN_BOTTOM, border=0)
 
         # Create and add cycles + left buttons panel to RunSimulationPanel
         hbox.Add(self.cycles_and_left_buttons_panel, 1, flag=wx.ALIGN_LEFT)
@@ -1058,7 +1058,7 @@ class AddDeviceDialog(wx.Dialog):
 class LogicSimApp(wx.App):
     def OnInit(self):
       
-        file_path = "logsim/logsim/example1_logic_description.txt"
+        file_path = "example2_logic_description.txt"
 
         with open(file_path) as f:
             print('success')
