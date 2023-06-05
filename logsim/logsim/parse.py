@@ -451,12 +451,12 @@ class Parser:
             # Check if semicolon was missing and now symbol is at the close brace '{' symbol
             if self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.symbol = self.scanner.get_symbol()
-                return
+                return False
 
             # Check if semicolon and close brace '{' was missing and now symbol is at the next keyword
             elif self.symbol.type == self.scanner.KEYWORD:
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
-                return
+                return False
 
         # Check all devices in list, which are all separated by a ';'
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
@@ -465,12 +465,12 @@ class Parser:
             # Incase a KEYWORD is entered straight after a ';', assume '}' was missed and go on to monitor list
             if (self.symbol.type == self.scanner.KEYWORD):
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
-                return
+                return False
 
             # Incase symbol type is a close brace '}', leave while loop
             if self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.symbol = self.scanner.get_symbol()
-                return
+                return False
 
             # Parse device
             self.device()
@@ -480,10 +480,10 @@ class Parser:
                 self.display_error(self.symbol, self.NO_SEMICOLON,
                                    proceed=False)
 
-                # If stopping symbol reached is a semicolon, need to pass, else if brace, need to return
+                # If stopping symbol reached is a semicolon, need to pass, else if brace, need to return False
                 if self.symbol.type == self.scanner.BRACE_CLOSE:
                     self.symbol = self.scanner.get_symbol()
-                    return
+                    return False
                 elif self.symbol.type == self.scanner.SEMICOLON:
                     pass
 
@@ -491,12 +491,12 @@ class Parser:
             elif self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.display_error(self.symbol, self.NO_SEMICOLON)
                 self.symbol = self.scanner.get_symbol()
-                return
+                return False
 
             # If semicolon missing and unknown symbol (including EOF)
             elif self.symbol.type != self.scanner.SEMICOLON:
                 self.display_error(self.symbol, self.NO_SEMICOLON)
-                return
+                return False
 
     def device(self):
         """Parse a user defined device.
@@ -852,7 +852,7 @@ class Parser:
             # If it is possible, return now as not necessary to continue
             else:
                 self.symbol = self.scanner.get_symbol()
-                return
+                return False
 
         # Parse a connection
         self.connection()
@@ -865,12 +865,12 @@ class Parser:
             # Check if semicolon was missing and now symbol is at the close brace '{' symbol
             if self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.symbol = self.scanner.get_symbol()
-                return
+                return False
 
             # Check if semicolon and close brace '{' was missing and now symbol is at the next keyword
             elif self.symbol.type == self.scanner.KEYWORD:
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
-                return
+                return False
 
         # Repeat checking connections in list until the close brace "}"
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
@@ -879,12 +879,12 @@ class Parser:
             # Incase a KEYWORD is entered straight after a ';', assume '{' was missed
             if (self.symbol.type == self.scanner.KEYWORD):
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
-                return
+                return False
 
             # Incase now a brace, leave while loop
             if self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.symbol = self.scanner.get_symbol()
-                return
+                return False
 
             # Parse a connection
             self.connection()
@@ -894,10 +894,10 @@ class Parser:
                 self.display_error(self.symbol, self.NO_SEMICOLON,
                                    proceed=False)
 
-                # If stopping symbol reached is a semicolon, need to pass, else if brace, need to return
+                # If stopping symbol reached is a semicolon, need to pass, else if brace, need to return False
                 if self.symbol.type == self.scanner.BRACE_CLOSE:
                     self.symbol = self.scanner.get_symbol()
-                    return
+                    return False
                 elif self.symbol.type == self.scanner.SEMICOLON:
                     pass
 
@@ -905,12 +905,12 @@ class Parser:
             elif self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.display_error(self.symbol, self.NO_SEMICOLON)
                 self.symbol = self.scanner.get_symbol()
-                return
+                return False
 
             # If semicolon missing and unknown symbol (including EOF)
             elif self.symbol.type != self.scanner.SEMICOLON:
                 self.display_error(self.symbol, self.NO_SEMICOLON)
-                return
+                return False
 
     def connection(self):
         """Parse a connection.
@@ -1034,7 +1034,7 @@ class Parser:
 
         # If monitors list is empty, exit early
         if self.symbol.type == self.scanner.BRACE_CLOSE:
-            return
+            return False
 
         # Parse a monitor
         [monitor_device_id, monitor_port_id] = self.output()
@@ -1050,12 +1050,12 @@ class Parser:
             # Check if semicolon was missing and now symbol is at the close brace '{' symbol
             if self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.symbol = self.scanner.get_symbol()
-                return
+                return False
 
             # Check if semicolon and close brace '{' was missing and now symbol is at the next keyword
             elif self.symbol.type == self.scanner.KEYWORD:
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
-                return
+                return False
 
         # Repeat checking monitors in list until the close brace "}"
         while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
@@ -1064,14 +1064,14 @@ class Parser:
             # Incase a KEYWORD is entered straight after a ';', assume '}' was missed and go on to END function
             if (self.symbol.type == self.scanner.KEYWORD):
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
-                return
+                return False
 
             # Incase now a brace, leave while loop
             elif self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.symbol = self.scanner.get_symbol()
-                return
+                return False
 
-            # Return ids for assigning monitor functionality
+            # Return False ids for assigning monitor functionality
             [monitor_device_id, monitor_port_id] = self.output()
 
             # Assign the monitor
@@ -1082,10 +1082,10 @@ class Parser:
                 self.display_error(self.symbol, self.NO_SEMICOLON,
                                    proceed=False)
 
-                # If stopping symbol reached is a semicolon, need to pass, else if brace, need to return
+                # If stopping symbol reached is a semicolon, need to pass, else if brace, need to return False
                 if self.symbol.type == self.scanner.BRACE_CLOSE:
                     self.symbol = self.scanner.get_symbol()
-                    return
+                    return False
                 elif self.symbol.type == self.scanner.SEMICOLON:
                     pass
 
@@ -1093,12 +1093,12 @@ class Parser:
             elif self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.display_error(self.symbol, self.NO_SEMICOLON)
                 self.symbol = self.scanner.get_symbol()
-                return
+                return False
 
             # If semicolon missing and unknown symbol (including EOF)
             elif self.symbol.type != self.scanner.SEMICOLON:
                 self.display_error(self.symbol, self.NO_SEMICOLON)
-                return
+                return False
 
     def assign_monitor(self, monitor_device_id, monitor_port_id):
         """Assign a single monitor to the given output port."""
@@ -1162,7 +1162,7 @@ class Parser:
                 self.display_error(self.symbol, self.EMPTY_FILE, display=False)
             else:
 
-                if propagated_error != True:  # JC!  Need to make all the fine cases return false such that you can change this to "if not ..."
+                if not propagated_error:
                     # Parse connection list
                     propagated_error = self.connection_list()
 
@@ -1204,7 +1204,7 @@ class Parser:
                         self.display_error(
                             self.symbol, self.EMPTY_FILE, display=False)
                     else:
-                        if propagated_error != True:
+                        if not propagated_error:
                             # Parse monitor list. If catastrophic error occurs (ie order of keywords wrong, terminate the program early)
                             propagated_error = self.monitor_list()
 
@@ -1212,7 +1212,7 @@ class Parser:
                         self.monitors.display_signals()
 
                         # Check for END keyword
-                        if propagated_error != True:
+                        if not propagated_error:
                             self.end()
 
             # Check if there are errors, and return True if error count is zero, otherwise return falsex
