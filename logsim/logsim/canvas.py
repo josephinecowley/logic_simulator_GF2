@@ -11,6 +11,7 @@ import wx
 import wx.glcanvas as wxcanvas
 from OpenGL import GL, GLUT
 
+
 class MyGLCanvas(wxcanvas.GLCanvas):
     """Handle all drawing operations.
 
@@ -107,7 +108,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         GL.glLoadIdentity()
 
         # Adjust the translation values for panning and centering
-        GL.glTranslated(self.pan_x , self.pan_y + size.height/2 - self.y_spacing * (len(self.traces) - 1) , 0.0)
+        GL.glTranslated(self.pan_x, self.pan_y + size.height /
+                        2 - self.y_spacing * (len(self.traces) - 1), 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
 
     def draw_canvas(self):
@@ -124,14 +126,14 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             (1.0, 0.0, 1.0),
             (0.0, 1.0, 1.0)]
 
-        # Iterate through each trace in self.traces and draw on canvas 
+        # Iterate through each trace in self.traces and draw on canvas
         for i, trace in enumerate(self.traces):
             signal = trace[1]
             label = trace[0]
             color = color_list[i % len(color_list)]
             self.draw_trace(signal, x_offset, y_offset, label, color)
             y_offset -= self.y_spacing
-        
+
     def draw_trace(self, signal, x_pos, y_pos, label, color=(0.0, 0.0, 1.0)):
         """Draws trace with axes and ticks"""
 
@@ -149,7 +151,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                 GL.glVertex2f(x_next, y)
                 GL.glVertex2f(x, y)
                 GL.glVertex2f(x_next, y)
-            
+
         GL.glEnd()
 
         # draw axis
@@ -172,10 +174,12 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
             # Render sizes
             if self.zoom >= 1:
-                self.render_text(str(i + self.current_time), x - 5, y_pos - 15, small=True)
+                self.render_text(str(i + self.current_time),
+                                 x - 5, y_pos - 15, small=True)
             elif ((self.zoom < 1) and (i % 5 == 0)):
-                self.render_text(str(i + self.current_time), x - 5, y_pos - 25, small=True)
-        
+                self.render_text(str(i + self.current_time),
+                                 x - 5, y_pos - 25, small=True)
+
         # Render device name labels
         x_pos -= int(40 / 3 * len(label))
         self.render_text(label, x_pos, y_pos + 18)
@@ -198,7 +202,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # and swap the back buffer to the front
         GL.glFlush()
         self.SwapBuffers()
-    
+
     def on_key_press(self, event):
         """Handles key press events"""
         keycode = event.GetKeyCode()
@@ -222,21 +226,21 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         # Adjust the translation values for panning and centering
         GL.glMatrixMode(GL.GL_MODELVIEW)
         GL.glLoadIdentity()
-        GL.glTranslated(self.pan_x , self.pan_y + size.height/2 - self.y_spacing * (len(self.traces) - 1) , 0.0)
+        GL.glTranslated(self.pan_x, self.pan_y + size.height /
+                        2 - self.y_spacing * (len(self.traces) - 1), 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
-        
+
         self.Refresh()
-    
+
     def clear_traces(self):
         """Updates current time and clears traces"""
-        # update current_time 
-        no_of_cycles = len(self.traces[0][1]) 
+        # update current_time
+        no_of_cycles = len(self.traces[0][1])
         self.current_time += no_of_cycles
 
         # clear monitor traces
         self.monitors.reset_monitors()
         self.update_arguments(self.devices, self.monitors)
-
 
     def on_paint(self, event):
         """Handle the paint event."""
