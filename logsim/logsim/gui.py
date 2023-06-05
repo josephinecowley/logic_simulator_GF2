@@ -102,7 +102,7 @@ class Gui(wx.Frame):
             data_panel, self.simulation_panel, names, devices, network, monitors)
         hbox.Add(self.switches_panel, 1, wx.EXPAND, 0)
 
-        self.SetSizeHints(930, 500)
+        self.SetSizeHints(1150, 700)
         self.SetSizer(vbox)
 
         if self.first_init:
