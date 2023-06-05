@@ -1,0 +1,94 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-06-05 15:35+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: gui.py:77
+msgid "Hello"
+msgstr ""
+
+#: gui.py:80
+msgid "GF2 P2 Team 7 Logic Simulator GUI: "
+msgstr ""
+
+#: gui.py:86
+msgid "&About"
+msgstr ""
+
+#: gui.py:87
+msgid "&Exit"
+msgstr ""
+
+#: gui.py:88
+msgid "&File"
+msgstr ""
+
+#: gui.py:184
+msgid "NO. CYCLES"
+msgstr ""
+
+#: gui.py:211
+msgid "RUN"
+msgstr ""
+
+#: gui.py:225
+msgid "CLEAR"
+msgstr ""
+
+#: gui.py:239
+msgid "RESET"
+msgstr ""
+
+#: gui.py:280
+msgid "QUIT"
+msgstr ""
+
+#: gui.py:306
+msgid "UPLOAD"
+msgstr ""
+
+#: gui.py:317
+msgid "HELP"
+msgstr ""
+
+#: gui.py:448
+msgid "Tutorial on GF2 Team 7 Logic Simulator"
+msgstr ""
+
+#: gui.py:509
+msgid "ADD NEW MONITOR"
+msgstr ""
+
+#: gui.py:527 gui.py:558
+msgid "Select output"
+msgstr ""
+
+#: gui.py:548
+msgid "DELETE MONITOR"
+msgstr ""
+
+#: gui.py:676
+msgid "INPUTS"
+msgstr ""
+
+#: gui.py:737 gui.py:830
+msgid "ON"
+msgstr ""
+
+#: gui.py:744 gui.py:859
+msgid "OFF"
+msgstr ""

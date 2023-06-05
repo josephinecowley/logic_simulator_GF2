@@ -65,8 +65,11 @@ class Gui(wx.Frame):
         ldf_title = self.extract_ldf_title()
 
         self.locale = wx.Locale(wx.LANGUAGE_DEFAULT)
-        self.locale.AddCatalogLookupPathPrefix("locale")
-        self.locale.AddCatalog("base")
+        self.locale.AddCatalogLookupPathPrefix("locales")
+        if self.locale.AddCatalog("translate"):
+            print('catalog found')
+        else:
+            print('catalog NOT found')
         _ = wx.GetTranslation
 
         print(self.locale.GetCanonicalName())
@@ -141,6 +144,7 @@ class RunSimulationPanel(wx.Panel):
     def __init__(self, parent, signal_traces_panel, names, devices, network, monitors, id=wx.ID_ANY, size=wx.DefaultSize):
         super(RunSimulationPanel, self).__init__(
             parent, id, size=size, style=wx.SIMPLE_BORDER)
+        _ = wx.GetTranslation
 
         self.parent = parent
         self.signal_traces_panel = signal_traces_panel
@@ -436,6 +440,7 @@ class RunSimulationPanel(wx.Panel):
         self.open_help_dialog()
 
     def open_help_dialog(self):
+        _ = wx.GetTranslation
         help_dialog_file_path = Path(__file__).with_name("help_dialog.txt")
         with open(help_dialog_file_path, "r", encoding="utf8") as help_dialog_file:
             help_dialog_text = "".join(help_dialog_file.readlines())
@@ -450,6 +455,7 @@ class RunSimulationPanel(wx.Panel):
 class SignalTrace(wx.ScrolledWindow):
     def __init__(self, parent, names, devices, network, monitors, id=wx.ID_ANY, size=wx.DefaultSize):
         super(SignalTrace, self).__init__(parent, id, size=size)
+        _ = wx.GetTranslation
 
         size = self.GetClientSize()
 
@@ -470,6 +476,7 @@ class SignalTracesPanel(wx.Panel):
     def __init__(self, parent, names, devices, network, monitors):
         super(SignalTracesPanel, self).__init__(
             parent, size=wx.DefaultSize, style=wx.BORDER_SUNKEN)
+        _ = wx.GetTranslation
 
         self.names = names
         self.devices = devices
@@ -517,7 +524,7 @@ class SignalTracesPanel(wx.Panel):
         # Create and add the dropdown menu for the as-of-yet unmonitored devices, ready to be monitored
         self.selected_signal_to_monitor = None
         self.monitor_output_list = self.unmonitored_devices_names
-        self.select_monitor_combo_box = wx.ComboBox(self.add_new_monitor_panel_centre, wx.ID_ANY, "Select output", (90, 50),
+        self.select_monitor_combo_box = wx.ComboBox(self.add_new_monitor_panel_centre, wx.ID_ANY, _("Select output"), (90, 50),
                                                     (160, -1), self.monitor_output_list,
                                                     wx.CB_DROPDOWN
                                                     # | wx.TE_PROCESS_ENTER
@@ -548,7 +555,7 @@ class SignalTracesPanel(wx.Panel):
         # Create and add the dropdown menu for the currently monitored devices, ready to be zapped
         self.selected_signal_to_zap = None
         self.monitor_output_list = self.monitored_devices_names
-        self.zap_monitor_combo_box = wx.ComboBox(self.add_new_monitor_panel_centre, wx.ID_ANY, "Select output", (90, 50),
+        self.zap_monitor_combo_box = wx.ComboBox(self.add_new_monitor_panel_centre, wx.ID_ANY, _("Select output"), (90, 50),
                                                  (160, -1), self.monitor_output_list,
                                                  wx.CB_DROPDOWN
                                                  # | wx.TE_PROCESS_ENTER
@@ -652,6 +659,7 @@ class SignalTracesPanel(wx.Panel):
 class SwitchesPanel(wx.Panel):
     def __init__(self, parent, simulation_panel, names, devices, network, monitors):
         super(SwitchesPanel, self).__init__(parent, size=(300, 200))
+        _ = wx.GetTranslation
 
         self.names = names
         self.devices = devices
@@ -783,6 +791,7 @@ class SwitchesPanel(wx.Panel):
             pass
 
     def on_switch_slider_button(self, event):
+        _ = wx.GetTranslation
         selected_switch_panel_id = event.GetEventObject().GetParent().GetId()
         selected_switch_id = self.switch_dict[selected_switch_panel_id][0]
         selected_switch_name = self.switch_dict[selected_switch_panel_id][1]
@@ -869,6 +878,7 @@ class AddDeviceDialog(wx.Dialog):
     def __init__(self, parent, title, switches_panel, names, devices, network, monitors):
         super(AddDeviceDialog, self).__init__(
             parent, title=title, size=(250, 150))
+        _ = wx.GetTranslation
 
         self.switches_panel = switches_panel
         self.names = names
