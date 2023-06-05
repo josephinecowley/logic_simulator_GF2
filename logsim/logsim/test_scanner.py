@@ -7,7 +7,7 @@ from names import Names
 @pytest.fixture
 def path_fixture():
     """returns the required relative path of the file to read"""
-    return "test_scanner_example1_logic_description.txt"
+    return "logsim/logsim/test_scanner_example1_logic_description.txt"
 
 
 @pytest.fixture
@@ -75,7 +75,7 @@ def test_scanner_initialisation(scanner_fixture, names_fixture):
     assert scanner.line_number == 1
     assert scanner.position == 0
     assert scanner.names is names_fixture
-    assert scanner.symbol_type_list == range(0, 12)
+    assert scanner.symbol_type_list == range(0, 13)
     assert scanner.keywords_list == [
         "DEVICES", "CONNECTIONS", "MONITORS", "END"]
     assert scanner.DEVICES_ID is not None
@@ -259,3 +259,11 @@ def test_EOF(scanner_fixture, set_scanner_location):
     symbol = scanner.get_symbol()  # call once to get END
     symbol = scanner.get_symbol()  # call again to get to EOF
     assert symbol.type == scanner.EOF
+
+def test_get_siggen_signal(scanner_fixture, set_scanner_location):
+    location = (27,1)
+    scanner = scanner_fixture
+    set_scanner_location(location)
+    signal_string = scanner.get_siggen_signal()
+
+    assert signal_string == "[1, 2, 3, 4]"
