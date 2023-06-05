@@ -64,27 +64,25 @@ class Gui(wx.Frame):
 
         ldf_title = self.extract_ldf_title()
 
-        locale = wx.Locale(wx.LANGUAGE_DEFAULT)
+        self.locale = wx.Locale(wx.LANGUAGE_DEFAULT)
+        self.locale.AddCatalogLookupPathPrefix("locale")
+        self.locale.AddCatalog("base")
+        _ = wx.GetTranslation
 
-        system_language = locale.GetSystemLanguage()
-        language_name = locale.GetLanguageName(system_language)
+        print(self.locale.GetCanonicalName())
 
-        print("Language:", language_name)
-
-        locale.AddCatalog("english_to_spanish_translation")
-        translated_word = wx.GetTranslation("Hello")
-
-        print("Translated word:", translated_word)
+        print(_("Hello"))
 
         # Configure the title of the GUI frame window
-        self.SetTitle(f"GF2 P2 Team 7 Logic Simulator GUI: {ldf_title}")
+        team_name = _("GF2 P2 Team 7 Logic Simulator GUI: ")
+        self.SetTitle(team_name + ldf_title)
 
         # Configure the file menu
         fileMenu = wx.Menu()
         menuBar = wx.MenuBar()
-        fileMenu.Append(wx.ID_ABOUT, "&About")
-        fileMenu.Append(wx.ID_EXIT, "&Exit")
-        menuBar.Append(fileMenu, "&File")
+        fileMenu.Append(wx.ID_ABOUT, _("&About"))
+        fileMenu.Append(wx.ID_EXIT, _("&Exit"))
+        menuBar.Append(fileMenu, _("&File"))
         self.SetMenuBar(menuBar)
 
         # Bind events to widgets
@@ -179,7 +177,7 @@ class RunSimulationPanel(wx.Panel):
         cycles_and_left_buttons_panel_top_padding_vbox.Add(self.cycles_panel, 1, flag=wx.TOP)
 
         # Create and add number of cycles text to cycles panel
-        str = "NO. CYCLES"
+        str = _("NO. CYCLES")
         text = wx.StaticText(self.cycles_panel, wx.ID_ANY,
                              str, style=wx.ALIGN_LEFT)
         font = wx.Font(15, wx.FONTFAMILY_SWISS,
@@ -206,7 +204,7 @@ class RunSimulationPanel(wx.Panel):
         left_buttons_panel_hbox.Add(self.run_button_panel, flag=wx.ALIGN_BOTTOM, border=0)
 
         self.run_button = wxbuttons.GenButton(
-            self.run_button_panel, wx.ID_ANY, "RUN", name="run button")
+            self.run_button_panel, wx.ID_ANY, _("RUN"), name="run button")
         self.Bind(wx.EVT_BUTTON, self.on_run_button, self.run_button)
         self.run_button.SetFont(wx.Font(
             20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
@@ -220,7 +218,7 @@ class RunSimulationPanel(wx.Panel):
         
         # Create, bind clearing signal traces event to and add the "CLEAR" button
         self.clear_button = wxbuttons.GenButton(
-            self.left_buttons_panel, wx.ID_ANY, "CLEAR", name="clear button")
+            self.left_buttons_panel, wx.ID_ANY, _("CLEAR"), name="clear button")
         self.Bind(wx.EVT_BUTTON, self.on_clear_button, self.clear_button)
         self.clear_button.SetFont(wx.Font(
             20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
@@ -234,7 +232,7 @@ class RunSimulationPanel(wx.Panel):
         
         # Create, bind resetting signal traces event to and add the "RESET" button
         self.reset_button = wxbuttons.GenButton(
-            self.left_buttons_panel, wx.ID_ANY, "RESET", name="reset button")
+            self.left_buttons_panel, wx.ID_ANY, _("RESET"), name="reset button")
         self.Bind(wx.EVT_BUTTON, self.on_reset_button, self.reset_button)
         self.reset_button.SetFont(wx.Font(
             20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
@@ -275,7 +273,7 @@ class RunSimulationPanel(wx.Panel):
 
         # Create, bind quitting event to and add the "Quit simulation" button
         self.quit_button = wxbuttons.GenButton(
-            self.centre_panel_bottom_padding_right, wx.ID_ANY, "QUIT", name="quit button")
+            self.centre_panel_bottom_padding_right, wx.ID_ANY, _("QUIT"), name="quit button")
         self.Bind(wx.EVT_BUTTON, parent.on_quit_button, self.quit_button)
         self.quit_button.SetFont(wx.Font(
             20, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
@@ -301,7 +299,7 @@ class RunSimulationPanel(wx.Panel):
         #self.upload_and_help_buttons_panel.SetSizerAndFit(upload_button_panel_vbox)
 
         self.upload_button = wx.Button(
-            self.upload_button_panel, wx.ID_ANY, "UPLOAD")
+            self.upload_button_panel, wx.ID_ANY, _("UPLOAD"))
         self.Bind(wx.EVT_BUTTON, self.on_upload_button, self.upload_button)
         self.upload_button.SetToolTip("Upload logic description file")
         upload_button_panel_vbox.Add(
@@ -312,7 +310,7 @@ class RunSimulationPanel(wx.Panel):
         help_button_panel_vbox = wx.BoxSizer(wx.VERTICAL)
         self.help_button_panel.SetSizer(help_button_panel_vbox)
 
-        self.help_button = wx.Button(self.help_button_panel, wx.ID_ANY, "HELP")
+        self.help_button = wx.Button(self.help_button_panel, wx.ID_ANY, _("HELP"))
         self.Bind(wx.EVT_BUTTON, self.on_help_button, self.help_button)
         self.help_button.SetToolTip("Help on running logic simulation")
         help_button_panel_vbox.Add(self.help_button, 1, flag=wx.ALIGN_CENTER)
@@ -442,7 +440,7 @@ class RunSimulationPanel(wx.Panel):
         with open(help_dialog_file_path, "r", encoding="utf8") as help_dialog_file:
             help_dialog_text = "".join(help_dialog_file.readlines())
         dlg = wx.MessageDialog(self, help_dialog_text,
-                               "Tutorial on GF2 Team 7 Logic Simulator",
+                               _("Tutorial on GF2 Team 7 Logic Simulator"),
                                wx.OK | wx.ICON_INFORMATION
                                # wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL | wx.ICON_INFORMATION
                                )
@@ -501,7 +499,7 @@ class SignalTracesPanel(wx.Panel):
         add_new_monitor_panel_hbox.Add(self.add_new_monitor_panel_centre, 5, flag=wx.EXPAND)
 
         # Create and add "Add new monitor" text to add new monitor panel
-        str = "ADD NEW MONITOR"
+        str = _("ADD NEW MONITOR")
         text = wx.StaticText(self.add_new_monitor_panel_centre, wx.ID_ANY, str)
         font = wx.Font(15, wx.FONTFAMILY_SWISS,
                        wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, faceName="Arial")
@@ -540,7 +538,7 @@ class SignalTracesPanel(wx.Panel):
             self.add_new_monitor_button, 1, flag=wx.CENTER | wx.EXPAND)
 
         # Create and add "Zap a monitor" text to add new monitor panel
-        str = "DELETE MONITOR"
+        str = _("DELETE MONITOR")
         text = wx.StaticText(self.add_new_monitor_panel_centre, wx.ID_ANY, str)
         font = wx.Font(15, wx.FONTFAMILY_SWISS,
                        wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
@@ -667,7 +665,7 @@ class SwitchesPanel(wx.Panel):
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
         # Create and add the title to SwitchesPanel panel
-        str = "INPUTS"
+        str = _("INPUTS")
         text = wx.StaticText(self, wx.ID_ANY, str, style=wx.ALIGN_CENTER)
         font = wx.Font(18, wx.FONTFAMILY_SWISS,
                        wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
@@ -728,14 +726,14 @@ class SwitchesPanel(wx.Panel):
 
             if initial_switch_state == 1:
                 switch_state_indicator_panel.SetBackgroundColour(wx.Colour(4, 84, 14))
-                text = wx.StaticText(switch_state_indicator_panel, wx.ID_ANY, "ON", style=wx.ALIGN_LEFT)
+                text = wx.StaticText(switch_state_indicator_panel, wx.ID_ANY, _("ON"), style=wx.ALIGN_LEFT)
                 font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False)
                 text.SetFont(font)
                 text.SetForegroundColour(wx.WHITE)
                 switch_state_indicator_panel_sizer.Add(text, 0, flag=wx.CENTER)
             elif initial_switch_state == 0:
                 switch_state_indicator_panel.SetBackgroundColour(wx.Colour(139, 26, 26))
-                text = wx.StaticText(switch_state_indicator_panel, wx.ID_ANY, "OFF", style=wx.ALIGN_LEFT)
+                text = wx.StaticText(switch_state_indicator_panel, wx.ID_ANY, _("OFF"), style=wx.ALIGN_LEFT)
                 font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False)
                 text.SetFont(font)
                 text.SetForegroundColour(wx.WHITE)
@@ -820,7 +818,7 @@ class SwitchesPanel(wx.Panel):
             selected_switch_panel.Update()
 
             selected_switch_state_indicator_panel.SetBackgroundColour(wx.Colour(4, 84, 14))
-            text = wx.StaticText(parent=selected_switch_state_indicator_panel, id=wx.ID_ANY, label="ON", style=wx.ALIGN_LEFT)
+            text = wx.StaticText(parent=selected_switch_state_indicator_panel, id=wx.ID_ANY, label=_("ON"), style=wx.ALIGN_LEFT)
             font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False)
             text.SetFont(font)
             text.SetForegroundColour(wx.WHITE)
@@ -849,7 +847,7 @@ class SwitchesPanel(wx.Panel):
             selected_switch_panel.Update()
 
             selected_switch_state_indicator_panel.SetBackgroundColour(wx.Colour(139, 26, 26))
-            text = wx.StaticText(parent=selected_switch_state_indicator_panel, id=wx.ID_ANY, label="OFF", style=wx.ALIGN_LEFT)
+            text = wx.StaticText(parent=selected_switch_state_indicator_panel, id=wx.ID_ANY, label=_("OFF"), style=wx.ALIGN_LEFT)
             font = wx.Font(15, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False)
             text.SetFont(font)
             text.SetForegroundColour(wx.WHITE)
