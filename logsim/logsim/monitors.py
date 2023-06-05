@@ -192,6 +192,6 @@ class Monitors:
             length_dif = max_signal_len - len(signal[1])
             if length_dif > 0:
                 # replace signal tuple with longer version
-                signals[i] = (signal[0], [0] * length_dif + signal[1])
+                signals[i] = (signal[0], [-1] * length_dif + signal[1])
 
         return signals
