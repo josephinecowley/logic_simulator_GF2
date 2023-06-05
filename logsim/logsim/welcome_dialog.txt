@@ -1,0 +1,3 @@
+Welcome to the GF2 P2 Team 7 Logic Simulator!
+
+Developed by Josephine Cowley (jhmdc2), Tom Hill (th621), Khalid Omar (ko366)
