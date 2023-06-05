@@ -115,8 +115,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     def draw_canvas(self):
         """Iterates through each trace and draws it on the canvas with an offset"""
-        x_offset = 100
-        y_offset = 200
+        x_offset = 150
+        y_offset = 400
         color_list = [
             (1.0, 0.0, 0.0),
             (0.0, 1.0, 0.0),
@@ -168,18 +168,17 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             GL.glColor3f(0.0, 0.0, 0.0)  # black
             GL.glBegin(GL.GL_LINES)
             GL.glVertex2f(x_pos, y_pos)
-            GL.glVertex2f(x_pos, y_pos - 4)
             GL.glEnd()
             # Render sizes
-            if self.zoom > 1:
-                self.render_text(str(i + self.current_time), x - 5, y_pos - 15)
+            if self.zoom >= 1:
+                self.render_text(str(i + self.current_time), x - 5, y_pos - 15, small=True)
             elif ((self.zoom < 1) and (i % 5 == 0)):
-                self.render_text(str(i + self.current_time), x - 5, y_pos - 25)
+                self.render_text(str(i + self.current_time), x - 5, y_pos - 25, small=True)
         
         x_pos -= int(40 / 3 * len(label))
         self.render_text(label, x_pos, y_pos + 18)
 
-    def render(self, text):
+    def render(self):
         """Handle all drawing operations."""
         self.SetCurrent(self.context)
         if not self.init:
@@ -189,9 +188,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
         # Clear everything
         GL.glClear(GL.GL_COLOR_BUFFER_BIT)
-
-        # Draw specified text at position (10, 10)
-        self.render_text(text, 10, 10)
 
         # Draw signal traces
         self.draw_canvas()
@@ -246,8 +242,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self.init = True
 
         size = self.GetClientSize()
-        text = " "
-        self.render(text)
+        self.render()
 
     def on_size(self, event):
         """Handle the canvas resize event."""
@@ -266,18 +261,12 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         if event.ButtonDown():
             self.last_mouse_x = event.GetX()
             self.last_mouse_y = event.GetY()
-            text = " "
-        if event.ButtonUp():
-            text = " "
-        if event.Leaving():
-            text = " "
         if event.Dragging():
             self.pan_x += event.GetX() - self.last_mouse_x
             self.pan_y -= event.GetY() - self.last_mouse_y
             self.last_mouse_x = event.GetX()
             self.last_mouse_y = event.GetY()
             self.init = False
-            text = " "
         if event.GetWheelRotation() < 0:
             self.zoom *= (1.0 + (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
@@ -285,7 +274,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self.pan_x -= (self.zoom - old_zoom) * ox
             self.pan_y -= (self.zoom - old_zoom) * oy
             self.init = False
-            text = " "
         if event.GetWheelRotation() > 0:
             self.zoom /= (1.0 - (
                 event.GetWheelRotation() / (20 * event.GetWheelDelta())))
@@ -293,17 +281,16 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self.pan_x -= (self.zoom - old_zoom) * ox
             self.pan_y -= (self.zoom - old_zoom) * oy
             self.init = False
-            text = " "
-        if text:
-            self.render(text)
-        else:
-            self.Refresh()  # triggers the paint event
+        self.Refresh()  # triggers the paint event
 
-    def render_text(self, text, x_pos, y_pos):
+    def render_text(self, text, x_pos, y_pos, small=False):
         """Handle text drawing operations."""
         GL.glColor3f(0.0, 0.0, 0.0)  # text is black
         GL.glRasterPos2f(x_pos, y_pos)
-        font = GLUT.GLUT_BITMAP_HELVETICA_18
+        if small:
+            font = GLUT.GLUT_BITMAP_HELVETICA_12
+        else:
+            font = GLUT.GLUT_BITMAP_HELVETICA_18
 
         for character in text:
             if character == '\n':
