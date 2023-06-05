@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-05 19:12+0100\n"
+"POT-Creation-Date: 2023-06-05 20:02+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -76,94 +76,94 @@ msgstr ""
 msgid "Reset the simulation from initialisation"
 msgstr ""
 
-#: gui.py:278
+#: gui.py:275
 msgid "QUIT"
 msgstr ""
 
-#: gui.py:286
+#: gui.py:283
 msgid "Quit the simulation"
 msgstr ""
 
-#: gui.py:302
+#: gui.py:299
 msgid "UPLOAD"
 msgstr ""
 
-#: gui.py:304
+#: gui.py:301
 msgid "Upload logic description file"
 msgstr ""
 
-#: gui.py:314
+#: gui.py:311
 msgid "SETTINGS"
 msgstr ""
 
-#: gui.py:316
+#: gui.py:313
 msgid "Change system settings"
 msgstr ""
 
-#: gui.py:325
+#: gui.py:322
 msgid "HELP"
 msgstr ""
 
-#: gui.py:327
+#: gui.py:324
 msgid "Help on running logic simulation"
 msgstr ""
 
-#: gui.py:344
+#: gui.py:341
 msgid "CONTINUE"
 msgstr ""
 
-#: gui.py:346
+#: gui.py:343
 msgid "Continue running the simulation"
 msgstr ""
 
-#: gui.py:381
+#: gui.py:378
 msgid "Error! Network oscillating."
 msgstr ""
 
-#: gui.py:438
+#: gui.py:435
 msgid "An error occurred."
 msgstr ""
 
-#: gui.py:455
+#: gui.py:453
 msgid "Tutorial on GF2 Team 7 Logic Simulator"
 msgstr ""
 
-#: gui.py:514
+#: gui.py:512
 msgid "ADD NEW MONITOR"
 msgstr ""
 
-#: gui.py:532 gui.py:563
+#: gui.py:530 gui.py:561
 msgid "Select output"
 msgstr ""
 
-#: gui.py:548
+#: gui.py:546
 msgid "Add a monitor"
 msgstr ""
 
-#: gui.py:553
+#: gui.py:551
 msgid "DELETE MONITOR"
 msgstr ""
 
-#: gui.py:579
+#: gui.py:577
 msgid "Delete an existing monitor"
 msgstr ""
 
-#: gui.py:589
+#: gui.py:587
 msgid "RECENTER"
 msgstr ""
 
-#: gui.py:597
+#: gui.py:595
 msgid "Recenter the signal traces"
 msgstr ""
 
-#: gui.py:700
+#: gui.py:698
 msgid "INPUTS"
 msgstr ""
 
-#: gui.py:731 gui.py:771 gui.py:871
+#: gui.py:729 gui.py:769 gui.py:869
 msgid "ON"
 msgstr ""
 
-#: gui.py:735 gui.py:784 gui.py:899
+#: gui.py:733 gui.py:782 gui.py:897
 msgid "OFF"
 msgstr ""

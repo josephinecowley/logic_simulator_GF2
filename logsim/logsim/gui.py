@@ -445,10 +445,7 @@ class RunSimulationPanel(wx.Panel):
         self.open_help_dialog()
 
     def open_help_dialog(self):
-        help_dialog_file_path = Path(__file__).with_name("help_dialog.txt")
-        with open(help_dialog_file_path, "r", encoding="utf8") as help_dialog_file:
-            help_dialog_text = "".join(help_dialog_file.readlines())
-        dlg = wx.MessageDialog(self, help_dialog_text,
+        dlg = wx.MessageDialog(self, self.translated_help_dialog_text,
                                _("Tutorial on GF2 Team 7 Logic Simulator"),
                                wx.OK | wx.ICON_INFORMATION
                                # wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL | wx.ICON_INFORMATION
