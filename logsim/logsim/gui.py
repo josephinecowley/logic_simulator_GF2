@@ -64,6 +64,18 @@ class Gui(wx.Frame):
 
         ldf_title = self.extract_ldf_title()
 
+        locale = wx.Locale(wx.LANGUAGE_DEFAULT)
+
+        system_language = locale.GetSystemLanguage()
+        language_name = locale.GetLanguageName(system_language)
+
+        print("Language:", language_name)
+
+        locale.AddCatalog("english_to_spanish_translation")
+        translated_word = wx.GetTranslation("Hello")
+
+        print("Translated word:", translated_word)
+
         # Configure the title of the GUI frame window
         self.SetTitle(f"GF2 P2 Team 7 Logic Simulator GUI: {ldf_title}")
 
