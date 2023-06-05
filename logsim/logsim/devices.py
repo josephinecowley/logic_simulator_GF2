@@ -12,7 +12,6 @@ import random
 
 
 class Device:
-
     """Store device properties.
 
     Parameters
@@ -50,7 +49,6 @@ class Device:
 
 
 class Devices:
-
     """Make and store devices.
 
     This class contains many functions for making devices and ports.
@@ -92,6 +90,11 @@ class Devices:
     make_clock(self, device_id, clock_half_period): Makes a clock device with
                                                     the specified half period.
 
+    make_siggen(self, device_id, initial_state, period_list): Make a siggen device
+                               with the specified initial state and signal periods.
+    
+    make_RC(self, device_id, RC_period): Make a RC device with the specified period.
+
     make_gate(self, device_id, device_kind, no_of_inputs): Makes logic gates
                                         with the specified number of inputs.
 
@@ -123,8 +126,12 @@ class Devices:
                              self.FALLING, self.BLANK] = range(5)
         self.gate_types = [self.AND, self.OR, self.NAND, self.NOR,
                            self.XOR] = self.names.lookup(gate_strings)
-        self.device_types = [self.CLOCK, self.SWITCH,
-                             self.D_TYPE, self.SIGGEN, self.RC] = self.names.lookup(device_strings)
+        self.device_types = [
+            self.CLOCK,
+            self.SWITCH,
+            self.D_TYPE,
+            self.SIGGEN,
+            self.RC] = self.names.lookup(device_strings)
         self.dtype_input_ids = [self.CLK_ID, self.SET_ID, self.CLEAR_ID,
                                 self.DATA_ID] = self.names.lookup(dtype_inputs)
         self.dtype_output_ids = [
@@ -142,8 +149,7 @@ class Devices:
     def find_devices(self, device_kind=None):
         """Return a list of device IDs of the specified device_kind.
 
-        Return a list of all device IDs in the network if no device_kind is
-        specified.
+        Return a list of all device IDs in the network if no device_kind is specified.
         """
         device_id_list = []
         for device in self.devices_list:
@@ -186,8 +192,8 @@ class Devices:
     def get_signal_name(self, device_id, port_id):
         """Return the name string of the specified signal.
 
-        The signal is specified by its device_id and port_id. Return None if
-        either ID is invalid.
+        The signal is specified by its device_id and port_id. Return None if either ID
+        is invalid.
         """
         device = self.get_device(device_id)
         if device is not None:
@@ -239,8 +245,8 @@ class Devices:
     def make_clock(self, device_id, clock_half_period):
         """Make a clock device with the specified half period.
 
-        clock_half_period is an integer > 0. It is the number of simulation
-        cycles before the clock switches state.
+        clock_half_period is an integer > 0. It is the number of simulation cycles
+        before the clock switches state.
         """
         self.add_device(device_id, self.CLOCK)
         device = self.get_device(device_id)
@@ -248,13 +254,12 @@ class Devices:
         self.cold_startup()  # clock initialised to a random point in its cycle
 
     def make_siggen(self, device_id, initial_state, period_list):
-        """Make a siggen device with the specified initial state and 
-        signal periods. """
+        """Make a siggen device with the specified initial state and signal periods."""
         self.add_device(device_id, self.SIGGEN)
         device = self.get_device(device_id)
 
         signal_list = []
-        
+
         current_state = initial_state
         for period in period_list:
             signal_list.extend([current_state] * period)
@@ -263,10 +268,13 @@ class Devices:
         device.siggen_signal_list = signal_list
         device.siggen_counter = 0
 
-        self.add_output(device.device_id, output_id=None, signal=signal_list[0])
+        self.add_output(
+            device.device_id,
+            output_id=None,
+            signal=signal_list[0])
 
     def make_RC(self, device_id, RC_period):
-        """Make a RC device with the specified period. """
+        """Make a RC device with the specified period."""
         self.add_device(device_id, self.RC)
         device = self.get_device(device_id)
         device.RC_period = RC_period
@@ -296,8 +304,8 @@ class Devices:
     def cold_startup(self):
         """Simulate cold start-up of D-types and clocks.
 
-        Set the memory of the D-types to a random state and make the clocks
-        begin from a random point in their cycles.
+        Set the memory of the D-types to a random state and make the clocks begin from a
+        random point in their cycles.
         """
         for device in self.devices_list:
             if device.device_kind == self.D_TYPE:
@@ -309,7 +317,7 @@ class Devices:
                                 signal=clock_signal)
                 # Initialise it to a random point in its cycle.
                 device.clock_counter = \
-                    random.randrange(device.clock_half_period)                
+                    random.randrange(device.clock_half_period)
 
     def make_device(self, device_id, device_kind, device_property=None):
         """Create the specified device.
@@ -365,8 +373,8 @@ class Devices:
                 error_type = self.NO_ERROR
 
         elif device_kind == self.SIGGEN:
-            #breakpoint()
-            # Device property is a tuple of the siggen initial state: 0(LOW) or 1(HIGH) and a list of signal periods
+            # Device property is a tuple of the siggen initial state: 0(LOW) or
+            # 1(HIGH) and a list of signal periods
             if device_property is None:
                 error_type = self.NO_QUALIFIER
             elif device_property[0] not in [self.LOW, self.HIGH] or not isinstance(device_property[1], list):
