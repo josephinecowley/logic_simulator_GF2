@@ -288,7 +288,7 @@ class RunSimulationPanel(wx.Panel):
             self.quit_button, 1, flag=wx.ALIGN_RIGHT, border=5)
 
         self.right_buttons_panel = wx.Panel(
-            self, name="upload and help buttons panel")
+            self, name="right buttons panel")
         right_buttons_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
         self.right_buttons_panel.SetSizer(
             right_buttons_panel_hbox)
@@ -304,6 +304,18 @@ class RunSimulationPanel(wx.Panel):
         self.upload_button.SetToolTip(_("Upload logic description file"))
         upload_button_panel_vbox.Add(
             self.upload_button, 1, flag=wx.ALIGN_CENTER)
+        
+        self.settings_button_panel = wx.Panel(
+            self.right_buttons_panel, name="settings button panel")
+        settings_button_panel_vbox = wx.BoxSizer(wx.VERTICAL)
+        self.settings_button_panel.SetSizer(settings_button_panel_vbox)
+
+        self.settings_button = wx.Button(
+            self.settings_button_panel, wx.ID_ANY, _("SETTINGS"))
+        #self.Bind(wx.EVT_BUTTON, self.on_settings_button, self.settings_button)
+        self.settings_button.SetToolTip(_("Change system settings"))
+        settings_button_panel_vbox.Add(
+            self.settings_button, 1, flag=wx.ALIGN_CENTER)
 
         self.help_button_panel = wx.Panel(
             self.right_buttons_panel, name="help button panel")
@@ -317,6 +329,7 @@ class RunSimulationPanel(wx.Panel):
 
         right_buttons_panel_hbox.Add(
             self.upload_button_panel, 1, flag=wx.EXPAND)
+        right_buttons_panel_hbox.Add(self.settings_button_panel, 1, flag=wx.EXPAND)
         right_buttons_panel_hbox.Add(
             self.help_button_panel, 1, flag=wx.EXPAND)
 
