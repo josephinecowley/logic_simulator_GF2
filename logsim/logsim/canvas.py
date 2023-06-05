@@ -50,7 +50,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
     render_text(self, text, x_pos, y_pos, small: bool): Handles text drawing operations.
 
     update_arguments(self, devices, monitors): Update the devices and monitors with new arguments.
-    
+
     """
 
     def __init__(self, parent, devices, monitors, current_time=None):
@@ -112,15 +112,19 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
     def draw_canvas(self):
         """Iterates through each trace and draws it on the canvas with an offset"""
+        # Initialise offset parameters for each canvas instance
         x_offset = 150
         y_offset = 400
+
+        # RGB values of the colors that the traces will loop through
         color_list = [
             (1.0, 0.0, 0.0),
             (0.0, 1.0, 0.0),
             (0.0, 0.0, 1.0),
             (1.0, 0.0, 1.0),
-            (0.0, 1.0, 1.0),
-        ]
+            (0.0, 1.0, 1.0)]
+
+        # Iterate through each trace in self.traces and draw on canvas 
         for i, trace in enumerate(self.traces):
             signal = trace[1]
             label = trace[0]
@@ -132,7 +136,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         """Draws trace with axes and ticks"""
 
         # draw trace
-        
         GL.glLineWidth(3.0)
         GL.glColor3f(*color)
         GL.glBegin(GL.GL_LINE_STRIP)
@@ -166,12 +169,14 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             GL.glBegin(GL.GL_LINES)
             GL.glVertex2f(x_pos, y_pos)
             GL.glEnd()
+
             # Render sizes
             if self.zoom >= 1:
                 self.render_text(str(i + self.current_time), x - 5, y_pos - 15, small=True)
             elif ((self.zoom < 1) and (i % 5 == 0)):
                 self.render_text(str(i + self.current_time), x - 5, y_pos - 25, small=True)
         
+        # Render device name labels
         x_pos -= int(40 / 3 * len(label))
         self.render_text(label, x_pos, y_pos + 18)
 
@@ -208,6 +213,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
     def recenter_canvas(self):
         """Translates and re-zooms the canvas to where it started"""
         size = self.GetClientSize()
+
+        # Reset canvas attributes
         self.pan_x = 0
         self.pan_y = 0
         self.zoom = 1.0
