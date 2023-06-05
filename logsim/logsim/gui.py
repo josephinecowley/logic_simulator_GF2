@@ -265,13 +265,10 @@ class RunSimulationPanel(wx.Panel):
         self.centre_panel_bottom_padding_left = wx.Panel(self.centre_panel_bottom_padding)
         centre_panel_bottom_padding_hbox.Add(self.centre_panel_bottom_padding_left, 1, flag=wx.EXPAND)
 
-        self.centre_panel_bottom_padding_centre = wx.Panel(self.centre_panel_bottom_padding)
-        centre_panel_bottom_padding_hbox.Add(self.centre_panel_bottom_padding_centre, 2, flag=wx.EXPAND)
-
         self.centre_panel_bottom_padding_right = wx.Panel(self.centre_panel_bottom_padding)
         centre_panel_bottom_padding_right_vbox = wx.BoxSizer(wx.VERTICAL)
         self.centre_panel_bottom_padding_right.SetSizer(centre_panel_bottom_padding_right_vbox)
-        centre_panel_bottom_padding_hbox.Add(self.centre_panel_bottom_padding_right, 1, flag=wx.EXPAND)
+        centre_panel_bottom_padding_hbox.Add(self.centre_panel_bottom_padding_right, 2, flag=wx.EXPAND)
 
         # Create, bind quitting event to and add the "Quit simulation" button
         self.quit_button = wxbuttons.GenButton(
