@@ -107,6 +107,18 @@ msgstr "Βοήθεια για την εκτέλεση λογικής προσο�
 msgid "CONTINUE"
 msgstr "ΝΑ ΣΥΝΕΧΙΣΕΙ"
 
+#: gui.py:346
+msgid "Continue running the simulation"
+msgstr "Συνεχίστε την εκτέλεση της προσομοίωσης"
+
+#: gui.py:381
+msgid "Error! Network oscillating."
+msgstr "Λάθος! Δίκτυο που ταλαντώνεται."
+
+#: gui.py:438
+msgid "An error occurred."
+msgstr "Παρουσιάστηκε σφάλμα."
+
 #: gui.py:444
 msgid "Tutorial on GF2 Team 7 Logic Simulator"
 msgstr "Εκμάθηση για GF2 Ομάδα 7 Προσομοιωτής Λογικής"
