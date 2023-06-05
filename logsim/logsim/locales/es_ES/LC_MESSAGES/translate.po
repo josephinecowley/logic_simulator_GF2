@@ -29,6 +29,20 @@ msgstr "Salga"
 msgid "&File"
 msgstr "Archivo"
 
+#: gui.py:130
+msgid ""
+"Logic Simulator\n"
+"Created by Josephine Cowley (jhmdc2), Tom Hill (th621), Khalid Omar (ko366)\n"
+"2023"
+msgstr ""
+"Simulador Lógico\n"
+"Creado por Josephine Cowley (jhmdc2), Tom Hill (th621), Khalid Omar (ko366)\n"
+"2023"
+
+#: gui.py:131
+msgid "About Logsim"
+msgstr "Acerca de Logsim"
+
 #: gui.py:181
 msgid "NO. CYCLES"
 msgstr "NO. CICLOS"

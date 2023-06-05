@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-05 15:48+0100\n"
+"POT-Creation-Date: 2023-06-05 18:10+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,106 +37,117 @@ msgstr ""
 msgid "&File"
 msgstr ""
 
-#: gui.py:184
+#: gui.py:130
+msgid ""
+"Logic Simulator\n"
+"Created by Josephine Cowley (jhmdc2), Tom Hill (th621), Khalid Omar (ko366)\n"
+"2023"
+msgstr ""
+
+#: gui.py:131
+msgid "About Logsim"
+msgstr ""
+
+#: gui.py:182
 msgid "NO. CYCLES"
 msgstr ""
 
-#: gui.py:211
+#: gui.py:209
 msgid "RUN"
 msgstr ""
 
-#: gui.py:219
+#: gui.py:217
 msgid "Begin running the simulation"
 msgstr ""
 
-#: gui.py:225
+#: gui.py:223
 msgid "CLEAR"
 msgstr ""
 
-#: gui.py:233
+#: gui.py:231
 msgid "Clear all signal traces"
 msgstr ""
 
-#: gui.py:239
+#: gui.py:237
 msgid "RESET"
 msgstr ""
 
-#: gui.py:247
+#: gui.py:245
 msgid "Reset the simulation from initialisation"
 msgstr ""
 
-#: gui.py:280
+#: gui.py:278
 msgid "QUIT"
 msgstr ""
 
-#: gui.py:288
+#: gui.py:286
 msgid "Quit the simulation"
 msgstr ""
 
-#: gui.py:306
+#: gui.py:304
 msgid "UPLOAD"
 msgstr ""
 
-#: gui.py:308
+#: gui.py:306
 msgid "Upload logic description file"
 msgstr ""
 
-#: gui.py:317
+#: gui.py:315
 msgid "HELP"
 msgstr ""
 
-#: gui.py:319
+#: gui.py:317
 msgid "Help on running logic simulation"
 msgstr ""
 
-#: gui.py:336
+#: gui.py:333
 msgid "CONTINUE"
 msgstr ""
 
-#: gui.py:338
+#: gui.py:335
 msgid "Continue running the simulation"
 msgstr ""
 
-#: gui.py:374
+#: gui.py:370
 msgid "Error! Network oscillating."
 msgstr ""
 
-#: gui.py:432
+#: gui.py:427
 msgid "An error occurred."
 msgstr ""
 
-#: gui.py:450
+#: gui.py:444
 msgid "Tutorial on GF2 Team 7 Logic Simulator"
 msgstr ""
 
-#: gui.py:511
+#: gui.py:503
 msgid "ADD NEW MONITOR"
 msgstr ""
 
-#: gui.py:529 gui.py:560
+#: gui.py:521 gui.py:552
 msgid "Select output"
 msgstr ""
 
-#: gui.py:545
+#: gui.py:537
 msgid "Add monitor"
 msgstr ""
 
-#: gui.py:550
+#: gui.py:542
 msgid "DELETE MONITOR"
 msgstr ""
 
-#: gui.py:576
+#: gui.py:568
 msgid "Zap an existing monitor"
 msgstr ""
 
-#: gui.py:678
+#: gui.py:669
 msgid "INPUTS"
 msgstr ""
 
-#: gui.py:739 gui.py:832
+#: gui.py:700 gui.py:740 gui.py:840
 msgid "ON"
 msgstr ""
 
-#: gui.py:746 gui.py:861
+#: gui.py:704 gui.py:753 gui.py:868
 msgid "OFF"
 msgstr ""
