@@ -113,7 +113,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
         """Iterates through each trace and draws it on the canvas with an offset."""
         # Initialise offset parameters for each canvas instance
         x_offset = 150
-        y_offset = 400
+        y_offset = 300
 
         # RGB values of the colors that the traces will loop through
         color_list = [
