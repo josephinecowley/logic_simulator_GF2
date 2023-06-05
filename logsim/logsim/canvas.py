@@ -116,7 +116,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
     def draw_canvas(self):
         """Iterates through each trace and draws it on the canvas with an offset"""
         x_offset = 100
-        y_offset = 420
+        y_offset = 200
         color_list = [
             (1.0, 0.0, 0.0),
             (0.0, 1.0, 0.0),
@@ -176,7 +176,7 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             elif ((self.zoom < 1) and (i % 5 == 0)):
                 self.render_text(str(i + self.current_time), x - 5, y_pos - 25)
         
-        x_pos -= int(20 / 3 * len(label))
+        x_pos -= int(40 / 3 * len(label))
         self.render_text(label, x_pos, y_pos + 18)
 
     def render(self, text):
