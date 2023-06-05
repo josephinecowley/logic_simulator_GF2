@@ -6,13 +6,11 @@ signals.
 Classes
 -------
 Monitors - records and displays specified output signals.
-
 """
 import collections
 
 
 class Monitors:
-
     """Record and display output signals.
 
     This class contains functions for recording and displaying the signal state
@@ -45,6 +43,8 @@ class Monitors:
     get_margin(self): Returns the length of the longest monitor's name.
 
     display_signals(self): Displays signal trace(s) in the text console.
+
+    get_signals_for_GUI(self): Retrieves signals from monitors and places them in a list of tuples for the GUI
     """
 
     def __init__(self, names, devices, network):
@@ -141,9 +141,9 @@ class Monitors:
     def get_margin(self):
         """Return the length of the longest monitor's name.
 
-        Return None if no signals are being monitored. This is useful for
-        finding out how much space to leave after each monitor's name before
-        starting to draw the signal trace.
+        Return None if no signals are being monitored. This is useful for finding out
+        how much space to leave after each monitor's name before starting to draw the
+        signal trace.
         """
         length_list = []  # for storing name lengths
         for device_id, output_id in self.monitors_dictionary:
@@ -177,7 +177,8 @@ class Monitors:
             print("\n", end="")
 
     def get_signals_for_GUI(self):
-        """Retrieves signals from monitors and places them in a list of tuples for the GUI"""
+        """Retrieves signals from monitors and places them in a list of tuples for the
+        GUI."""
         signals = []
         for device_id, output_id in self.monitors_dictionary:
             monitor_name = self.devices.get_signal_name(device_id, output_id)
