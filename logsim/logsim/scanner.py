@@ -96,8 +96,9 @@ class Scanner:
 
             else:
                 symbol.type = self.NAME
-            symbol.id = self.names.lookup([name_string])[0]
+            
             # lookup a symbol id
+            symbol.id = self.names.lookup([name_string])[0]  
 
         elif self.current_character.isdigit():  # number
             self.load_scanner_data(symbol)
@@ -105,7 +106,7 @@ class Scanner:
             symbol.type = self.NUMBER
             symbol.id = self.names.lookup([number])[0]
 
-        elif self.current_character == "=":  # punctuation...
+        elif self.current_character == "=":  # punctuation
             self.load_scanner_data(symbol)
             symbol.type = self.EQUALS
             self.advance()
@@ -152,13 +153,13 @@ class Scanner:
         elif self.current_character == "":  # end of file
             self.load_scanner_data(symbol)
             symbol.type = self.EOF
-
-        elif self.current_character == "[":  # siggen signal opener
+        
+        elif self.current_character == "[": # siggen signal opener
             signal_string = self.get_siggen_signal()
             symbol.type = self.SIGNAL
 
             # lookup signal string in name table
-            symbol.id = self.names.lookup([signal_string])[0]
+            symbol.id = self.names.lookup([signal_string])[0]  
 
         else:  # not a valid character
             self.advance()
@@ -303,14 +304,16 @@ class Scanner:
             num += self.current_character
             self.advance()
         return num  # returns the number as a string
-
+    
     def get_siggen_signal(self):
         """Assumes current character is '[' and reads string from file until ']' or EOF.
         Returns a string like '[1, 2, 3, 4, 5]'. """
         signal_string = ""
         self.advance
+        # create signal string by iterating advance()
         while not self.current_character in ["]", ""]:
             signal_string += self.current_character
             self.advance()
         signal_string += self.current_character
-        return signal_string
+        return signal_string # returns the signal string (eg. "[1, 2, 3, 4]"")
+
