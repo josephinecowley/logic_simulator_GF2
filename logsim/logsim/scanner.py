@@ -12,7 +12,6 @@ import sys
 
 
 class Symbol:
-
     """Encapsulate a symbol and store its properties.
 
     Parameters
@@ -29,12 +28,12 @@ class Symbol:
         self.type = None  # integer or None that corresponds to a symbol type in scanner.symbol_type_list
         self.id = None  # id given by the lookup function to names, keywords, and numbers
         self.line_number = None  # line number where this symbol is read
-        # one-based index of the (first) character of the symbol from the beginning of the line
+        # one-based index of the (first) character of the symbol from the
+        # beginning of the line
         self.start_position = None
 
 
 class Scanner:
-
     """Read circuit definition file and translate the characters into symbols.
 
     Once supplied with the path to a valid definition file, the scanner
@@ -70,8 +69,20 @@ class Scanner:
         self.names = names
 
         # initialises a list of symbol types
-        self.symbol_type_list = [self.BRACKET_OPEN, self.BRACKET_CLOSE, self.BRACE_OPEN, self.BRACE_CLOSE, self.COMMA, self.FULLSTOP,
-                                 self.SEMICOLON, self.EQUALS, self.KEYWORD, self.NUMBER, self.NAME, self.EOF, self.SIGNAL] = range(13)
+        self.symbol_type_list = [
+            self.BRACKET_OPEN,
+            self.BRACKET_CLOSE,
+            self.BRACE_OPEN,
+            self.BRACE_CLOSE,
+            self.COMMA,
+            self.FULLSTOP,
+            self.SEMICOLON,
+            self.EQUALS,
+            self.KEYWORD,
+            self.NUMBER,
+            self.NAME,
+            self.EOF,
+            self.SIGNAL] = range(13)
         self.keywords_list = ["DEVICES", "CONNECTIONS", "MONITORS", "END"]
 
         # populates name table with keywords and assigns keywork IDs
@@ -79,11 +90,13 @@ class Scanner:
             self.END_ID] = self.names.lookup(self.keywords_list)
 
         # hold the last character read from the definition file
-        # initialised with a space so that advance() is called on the first call to get_symbol
+        # initialised with a space so that advance() is called on the first
+        # call to get_symbol
         self.current_character = " "
 
     def get_symbol(self):
-        """Translate the next sequence of characters into a symbol and return the symbol."""
+        """Translate the next sequence of characters into a symbol and return the
+        symbol."""
         symbol = Symbol()
         self.skip_spaces()  # current character now not whitespace
 
@@ -96,9 +109,9 @@ class Scanner:
 
             else:
                 symbol.type = self.NAME
-            
+
             # lookup a symbol id
-            symbol.id = self.names.lookup([name_string])[0]  
+            symbol.id = self.names.lookup([name_string])[0]
 
         elif self.current_character.isdigit():  # number
             self.load_scanner_data(symbol)
@@ -153,13 +166,13 @@ class Scanner:
         elif self.current_character == "":  # end of file
             self.load_scanner_data(symbol)
             symbol.type = self.EOF
-        
-        elif self.current_character == "[": # siggen signal opener
+
+        elif self.current_character == "[":  # siggen signal opener
             signal_string = self.get_siggen_signal()
             symbol.type = self.SIGNAL
 
             # lookup signal string in name table
-            symbol.id = self.names.lookup([signal_string])[0]  
+            symbol.id = self.names.lookup([signal_string])[0]
 
         else:  # not a valid character
             self.advance()
@@ -168,11 +181,15 @@ class Scanner:
         return symbol
 
     def display_line_and_marker(self, symbol, display_marker=True):
-        """Takes a symbol instance and prints its line in the file with a marker underneath.
-        If the 'name' is over length one, use tildes, otherwise use caret.
-        Printed lines will have a standard indent of eight spaces."""
+        """Takes a symbol instance and prints its line in the file with a marker
+        underneath.
 
-        # Uses a temp_file instance to avoid interference with scanner's pointer.
+        If the 'name' is over length one, use tildes, otherwise use caret. Printed lines
+        will have a standard indent of eight spaces.
+        """
+
+        # Uses a temp_file instance to avoid interference with scanner's
+        # pointer.
         temp_file = self.open_file(self.path)
         # find the whole line where that symbol appears
         for i, line in enumerate(temp_file, start=1):
@@ -217,11 +234,11 @@ class Scanner:
             filled_marker_string = "".join(caret_list)
 
         # standardise line indent
-        line_text = " "*8 + line_text.lstrip()
-        filled_marker_string = " "*8 + \
+        line_text = " " * 8 + line_text.lstrip()
+        filled_marker_string = " " * 8 + \
             filled_marker_string[start_of_text_index:]
 
-        if display_marker == False:
+        if not display_marker:
             # Just print line text
             print(line_text)
             return
@@ -239,7 +256,7 @@ class Scanner:
         try:
             # Try to open the file for reading
             file = open(path, "r")
-        except:
+        except BaseException:
             # raise a value error
             raise ValueError(
                 "Error: can\'t find specified file - check file name is correct")
@@ -247,21 +264,25 @@ class Scanner:
             return file
 
     def load_scanner_data(self, symbol):
-        """Update the location attributes of symbol using Scanner's current location attributes."""
+        """Update the location attributes of symbol using Scanner's current location
+        attributes."""
         symbol.line_number = self.line_number
         symbol.start_position = self.position
 
     def advance(self):
         """Reads the next character in file and places it in current_character.
-           Increments position in line for every call.
+
+        Increments position in line for every call.
         """
         self.current_character = self.file.read(1)
         self.position += 1
 
     def skip_spaces(self):
-        """Calls advance() method until current character is not space. 
-        If current_character is a space, returns next non-whitespace character.
-        If current_character is not a space, returns current character."""
+        """Calls advance() method until current character is not space.
+
+        If current_character is a space, returns next non-whitespace character. If
+        current_character is not a space, returns current character.
+        """
         while self.current_character.isspace():
             if self.current_character == "\n":
                 self.line_number += 1
@@ -269,8 +290,10 @@ class Scanner:
             self.advance()
 
     def skip_comment(self):
-        """Assumes current character is a # or " and advances until comments are closed. 
-        Then skip spaces such than current_character is non_whitespace"""
+        """Assumes current character is a # or " and advances until comments are closed.
+
+        Then skip spaces such than current_character is non_whitespace
+        """
         if self.current_character == "#":
             self.advance()  # get first character in comment
             while not self.current_character == "\n":  # closed by new line
@@ -288,7 +311,8 @@ class Scanner:
             self.skip_spaces()
 
     def get_name(self):
-        """Assumes that current character is alphabetical and returns an alphanumeric name."""
+        """Assumes that current character is alphabetical and returns an alphanumeric
+        name."""
         name = f"{self.current_character}"  # put first character in string
         self.advance()  # get next character
         while self.current_character.isalnum():  # updating alnum chars to string
@@ -297,23 +321,25 @@ class Scanner:
         return name
 
     def get_number(self):
-        """Assumes that current character is a number and returns a string of integer number."""
+        """Assumes that current character is a number and returns a string of integer
+        number."""
         num = f"{self.current_character}"  # put first digit in string
         self.advance()  # get next character
         while self.current_character.isdigit():  # updating digits to string
             num += self.current_character
             self.advance()
         return num  # returns the number as a string
-    
+
     def get_siggen_signal(self):
         """Assumes current character is '[' and reads string from file until ']' or EOF.
-        Returns a string like '[1, 2, 3, 4, 5]'. """
+
+        Returns a string like '[1, 2, 3, 4, 5]'.
+        """
         signal_string = ""
         self.advance
-        # create signal string by iterating advance()
-        while not self.current_character in ["]", ""]:
+        #  create signal string by iterating advance()
+        while self.current_character not in ["]", ""]:
             signal_string += self.current_character
             self.advance()
         signal_string += self.current_character
-        return signal_string # returns the signal string (eg. "[1, 2, 3, 4]"")
-
+        return signal_string  # returns the signal string (eg. "[1, 2, 3, 4]"")
