@@ -252,7 +252,7 @@ class RunSimulationPanel(wx.Panel):
         self.centre_panel = wx.Panel(self)
         centre_panel_vbox = wx.BoxSizer(wx.VERTICAL)
         self.centre_panel.SetSizer(centre_panel_vbox)
-        hbox.Add(self.centre_panel, 2, flag=wx.EXPAND)
+        hbox.Add(self.centre_panel, 2, flag=wx.RIGHT|wx.EXPAND, border=10)
 
         self.centre_panel_top_padding = wx.Panel(self.centre_panel)
         centre_panel_vbox.Add(self.centre_panel_top_padding, 1, flag=wx.EXPAND)
@@ -587,7 +587,7 @@ class SignalTracesPanel(wx.Panel):
 
         self.recentre_button = wxbuttons.GenButton(
             self.add_new_monitor_panel_right, wx.ID_ANY, _("RECENTRE"), name="recentre button")
-        #self.Bind(wx.EVT_BUTTON, parent.on_recentre_button, self.quit_button)
+        self.Bind(wx.EVT_BUTTON, self.on_recentre_button, self.recentre_button)
         self.recentre_button.SetFont(wx.Font(
             10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
         self.recentre_button.SetBezelWidth(5)
@@ -673,6 +673,9 @@ class SignalTracesPanel(wx.Panel):
                     self.selected_signal_to_zap)
             else:
                 pass
+
+    def on_recentre_button(self, event):
+        self.canvas.recenter_canvas()
 
     def update_canvas(self):
         self.canvas.update_arguments(self.devices, self.monitors)
