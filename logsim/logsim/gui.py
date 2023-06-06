@@ -189,7 +189,7 @@ class WelcomeDialog(wx.Dialog):
         middle_panel_fgs.Add(preloaded_ldf_title_text, 0, wx.BOTTOM)
 
         upload_new_file_button = wx.Button(bottom_panel, wx.ID_ANY, label=_("Upload new file"))
-        #upload_new_file_button.Bind(wx.EVT_BUTTON, self.on_upload_new_file, upload_new_file_button)
+        upload_new_file_button.Bind(wx.EVT_BUTTON, self.on_upload_new_file, upload_new_file_button)
         upload_new_file_button.SetToolTip(_("Upload a new Logic Description File"))
         bottom_panel_hbox.Add(upload_new_file_button, 1, flag=wx.EXPAND)
 
@@ -216,6 +216,62 @@ class WelcomeDialog(wx.Dialog):
         help_dialog.ShowModal()
 
         help_dialog.Destroy()
+
+    def on_upload_new_file(self, event):
+        """Handle the event when the user clicks the upload new file button."""
+        dlg = wx.FileDialog(
+            self, message="Choose a file",
+            defaultDir=os.getcwd(),
+            defaultFile="",
+            wildcard="Text file (*.txt)|*.txt|All files (*.*)|*.*",
+            style=wx.FD_OPEN |
+            wx.FD_CHANGE_DIR | wx.FD_FILE_MUST_EXIST |
+            wx.FD_PREVIEW
+        )
+
+        file_path = None
+
+        # Show the dialog and retrieve the user response. If it is the OK response,
+        # process the data.
+        if dlg.ShowModal() == wx.ID_OK:
+            # This returns a Python list of files that were selected.
+            file_path = dlg.GetPath()
+
+        if file_path is not None:  # confirm a file has been selected from upload file dialog
+            names = Names()
+            devices = Devices(names)
+            network = Network(names, devices)
+            monitors = Monitors(names, devices, network)
+            scanner = Scanner(file_path, names)
+            parser = Parser(names, devices, network, monitors, scanner)
+
+            captured_print = StringIO()
+            with redirect_stdout(captured_print):
+                parsing_result = parser.parse_network()
+
+            output = captured_print.getvalue()
+
+            if parsing_result:
+                new_Gui = Gui(file_path,
+                              names,
+                              devices,
+                              network,
+                              monitors,
+                              first_init=False,
+                              locale=self.parent.locale)
+                new_Gui.Show()
+                self.Close()
+                self.parent.Close()
+            else:
+                dlg = wx.MessageDialog(self, output,
+                                       _("An error occurred."),
+                                       wx.OK | wx.ICON_INFORMATION
+                                       # wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL | wx.ICON_INFORMATION
+                                       )
+                dlg.ShowModal()
+                dlg.Destroy()
+
+        dlg.Destroy()
 
 
 class RunSimulationPanel(wx.Panel):
