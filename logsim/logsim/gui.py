@@ -70,14 +70,7 @@ class Gui(wx.Frame):
         else:
             self.locale = locale
         self.locale.AddCatalogLookupPathPrefix("locales")
-        if self.locale.AddCatalog("translate"):
-            print('catalog found')
-        else:
-            print('catalog NOT found')
-
-        print(self.locale.GetCanonicalName())
-
-        print(_("Hello"))
+        self.locale.AddCatalog("translate")
 
         # Configure the title of the GUI frame window
         team_name = _("GF2 P2 Team 7 Logic Simulator GUI: ")
@@ -134,9 +127,11 @@ class Gui(wx.Frame):
                           _("About Logsim"), wx.ICON_INFORMATION | wx.OK)
 
     def on_quit_button(self, event):
+        """Handle the event when the user presses the QUIT button."""
         self.Close()
 
     def extract_ldf_title(self):
+        """Extract the name of the LDF file supplied from the file path."""
         ldf_title = self.path.split(os.sep)[-1]
 
         return ldf_title
@@ -146,6 +141,7 @@ class RunSimulationPanel(wx.Panel):
     def __init__(self, parent, signal_traces_panel, names, devices, network, monitors, path, id=wx.ID_ANY, size=wx.DefaultSize):
         super(RunSimulationPanel, self).__init__(
             parent, id, size=size, style=wx.SIMPLE_BORDER)
+        """Initialise widgets and layout."""
 
         self.parent = parent
         self.signal_traces_panel = signal_traces_panel
