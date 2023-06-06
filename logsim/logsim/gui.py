@@ -107,7 +107,7 @@ class Gui(wx.Frame):
 
         # Instantiate RunSimulationPanel widget and add to Frame
         self.simulation_panel = RunSimulationPanel(
-            self, self.signal_traces_panel, names, devices, network, monitors)
+            self, self.signal_traces_panel, names, devices, network, monitors, self.path)
         vbox.Add(self.simulation_panel, 1, wx.EXPAND)
 
         # Instantiate SwitchesPanel widget and add to Frame
@@ -140,7 +140,7 @@ class Gui(wx.Frame):
 
 
 class RunSimulationPanel(wx.Panel):
-    def __init__(self, parent, signal_traces_panel, names, devices, network, monitors, id=wx.ID_ANY, size=wx.DefaultSize):
+    def __init__(self, parent, signal_traces_panel, names, devices, network, monitors, path, id=wx.ID_ANY, size=wx.DefaultSize):
         super(RunSimulationPanel, self).__init__(
             parent, id, size=size, style=wx.SIMPLE_BORDER)
 
@@ -150,6 +150,7 @@ class RunSimulationPanel(wx.Panel):
         self.devices = devices
         self.network = network
         self.monitors = monitors
+        self.path = parent.path
 
         # Configure sizers for layout of RunSimulationPanel
         vbox = wx.BoxSizer(wx.VERTICAL)
@@ -442,7 +443,7 @@ class RunSimulationPanel(wx.Panel):
         dlg.Destroy()
 
     def on_settings_button(self, event):
-        settings_dialog = SettingsDialog(self)
+        settings_dialog = SettingsDialog(self, self.path)
 
         settings_dialog.CenterOnScreen()
 
@@ -463,8 +464,10 @@ class RunSimulationPanel(wx.Panel):
         help_dialog.Destroy()
 
 class SettingsDialog(wx.Dialog):
-    def __init__(self, parent, title=_("Configure Logic Simulator GUI settings"), id=wx.ID_ANY, size=wx.DefaultSize, style=wx.DEFAULT_DIALOG_STYLE):
+    def __init__(self, parent, path, title=_("Configure Logic Simulator GUI settings"), id=wx.ID_ANY, size=wx.DefaultSize, style=wx.DEFAULT_DIALOG_STYLE):
         super(SettingsDialog, self).__init__(parent, title=_(title), id=id, size=size, style=style)
+        self.parent = parent
+
         vbox = wx.BoxSizer(wx.VERTICAL)
 
         top_panel = wx.Panel(self)
@@ -511,7 +514,15 @@ class SettingsDialog(wx.Dialog):
             pass
     
     def on_confirm_settings_button(self, event):
-        pass
+        if self.selected_language is not None:
+            new_Gui = Gui(self.parent.path,
+                              self.parent.names,
+                              self.parent.devices,
+                              self.parent.network,
+                              self.parent.monitors,
+                              first_init=False)
+            new_Gui.Show()
+            self.parent.parent.Close()
 
 
 class HelpDialog(wx.Dialog):
