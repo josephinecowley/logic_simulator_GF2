@@ -9,12 +9,15 @@ component =  “AND” , “(“ , number , “)”  |
 		“XOR” |
 		“SWITCH” , “(“ , number , “)” |
 		“DTYPE” |
-		“CLK” , “(“ , number , “)” ;
+		“CLK” , “(“ , number , “)” |
+		”SIGGEN” , ”(” , number , ”,” , siggen_signal, ”)” |
+		”RC” , ”(” , number , ”)”;
 
 connection_list = "CONNECTIONS" , “{”, output , "=" , input , { “;” , output , "=" , input } , “;” ,  ”}” ;
 input = name , “.” , input_suffix ;
 input_suffix = ( "I" , number | "DATA" | "CLK" | "SET" | "CLEAR" ) ;
 output =  name , [ “.” , “Q” | “QBAR” ] ;
+siggen_signal = ”[”, number, { ”,” , number } , ”]”;
 
 monitor_list = “MONITORS”, “{“, output , { “;” , output} , “;” ,  “}” ;
 
