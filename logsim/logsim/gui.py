@@ -51,7 +51,7 @@ class Gui(wx.Frame):
     on_text_box(self, event): Event handler for when the user enters text.
     """
 
-    def __init__(self, path, names, devices, network, monitors, first_init=True):
+    def __init__(self, path, names, devices, network, monitors, first_init=True, locale=None):
         """Initialise widgets and layout."""
         super().__init__(parent=None, size=(1030, 700))
 
@@ -65,7 +65,10 @@ class Gui(wx.Frame):
 
         ldf_title = self.extract_ldf_title()
 
-        self.locale = wx.Locale(wx.LANGUAGE_DEFAULT)
+        if self.first_init:
+            self.locale = wx.Locale(wx.LANGUAGE_DEFAULT)
+        else:
+            self.locale = locale
         self.locale.AddCatalogLookupPathPrefix("locales")
         if self.locale.AddCatalog("translate"):
             print('catalog found')
@@ -428,7 +431,8 @@ class RunSimulationPanel(wx.Panel):
                               devices,
                               network,
                               monitors,
-                              first_init=False)
+                              first_init=False,
+                              locale=self.parent.locale)
                 new_Gui.Show()
                 self.parent.Close()
             else:
@@ -515,16 +519,41 @@ class SettingsDialog(wx.Dialog):
     
     def on_confirm_settings_button(self, event):
         if self.selected_language is not None:
-            new_Gui = Gui(self.parent.path,
-                              self.parent.names,
-                              self.parent.devices,
-                              self.parent.network,
-                              self.parent.monitors,
-                              first_init=False)
-            new_Gui.Show()
-            self.parent.settings_dialog.Destroy()
-            self.parent.parent.Close()
-
+            if self.selected_language == "English (GB)":
+                new_Gui = Gui(self.parent.path,
+                                self.parent.names,
+                                self.parent.devices,
+                                self.parent.network,
+                                self.parent.monitors,
+                                first_init=False,
+                                locale=wx.Locale(wx.LANGUAGE_ENGLISH))
+                new_Gui.Show()
+                self.parent.settings_dialog.Destroy()
+                self.parent.parent.Close()
+            
+            elif self.selected_language == "Español (ES)":
+                new_Gui = Gui(self.parent.path,
+                                self.parent.names,
+                                self.parent.devices,
+                                self.parent.network,
+                                self.parent.monitors,
+                                first_init=False,
+                                locale=wx.Locale(wx.LANGUAGE_SPANISH))
+                new_Gui.Show()
+                self.parent.settings_dialog.Destroy()
+                self.parent.parent.Close()
+            
+            elif self.selected_language == "Ελληνικά (EL)":
+                new_Gui = Gui(self.parent.path,
+                                self.parent.names,
+                                self.parent.devices,
+                                self.parent.network,
+                                self.parent.monitors,
+                                first_init=False,
+                                locale=wx.Locale(wx.LANGUAGE_GREEK))
+                new_Gui.Show()
+                self.parent.settings_dialog.Destroy()
+                self.parent.parent.Close()
 
 class HelpDialog(wx.Dialog):
     def __init__(self, parent, title=_("Tutorial on GF2 Team 7 Logic Simulator"), id=wx.ID_ANY, size=wx.DefaultSize, style=wx.DEFAULT_DIALOG_STYLE):
