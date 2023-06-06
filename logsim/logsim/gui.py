@@ -176,7 +176,7 @@ class WelcomeDialog(wx.Dialog):
         middle_panel_fgs.Add(help_prompt_text, 0, wx.ALIGN_LEFT)
 
         help_button = wx.Button(middle_panel, wx.ID_ANY, label=_("Tutorial"))
-        #upload_new_file_button.Bind(wx.EVT_BUTTON, self.on_upload_new_file, upload_new_file_button)
+        help_button.Bind(wx.EVT_BUTTON, self.on_help_button, help_button)
         help_button.SetToolTip(_("Click here to learn how to use our Logic Simulator"))
         middle_panel_fgs.Add(help_button, 1, flag=wx.EXPAND)
 
@@ -204,6 +204,18 @@ class WelcomeDialog(wx.Dialog):
 
         self.SetSizer(vbox)
         vbox.Fit(self)
+    
+    def on_help_button(self, event):
+        self.open_help_dialog()
+
+    def open_help_dialog(self):
+        help_dialog = HelpDialog(self)
+
+        help_dialog.CenterOnScreen()
+
+        help_dialog.ShowModal()
+
+        help_dialog.Destroy()
 
 
 class RunSimulationPanel(wx.Panel):
