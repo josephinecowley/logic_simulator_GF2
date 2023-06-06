@@ -443,13 +443,13 @@ class RunSimulationPanel(wx.Panel):
         dlg.Destroy()
 
     def on_settings_button(self, event):
-        settings_dialog = SettingsDialog(self, self.path)
+        self.settings_dialog = SettingsDialog(self, self.path)
 
-        settings_dialog.CenterOnScreen()
+        self.settings_dialog.CenterOnScreen()
 
-        settings_dialog.ShowModal()
+        self.settings_dialog.ShowModal()
 
-        settings_dialog.Destroy()
+        self.settings_dialog.Destroy()
 
     def on_help_button(self, event):
         self.open_help_dialog()
@@ -522,6 +522,7 @@ class SettingsDialog(wx.Dialog):
                               self.parent.monitors,
                               first_init=False)
             new_Gui.Show()
+            self.parent.settings_dialog.Destroy()
             self.parent.parent.Close()
 
 
