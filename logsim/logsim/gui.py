@@ -465,30 +465,52 @@ class RunSimulationPanel(wx.Panel):
 class SettingsDialog(wx.Dialog):
     def __init__(self, parent, title=_("Configure Logic Simulator GUI settings"), id=wx.ID_ANY, size=wx.DefaultSize, style=wx.DEFAULT_DIALOG_STYLE):
         super(SettingsDialog, self).__init__(parent, title=_(title), id=id, size=size, style=style)
-        print(self.GetSize())
         vbox = wx.BoxSizer(wx.VERTICAL)
+
+        top_panel = wx.Panel(self)
+        top_panel_vbox = wx.BoxSizer(wx.VERTICAL)
+        top_panel.SetSizer(top_panel_vbox)
+
+        bottom_panel = wx.Panel(self)
+        bottom_panel_vbox = wx.BoxSizer(wx.VERTICAL)
+        bottom_panel.SetSizer(bottom_panel_vbox)
  
-        text = wx.StaticText(self, wx.ID_ANY, _("GUI Settings"), style=wx.ALIGN_CENTER)
+        text = wx.StaticText(top_panel, wx.ID_ANY, _("GUI Settings"), style=wx.ALIGN_CENTER)
         font = wx.Font(18, wx.FONTFAMILY_SWISS,
                        wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
         text.SetFont(font)
-        vbox.Add(text, 0, wx.ALIGN_CENTER)
+        top_panel_vbox.Add(text, 0, wx.ALIGN_CENTER)
 
-        selected_language = None
+        self.selected_language = None
         available_languages_list = ["English (GB)", "Español (ES)", "Ελληνικά (EL)"]
-        select_language_combo_box = wx.ComboBox(self, wx.ID_ANY, _("Select language"), (90, 50),
+        select_language_combo_box = wx.ComboBox(top_panel, wx.ID_ANY, _("Select language"), (90, 50),
                                                     (160, -1), available_languages_list,
                                                     wx.CB_DROPDOWN
                                                     )
         self.Bind(wx.EVT_COMBOBOX, self.on_select_new_langauge,
                   select_language_combo_box)
-        vbox.Add(
+        top_panel_vbox.Add(
             select_language_combo_box, 0, flag=wx.ALIGN_LEFT|wx.TOP, border=30)
+        
+        confirm_settings_button = wx.Button(bottom_panel, wx.ID_ANY, label=_("CONFIRM SETTINGS"))
+        confirm_settings_button.Bind(wx.EVT_BUTTON, self.on_confirm_settings_button, confirm_settings_button)
+        confirm_settings_button.SetToolTip(_("Confirm settings changes"))
+        bottom_panel_vbox.Add(confirm_settings_button, 0, flag=wx.CENTER|wx.BOTTOM)
+
+        vbox.Add(top_panel, 3, flag=wx.EXPAND)
+        vbox.Add(bottom_panel, 1, flag=wx.EXPAND)
 
         self.SetSizer(vbox)
-        #vbox.Fit(self)
 
     def on_select_new_langauge(self, event):
+        select_language_combo_box = event.GetEventObject()
+        self.selected_language = select_language_combo_box.GetValue()
+
+        print(self.selected_language)
+        if self.selected_language is not None:
+            pass
+    
+    def on_confirm_settings_button(self, event):
         pass
 
 
