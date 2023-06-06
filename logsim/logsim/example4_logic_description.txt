@@ -1,0 +1,30 @@
+"
+This definition file demonstrates the scenario given in Maintenance: as RC device is connected
+to dtype1.CLEAR, dtype1.Q will be forced LOW for 5 simulation cycles. The value of the signal
+generator will then move to dtype1.Q on the rising edge of the clock.
+data = 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, ...
+"
+
+DEVICES {
+    data = SIGGEN(0, [1, 2, 4, 8]);
+    dtype1 = DTYPE;
+    rc1 = RC(5);
+    set1 = SWITCH(1);
+    clock = CLOCK(1);
+}
+
+CONNECTIONS {
+    dtype1.DATA = data;
+    dtype1.SET = set1;
+    dtype1.CLEAR = rc1;
+    dtype1.CLK = clock;
+}
+
+MONITORS {
+    data;
+    rc1;
+    dtype1.Q;
+    dtype1.QBAR;
+}
+
+END
