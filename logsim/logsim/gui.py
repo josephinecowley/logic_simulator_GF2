@@ -194,7 +194,7 @@ class WelcomeDialog(wx.Dialog):
         bottom_panel_hbox.Add(upload_new_file_button, 1, flag=wx.EXPAND)
 
         continue_button = wx.Button(bottom_panel, wx.ID_ANY, label=_("Continue"))
-        #upload_new_file_button.Bind(wx.EVT_BUTTON, self.on_upload_new_file, upload_new_file_button)
+        continue_button.Bind(wx.EVT_BUTTON, self.on_continue_button, continue_button)
         continue_button.SetToolTip(_("Continue with preloaded logic description file"))
         bottom_panel_hbox.Add(continue_button, 1, flag=wx.EXPAND)
 
@@ -272,6 +272,10 @@ class WelcomeDialog(wx.Dialog):
                 dlg.Destroy()
 
         dlg.Destroy()
+    
+    def on_continue_button(self, event):
+        self.Close()
+
 
 
 class RunSimulationPanel(wx.Panel):
