@@ -277,7 +277,6 @@ class WelcomeDialog(wx.Dialog):
         self.Close()
 
 
-
 class RunSimulationPanel(wx.Panel):
     def __init__(self, parent, signal_traces_panel, names, devices, network, monitors, path, id=wx.ID_ANY, size=wx.DefaultSize):
         super(RunSimulationPanel, self).__init__(
@@ -585,7 +584,7 @@ class RunSimulationPanel(wx.Panel):
         dlg.Destroy()
 
     def on_settings_button(self, event):
-        self.settings_dialog = SettingsDialog(self, self.path)
+        self.settings_dialog = SettingsDialog(self)
 
         self.settings_dialog.CenterOnScreen()
 

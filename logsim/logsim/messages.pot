@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-06 15:33+0100\n"
+"POT-Creation-Date: 2023-06-06 16:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,23 +17,19 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: gui.py:80
-msgid "Hello"
-msgstr ""
-
-#: gui.py:83
+#: gui.py:76
 msgid "GF2 P2 Team 7 Logic Simulator GUI: "
 msgstr ""
 
-#: gui.py:89
+#: gui.py:82
 msgid "&About"
 msgstr ""
 
-#: gui.py:90
+#: gui.py:83
 msgid "&Exit"
 msgstr ""
 
-#: gui.py:91
+#: gui.py:84
 msgid "&File"
 msgstr ""
 
@@ -48,142 +44,184 @@ msgstr ""
 msgid "About Logsim"
 msgstr ""
 
-#: gui.py:186
-msgid "NO. CYCLES"
+#: gui.py:148
+msgid "GF2 P2 Team 7 Logic Simulator GUI"
 msgstr ""
 
-#: gui.py:213
-msgid "RUN"
+#: gui.py:166
+msgid "Welcome to our Logic Simulator!\n"
 msgstr ""
 
-#: gui.py:221
-msgid "Begin running the simulation"
+#: gui.py:172
+msgid "Need some help?"
 msgstr ""
 
-#: gui.py:227
-msgid "CLEAR"
+#: gui.py:178
+msgid "Tutorial"
 msgstr ""
 
-#: gui.py:235
-msgid "Clear all signal traces"
+#: gui.py:180
+msgid "Click here to learn how to use our Logic Simulator"
 msgstr ""
 
-#: gui.py:241
-msgid "RESET"
+#: gui.py:183
+msgid ""
+"Pre-loaded\n"
+"Logic Description File: "
 msgstr ""
 
-#: gui.py:249
-msgid "Reset the simulation from initialisation"
+#: gui.py:191
+msgid "Upload new file"
 msgstr ""
 
-#: gui.py:279
-msgid "QUIT"
+#: gui.py:193
+msgid "Upload a new Logic Description File"
 msgstr ""
 
-#: gui.py:287
-msgid "Quit the simulation"
+#: gui.py:196
+msgid "Continue"
 msgstr ""
 
-#: gui.py:303
-msgid "UPLOAD"
+#: gui.py:198
+msgid "Continue with preloaded logic description file"
 msgstr ""
 
-#: gui.py:305
-msgid "Upload logic description file"
-msgstr ""
-
-#: gui.py:315
-msgid "SETTINGS"
-msgstr ""
-
-#: gui.py:317
-msgid "Change system settings"
-msgstr ""
-
-#: gui.py:326
-msgid "HELP"
-msgstr ""
-
-#: gui.py:328
-msgid "Help on running logic simulation"
-msgstr ""
-
-#: gui.py:345
-msgid "CONTINUE"
-msgstr ""
-
-#: gui.py:347
-msgid "Continue running the simulation"
-msgstr ""
-
-#: gui.py:383
-msgid "Error! Network oscillating."
-msgstr ""
-
-#: gui.py:441
+#: gui.py:267 gui.py:577
 msgid "An error occurred."
 msgstr ""
 
-#: gui.py:472
+#: gui.py:322
+msgid "NO. CYCLES"
+msgstr ""
+
+#: gui.py:349
+msgid "RUN"
+msgstr ""
+
+#: gui.py:357
+msgid "Begin running the simulation"
+msgstr ""
+
+#: gui.py:363
+msgid "CLEAR"
+msgstr ""
+
+#: gui.py:371
+msgid "Clear all signal traces"
+msgstr ""
+
+#: gui.py:377
+msgid "RESET"
+msgstr ""
+
+#: gui.py:385
+msgid "Reset the simulation from initialisation"
+msgstr ""
+
+#: gui.py:415
+msgid "QUIT"
+msgstr ""
+
+#: gui.py:423
+msgid "Quit the simulation"
+msgstr ""
+
+#: gui.py:439
+msgid "UPLOAD"
+msgstr ""
+
+#: gui.py:441
+msgid "Upload logic description file"
+msgstr ""
+
+#: gui.py:451
+msgid "SETTINGS"
+msgstr ""
+
+#: gui.py:453
+msgid "Change system settings"
+msgstr ""
+
+#: gui.py:462
+msgid "HELP"
+msgstr ""
+
+#: gui.py:464
+msgid "Help on running logic simulation"
+msgstr ""
+
+#: gui.py:481
+msgid "CONTINUE"
+msgstr ""
+
+#: gui.py:483
+msgid "Continue running the simulation"
+msgstr ""
+
+#: gui.py:519
+msgid "Error! Network oscillating."
+msgstr ""
+
+#: gui.py:609
 msgid "Configure Logic Simulator GUI settings"
 msgstr ""
 
-#: gui.py:486
+#: gui.py:623
 msgid "GUI Settings"
 msgstr ""
 
-#: gui.py:494
+#: gui.py:631
 msgid "Select language"
 msgstr ""
 
-#: gui.py:503
+#: gui.py:640
 msgid "CONFIRM SETTINGS"
 msgstr ""
 
-#: gui.py:505
+#: gui.py:642
 msgid "Confirm settings changes"
 msgstr ""
 
-#: gui.py:560
+#: gui.py:697
 msgid "Tutorial on GF2 Team 7 Logic Simulator"
 msgstr ""
 
-#: gui.py:630
+#: gui.py:767
 msgid "ADD NEW MONITOR"
 msgstr ""
 
-#: gui.py:648 gui.py:679
+#: gui.py:785 gui.py:816
 msgid "Select output"
 msgstr ""
 
-#: gui.py:664
+#: gui.py:801
 msgid "Add a monitor"
 msgstr ""
 
-#: gui.py:669
+#: gui.py:806
 msgid "DELETE MONITOR"
 msgstr ""
 
-#: gui.py:695
+#: gui.py:832
 msgid "Delete an existing monitor"
 msgstr ""
 
-#: gui.py:705
+#: gui.py:842
 msgid "RECENTER"
 msgstr ""
 
-#: gui.py:713
+#: gui.py:850
 msgid "Recenter the signal traces"
 msgstr ""
 
-#: gui.py:816
+#: gui.py:953
 msgid "INPUTS"
 msgstr ""
 
-#: gui.py:847 gui.py:887 gui.py:987
+#: gui.py:984 gui.py:1024 gui.py:1124
 msgid "ON"
 msgstr ""
 
-#: gui.py:851 gui.py:900 gui.py:1015
+#: gui.py:988 gui.py:1037 gui.py:1152
 msgid "OFF"
 msgstr ""
