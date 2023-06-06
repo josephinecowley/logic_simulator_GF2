@@ -154,6 +154,26 @@ msgstr "Continuar ejecutando la simulación."
 msgid "Error! Network oscillating."
 msgstr "¡Error! Red oscilante."
 
+#: gui.py:472
+msgid "Configure Logic Simulator GUI settings"
+msgstr "Configurar los ajustes de la GUI del simulador lógico"
+
+#: gui.py:486
+msgid "GUI Settings"
+msgstr "Configuración de la interfaz gráfica de usuario"
+
+#: gui.py:494
+msgid "Select language"
+msgstr "Seleccione el idioma"
+
+#: gui.py:503
+msgid "CONFIRM SETTINGS"
+msgstr "CONFIRMAR AJUSTES"
+
+#: gui.py:505
+msgid "Confirm settings changes"
+msgstr "Confirmar cambios de configuración"
+
 #: gui.py:438
 msgid "An error occurred."
 msgstr "Ocurrió un error."

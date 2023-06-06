@@ -154,6 +154,26 @@ msgstr "Συνεχίστε την εκτέλεση της προσομοίωση
 msgid "Error! Network oscillating."
 msgstr "Λάθος! Δίκτυο που ταλαντώνεται."
 
+#: gui.py:472
+msgid "Configure Logic Simulator GUI settings"
+msgstr "Διαμορφώστε τις ρυθμίσεις του Logic Simulator GUI"
+
+#: gui.py:486
+msgid "GUI Settings"
+msgstr "Ρυθμίσεις GUI"
+
+#: gui.py:494
+msgid "Select language"
+msgstr "Επιλέξτε γλώσσα"
+
+#: gui.py:503
+msgid "CONFIRM SETTINGS"
+msgstr "ΕΠΙΒΕΒΑΙΩΣΗ ΡΥΘΜΙΣΕΩΝ"
+
+#: gui.py:505
+msgid "Confirm settings changes"
+msgstr "Επιβεβαιώστε τις αλλαγές στις ρυθμίσεις"
+
 #: gui.py:438
 msgid "An error occurred."
 msgstr "Παρουσιάστηκε σφάλμα."
