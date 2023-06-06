@@ -309,7 +309,7 @@ class RunSimulationPanel(wx.Panel):
 
         self.settings_button = wx.Button(
             self.settings_button_panel, wx.ID_ANY, _("SETTINGS"))
-        #self.Bind(wx.EVT_BUTTON, self.on_settings_button, self.settings_button)
+        self.Bind(wx.EVT_BUTTON, self.on_settings_button, self.settings_button)
         self.settings_button.SetToolTip(_("Change system settings"))
         settings_button_panel_vbox.Add(
             self.settings_button, 1, flag=wx.ALIGN_CENTER)
@@ -441,6 +441,15 @@ class RunSimulationPanel(wx.Panel):
 
         dlg.Destroy()
 
+    def on_settings_button(self, event):
+        settings_dialog = SettingsDialog(self)
+
+        settings_dialog.CenterOnScreen()
+
+        settings_dialog.ShowModal()
+
+        settings_dialog.Destroy()
+
     def on_help_button(self, event):
         self.open_help_dialog()
 
@@ -453,9 +462,38 @@ class RunSimulationPanel(wx.Panel):
 
         help_dialog.Destroy()
 
+class SettingsDialog(wx.Dialog):
+    def __init__(self, parent, title=_("Configure Logic Simulator GUI settings"), id=wx.ID_ANY, size=wx.DefaultSize, style=wx.DEFAULT_DIALOG_STYLE):
+        super(SettingsDialog, self).__init__(parent, title=_(title), id=id, size=size, style=style)
+        print(self.GetSize())
+        vbox = wx.BoxSizer(wx.VERTICAL)
+ 
+        text = wx.StaticText(self, wx.ID_ANY, _("GUI Settings"), style=wx.ALIGN_CENTER)
+        font = wx.Font(18, wx.FONTFAMILY_SWISS,
+                       wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        text.SetFont(font)
+        vbox.Add(text, 0, wx.ALIGN_CENTER)
+
+        selected_language = None
+        available_languages_list = ["English (GB)", "Español (ES)", "Ελληνικά (EL)"]
+        select_language_combo_box = wx.ComboBox(self, wx.ID_ANY, _("Select language"), (90, 50),
+                                                    (160, -1), available_languages_list,
+                                                    wx.CB_DROPDOWN
+                                                    )
+        self.Bind(wx.EVT_COMBOBOX, self.on_select_new_langauge,
+                  select_language_combo_box)
+        vbox.Add(
+            select_language_combo_box, 0, flag=wx.ALIGN_LEFT|wx.TOP, border=30)
+
+        self.SetSizer(vbox)
+        #vbox.Fit(self)
+
+    def on_select_new_langauge(self, event):
+        pass
+
 
 class HelpDialog(wx.Dialog):
-    def __init__(self, parent, title="Tutorial on GF2 Team 7 Logic Simulator", id=wx.ID_ANY, size=wx.DefaultSize, style=wx.DEFAULT_DIALOG_STYLE):
+    def __init__(self, parent, title=_("Tutorial on GF2 Team 7 Logic Simulator"), id=wx.ID_ANY, size=wx.DefaultSize, style=wx.DEFAULT_DIALOG_STYLE):
         super(HelpDialog, self).__init__(parent, title=_(title), id=id, size=size, style=style)
 
         vbox = wx.BoxSizer(wx.VERTICAL)
