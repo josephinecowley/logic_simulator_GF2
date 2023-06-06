@@ -63,7 +63,7 @@ class Gui(wx.Frame):
         self.monitors = monitors
         self.first_init = first_init
 
-        ldf_title = self.extract_ldf_title()
+        self.ldf_title = self.extract_ldf_title()
 
         if self.first_init:
             self.locale = wx.Locale(wx.LANGUAGE_DEFAULT)
@@ -74,7 +74,7 @@ class Gui(wx.Frame):
 
         # Configure the title of the GUI frame window
         team_name = _("GF2 P2 Team 7 Logic Simulator GUI: ")
-        self.SetTitle(team_name + ldf_title)
+        self.SetTitle(team_name + self.ldf_title)
 
         # Configure the file menu
         fileMenu = wx.Menu()
@@ -115,7 +115,14 @@ class Gui(wx.Frame):
         self.SetSizer(vbox)
 
         if self.first_init:
-            print('SUCCESS')
+            print('FIRST INITIALISATION')
+            welcome_dialog = WelcomeDialog(self)
+
+            welcome_dialog.CenterOnScreen()
+
+            welcome_dialog.ShowModal()
+
+            welcome_dialog.Destroy()
 
     def on_menu(self, event):
         """Handle the event when the user selects a menu item."""
@@ -135,6 +142,68 @@ class Gui(wx.Frame):
         ldf_title = self.path.split(os.sep)[-1]
 
         return ldf_title
+
+
+class WelcomeDialog(wx.Dialog):
+    def __init__(self, parent, title=_("GF2 P2 Team 7 Logic Simulator GUI"), id=wx.ID_ANY, size=wx.DefaultSize, style=wx.DEFAULT_DIALOG_STYLE):
+        super(WelcomeDialog, self).__init__(parent, title=_(title), id=id, size=size, style=style)
+        self.parent = parent
+
+        vbox = wx.BoxSizer(wx.VERTICAL)
+
+        top_panel = wx.Panel(self)
+        top_panel_vbox = wx.BoxSizer(wx.VERTICAL)
+        top_panel.SetSizer(top_panel_vbox)
+
+        middle_panel = wx.Panel(self)
+        middle_panel_fgs = wx.FlexGridSizer(cols=2, rows=2, vgap=4, hgap=50)
+        middle_panel.SetSizer(middle_panel_fgs)
+
+        bottom_panel = wx.Panel(self)
+        bottom_panel_hbox = wx.BoxSizer(wx.HORIZONTAL)
+        bottom_panel.SetSizer(bottom_panel_hbox)
+
+        welcome_text = wx.StaticText(top_panel, wx.ID_ANY, _("Welcome to our Logic Simulator!\n"), style=wx.ALIGN_CENTER)
+        welcome_font = wx.Font(18, wx.FONTFAMILY_SWISS,
+                       wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        welcome_text.SetFont(welcome_font)
+        top_panel_vbox.Add(welcome_text, 0, wx.ALIGN_CENTER)
+
+        help_prompt_text = wx.StaticText(middle_panel, wx.ID_ANY, _("Need some help?"))
+        middle_panel_font = wx.Font(10, wx.FONTFAMILY_SWISS,
+                       wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        help_prompt_text.SetFont(middle_panel_font)
+        middle_panel_fgs.Add(help_prompt_text, 0, wx.ALIGN_LEFT)
+
+        help_button = wx.Button(middle_panel, wx.ID_ANY, label=_("Tutorial"))
+        #upload_new_file_button.Bind(wx.EVT_BUTTON, self.on_upload_new_file, upload_new_file_button)
+        help_button.SetToolTip(_("Click here to learn how to use our Logic Simulator"))
+        middle_panel_fgs.Add(help_button, 1, flag=wx.EXPAND)
+
+        preloaded_ldf_text = wx.StaticText(middle_panel, wx.ID_ANY, _("Pre-loaded\nLogic Description File: "))
+        preloaded_ldf_text.SetFont(middle_panel_font)
+        middle_panel_fgs.Add(preloaded_ldf_text, 0, wx.ALIGN_LEFT)
+
+        preloaded_ldf_title = self.parent.ldf_title
+        preloaded_ldf_title_text = wx.StaticText(middle_panel, wx.ID_ANY, preloaded_ldf_title)
+        middle_panel_fgs.Add(preloaded_ldf_title_text, 0, wx.BOTTOM)
+
+        upload_new_file_button = wx.Button(bottom_panel, wx.ID_ANY, label=_("Upload new file"))
+        #upload_new_file_button.Bind(wx.EVT_BUTTON, self.on_upload_new_file, upload_new_file_button)
+        upload_new_file_button.SetToolTip(_("Upload a new Logic Description File"))
+        bottom_panel_hbox.Add(upload_new_file_button, 1, flag=wx.EXPAND)
+
+        continue_button = wx.Button(bottom_panel, wx.ID_ANY, label=_("Continue"))
+        #upload_new_file_button.Bind(wx.EVT_BUTTON, self.on_upload_new_file, upload_new_file_button)
+        continue_button.SetToolTip(_("Continue with preloaded logic description file"))
+        bottom_panel_hbox.Add(continue_button, 1, flag=wx.EXPAND)
+
+        vbox.Add(top_panel, 1, flag=wx.EXPAND, border=10)
+        vbox.Add(middle_panel, 2, flag=wx.EXPAND, border=10)
+        vbox.Add(bottom_panel, 1, flag=wx.EXPAND, border=10)
+
+        self.SetSizer(vbox)
+        vbox.Fit(self)
 
 
 class RunSimulationPanel(wx.Panel):
@@ -464,8 +533,9 @@ class RunSimulationPanel(wx.Panel):
 
         help_dialog.Destroy()
 
+
 class SettingsDialog(wx.Dialog):
-    def __init__(self, parent, path, title=_("Configure Logic Simulator GUI settings"), id=wx.ID_ANY, size=wx.DefaultSize, style=wx.DEFAULT_DIALOG_STYLE):
+    def __init__(self, parent, title=_("Configure Logic Simulator GUI settings"), id=wx.ID_ANY, size=wx.DefaultSize, style=wx.DEFAULT_DIALOG_STYLE):
         super(SettingsDialog, self).__init__(parent, title=_(title), id=id, size=size, style=style)
         self.parent = parent
 
