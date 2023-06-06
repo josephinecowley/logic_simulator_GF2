@@ -370,7 +370,8 @@ class RunSimulationPanel(wx.Panel):
                       devices,
                       network,
                       monitors,
-                      first_init=False)
+                      first_init=False,
+                      locale=self.parent.locale)
         new_Gui.Show()
         self.parent.Close()
 
