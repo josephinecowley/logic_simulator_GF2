@@ -115,7 +115,6 @@ class Gui(wx.Frame):
         self.SetSizer(vbox)
 
         if self.first_init:
-            print('FIRST INITIALISATION')
             welcome_dialog = WelcomeDialog(self)
 
             welcome_dialog.CenterOnScreen()
@@ -465,10 +464,10 @@ class RunSimulationPanel(wx.Panel):
         help_button_panel_vbox.Add(self.help_button, 1, flag=wx.ALIGN_CENTER)
 
         right_buttons_panel_hbox.Add(
-            self.upload_button_panel, 1, flag=wx.EXPAND)
-        right_buttons_panel_hbox.Add(self.settings_button_panel, 1, flag=wx.EXPAND)
+            self.upload_button_panel, 1, flag=wx.CENTER)
+        right_buttons_panel_hbox.Add(self.settings_button_panel, 1, flag=wx.CENTER)
         right_buttons_panel_hbox.Add(
-            self.help_button_panel, 1, flag=wx.EXPAND)
+            self.help_button_panel, 1, flag=wx.CENTER)
 
         hbox.Add(self.right_buttons_panel, 1, flag=wx.EXPAND)
 
