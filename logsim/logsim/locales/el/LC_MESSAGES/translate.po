@@ -82,6 +82,46 @@ msgstr ""
 msgid "About Logsim"
 msgstr "Σχετικά με το Logsim"
 
+#: gui.py:148
+msgid "GF2 P2 Team 7 Logic Simulator GUI"
+msgstr "GF2 P2 Ομάδα 7 Προσομοιωτής Λογικής GUI"
+
+#: gui.py:172
+msgid "Need some help?"
+msgstr "Χρειάζομαι βοήθεια?"
+
+#: gui.py:178
+msgid "Tutorial"
+msgstr "Φροντιστήριο"
+
+#: gui.py:180
+msgid "Click here to learn how to use our Logic Simulator"
+msgstr "Κάντε κλικ εδώ για να μάθετε πώς να χρησιμοποιείτε τον Προσομοιωτής Λογικής"
+
+#: gui.py:183
+msgid ""
+"Pre-loaded\n"
+"Logic Description File: "
+msgstr ""
+"Προφορτώθηκε\n"
+"Αρχείο Λογικής Περιγραφής:"
+
+#: gui.py:191
+msgid "Upload new file"
+msgstr "Ανεβάστε νέο αρχείο"
+
+#: gui.py:193
+msgid "Upload a new Logic Description File"
+msgstr "Ανεβάστε ένα νέο αρχείο λογικής περιγραφής"
+
+#: gui.py:196
+msgid "Continue"
+msgstr "Να συνεχίσει"
+
+#: gui.py:198
+msgid "Continue with preloaded logic description file"
+msgstr "Συνεχίστε με το προφορτωμένο αρχείο περιγραφής λογικής"
+
 #: gui.py:181
 msgid "NO. CYCLES"
 msgstr "ΑΡΙΘΜΟΣ ΚΥΚΛΩΝ"
