@@ -445,22 +445,37 @@ class RunSimulationPanel(wx.Panel):
         self.open_help_dialog()
 
     def open_help_dialog(self):
+        help_dialog = HelpDialog(self)
+
+        help_dialog.CenterOnScreen()
+
+        help_dialog.ShowModal()
+
+        help_dialog.Destroy()
+
+
+class HelpDialog(wx.Dialog):
+    def __init__(self, parent, title="Tutorial on GF2 Team 7 Logic Simulator", id=wx.ID_ANY, size=wx.DefaultSize, style=wx.DEFAULT_DIALOG_STYLE):
+        super(HelpDialog, self).__init__(parent, title=_(title), id=id, size=size, style=style)
+
+        vbox = wx.BoxSizer(wx.VERTICAL)
+
         help_dialog_file_path = Path(__file__).with_name("help_dialog.txt")
         with open(help_dialog_file_path, "r", encoding="utf8") as help_dialog_file:
             help_dialog_text_list = help_dialog_file.readlines()
         translated_help_dialog_text_list = [_(i) for i in help_dialog_text_list]
         translated_help_dialog_text = "".join(translated_help_dialog_text_list)
-        dlg = wx.MessageDialog(self, translated_help_dialog_text,
-                               _("Tutorial on GF2 Team 7 Logic Simulator"),
-                               wx.OK | wx.ICON_INFORMATION
-                               # wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL | wx.ICON_INFORMATION
-                               )
-        dlg.ShowModal()
-        dlg.Destroy()
+
+        help_message = wx.StaticText(self, wx.ID_ANY, translated_help_dialog_text)
+        vbox.Add(help_message, 0, wx.ALIGN_CENTRE|wx.ALL, 5)
+
+        self.SetSizer(vbox)
+        vbox.Fit(self)
+
 
 class SignalTrace(wx.ScrolledWindow):
     def __init__(self, parent, names, devices, network, monitors, id=wx.ID_ANY, size=wx.DefaultSize):
-        super(SignalTrace, self).__init__(parent, id, size=size)
+        super(SignalTrace, self).__init__(parent, id=id, size=size)
 
         size = self.GetClientSize()
 

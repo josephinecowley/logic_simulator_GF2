@@ -15,14 +15,17 @@ msgstr "Bienvenido a nuestro simulador de lógica!\n"
 msgid "To get started you need a valid Logic Description File. This is one which follows our defined language syntax.\n"
 msgstr "Para comenzar, necesita un archivo de descripción lógica válido. Este es uno que sigue nuestra sintaxis de lenguaje definida.\n"
 
-msgid "Click on the UPLOAD button in the bottom right corner of the simulator tab and follow the command prompt to select your logic description file.\n"
+msgid "Click on the “UPLOAD” button in the bottom right corner of the simulator tab and follow the command prompt to select your logic description file.\n"
 msgstr "Haga clic en el botón CARGAR en la esquina inferior derecha de la pestaña del simulador y siga el símbolo del sistema para seleccionar su archivo de descripción lógica.\n"
 
 msgid "Upon clicking this, if you have uploaded a valid Logic Description File, you should see the y-axis of each monitor you have specified, along with all of the valid switches you have added in your logic circuit.\n"
 msgstr "Al hacer clic aquí, si ha cargado un archivo de descripción lógica válido, debería ver el eje Y de cada monitor que ha especificado, junto con todos los interruptores válidos que ha agregado en su circuito lógico.\n"
 
-msgid "You can update the number of monitors using the Add new monitor and Zap a monitor drop down boxes, which provides names of device output ports which you could monitor. Once you have specified the monitor that you want to add or zap, you must press the corresponding + (for adding a monitor) or - (for zapping a monitor) buttons on the right of these dropdown boxes.\n"
-msgstr "Puede actualizar la cantidad de monitores utilizando los cuadros desplegables Agregar nuevo monitor y Zap a monitor, que proporcionan los nombres de los puertos de salida del dispositivo que puede monitorear. Una vez que haya especificado el monitor que desea agregar o eliminar, debe presionar los botones correspondientes + (para agregar un monitor) o - (para eliminar un monitor) a la derecha de estos cuadros desplegables.\n"
+msgid "You can update the number of monitors using the “Add new monitor” and “Zap a monitor” drop down boxes, which provides names of device output ports which you could monitor. \n"
+msgstr "Puede actualizar la cantidad de monitores mediante los cuadros desplegables Agregar nuevo monitor y Eliminar un monitor, que proporcionan los nombres de los puertos de salida del dispositivo que puede monitorear.\n"
+
+msgid "Once you have specified the monitor that you want to add or zap, you must press the corresponding “+” (for adding a monitor) or “-” (for zapping a monitor) buttons on the right of these dropdown boxes.\n"
+msgstr "Una vez que haya especificado el monitor que desea agregar o eliminar, debe presionar los botones correspondientes + (para agregar un monitor) o - (para eliminar un monitor) a la derecha de estos cuadros desplegables.\n"
 
 msgid "Upon doing so, you should see the monitors update.\n"
 msgstr "Al hacerlo, debería ver la actualización de los monitores.\n"
@@ -33,14 +36,17 @@ msgstr "También puede cambiar el estado inicial de los interruptores en su circ
 msgid "Now specify the number of cycles you wish to run by using the spin button in the bottom left corner of the simulator.\n"
 msgstr "Ahora especifique la cantidad de ciclos que desea ejecutar usando el botón giratorio en la esquina inferior izquierda del simulador.\n"
 
-msgid "Now you can press the large green RUN button in the bottom left hand corner.\n"
+msgid "Now you can press the large green “RUN” button in the bottom left hand corner.\n"
 msgstr "Ahora puede presionar el botón verde grande EJECUTAR en la esquina inferior izquierda.\n"
 
 msgid "If successful, you should see the signal traces update for each monitored device.\n"
 msgstr "Si tiene éxito, debería ver la actualización de los rastros de señal para cada dispositivo monitoreado.\n"
 
-msgid "Note that upon clicking RUN this button will change to an orange CONTINUE button. Click this if you want to add further simulations. You can always change the number of cycles specified or the switch states or monitors in between each simulation."
-msgstr "Tenga en cuenta que al hacer clic en EJECUTAR, este botón cambiará a un botón naranja CONTINUAR. Haga clic aquí si desea agregar más simulaciones. Siempre puede cambiar la cantidad de ciclos especificados o los estados del interruptor o los monitores entre cada simulación."
+msgid "Note that upon clicking “RUN” this button will change to an orange “CONTINUE” button. Click this if you want to add further simulations. \n"
+msgstr "Tenga en cuenta que al hacer clic en EJECUTAR, este botón cambiará a un botón naranja CONTINUAR. Haga clic aquí si desea agregar más simulaciones.\n"
+
+msgid "You can always change the number of cycles specified or the switch states or monitors in between each simulation."
+msgstr "Siempre puede cambiar la cantidad de ciclos especificados o los estados del interruptor o los monitores entre cada simulación."
 
 #: gui.py:74
 msgid "Hello"
