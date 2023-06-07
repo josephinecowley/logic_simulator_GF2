@@ -327,6 +327,7 @@ class Parser:
             raise ValueError(
                 "Expected stopping symbol to be within range of given symbols")
 
+        self.symbol = self.scanner.get_symbol()
         # To skip symbols to recover parsing
         while ((self.symbol.type not in stopping_symbol_types) and (self.symbol.type != self.scanner.EOF)):
             self.symbol = self.scanner.get_symbol()
@@ -356,7 +357,7 @@ class Parser:
         # If symbol type is not keyword
         if not (self.symbol.type == self.scanner.KEYWORD):
 
-            # If symbol type is name
+            # If symbol type is not name
             if not (self.symbol.type == self.scanner.NAME):
 
                 # If symbol type is open brace '{'
@@ -367,7 +368,7 @@ class Parser:
                     self.symbol = self.scanner.get_symbol()
                     return
 
-            # If symbol type is not name
+            # If symbol type is name
             else:
                 previous_symbol = self.symbol
                 self.symbol = self.scanner.get_symbol()
@@ -727,6 +728,7 @@ class Parser:
                             self.symbol = self.scanner.get_symbol()
 
                             # Check we get a SIGNAL type
+                            print('hereeeee', self.symbol.type)
                             if self.symbol.type == self.scanner.SIGNAL:
                                 signal_string = self.names.get_name_string(
                                     self.symbol.id)
