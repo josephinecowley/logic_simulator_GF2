@@ -8,6 +8,7 @@ Classes:
 Gui - configures the main window and all its widgets.
 WelcomeDialog - configures the welcome dialog and all its widgets.
 RunSimulationPanel - configures the running simulation panel and all its widgets.
+ErrorDialog - configures the error dialog and all its widgets.
 SettingsDialog - configures the settings dialog and all its widgets.
 HelpDialog - configures the help dialog and all its widgets.
 SignalTracesPanel - configures the signal traces panel and all its widgets.
@@ -314,13 +315,11 @@ class WelcomeDialog(wx.Dialog):
                 new_Gui.Show()
                 self.Close()
                 self.parent.Close()
-            else:
-                dlg = wx.MessageDialog(self, output,
-                                       _("An error occurred."),
-                                       wx.OK | wx.ICON_INFORMATION
-                                       )
-                dlg.ShowModal()
-                dlg.Destroy()
+            else: # display the informative error message
+                error_dlg = ErrorDialog(self, output, size=(600, 400))
+
+                error_dlg.ShowModal()
+                error_dlg.Destroy()
     
     def on_continue_button(self, event):
         """Handle the event when the user clicks the continue button."""
@@ -700,13 +699,12 @@ class RunSimulationPanel(wx.Panel):
                               locale=self.parent.locale)
                 new_Gui.Show()
                 self.parent.Close()
-            else:
-                dlg = wx.MessageDialog(self, output,
-                                       _("An error occurred."),
-                                       wx.OK | wx.ICON_INFORMATION
-                                       )
-                dlg.ShowModal()
-                dlg.Destroy()
+            else: # display the informative error message
+                error_dlg = ErrorDialog(self, output, size=(600, 400))
+
+                error_dlg.ShowModal()
+                error_dlg.Destroy()
+                
 
     def on_settings_button(self, event):
         """Handle the event when the user clicks the SETTINGS button."""
@@ -731,6 +729,46 @@ class RunSimulationPanel(wx.Panel):
         help_dialog.ShowModal()
 
         help_dialog.Destroy()
+
+
+class ErrorDialog(wx.Dialog):
+    """Configure the error dialog and all the widgets.
+
+    This class provides an error dialog which reports the errors as identified by the parser and displays the informative error
+    message to the user in a scrollable panel.
+
+    Parameters
+    ----------
+    parent: parent of the dialog window.
+    title (optional): title of the dialog window.
+    id (optional): id of the dialog window. 
+    size (optional): size of the dialog window.
+    style (optional): style of the dialog window. 
+
+    Public methods
+    --------------
+    No public methods.
+    """
+    def __init__(self, parent, error_message, title=_("An error occurred."), id=wx.ID_ANY, size=wx.DefaultSize, style=wx.DEFAULT_DIALOG_STYLE):
+        """Initialise widgets and layout."""
+        super(ErrorDialog, self).__init__(parent, title=_(title), id=id, size=size, style=style)
+
+        # Create instance variables for the ErrorDialog class
+        self.parent = parent
+
+        # Configure sizer for layout of the Dialog box
+        vbox = wx.BoxSizer(wx.VERTICAL)
+
+        # Create and set the font of the error message text
+        error_text = wx.TextCtrl(self, wx.ID_ANY, style=wx.TE_MULTILINE|wx.TE_READONLY|wx.TE_DONTWRAP)
+        error_text.SetValue(error_message)
+        font = wx.Font(12, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        error_text.SetFont(font)
+
+        # Add the error text to the Dialog box
+        vbox.Add(error_text, 5, flag=wx.EXPAND|wx.ALL, border=5)
+
+        self.SetSizer(vbox)
 
 
 class SettingsDialog(wx.Dialog):
@@ -806,7 +844,6 @@ class SettingsDialog(wx.Dialog):
         select_language_combo_box = event.GetEventObject()
         self.selected_language = select_language_combo_box.GetValue()
 
-        print(self.selected_language)
         if self.selected_language is not None:
             pass
     
