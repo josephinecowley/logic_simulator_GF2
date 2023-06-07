@@ -267,7 +267,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
 
             if self.pan_x > 0:
                 self.pan_x = 0
-            # commit test comment
 
             self.last_mouse_x = event.GetX()
             self.last_mouse_y = event.GetY()
