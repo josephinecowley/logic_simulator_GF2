@@ -321,8 +321,6 @@ class WelcomeDialog(wx.Dialog):
                                        )
                 dlg.ShowModal()
                 dlg.Destroy()
-
-        dlg.Destroy()
     
     def on_continue_button(self, event):
         """Handle the event when the user clicks the continue button."""
