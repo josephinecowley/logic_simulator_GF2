@@ -710,8 +710,6 @@ class RunSimulationPanel(wx.Panel):
                 dlg.ShowModal()
                 dlg.Destroy()
 
-        dlg.Destroy()
-
     def on_settings_button(self, event):
         """Handle the event when the user clicks the SETTINGS button."""
         self.settings_dialog = SettingsDialog(self)
