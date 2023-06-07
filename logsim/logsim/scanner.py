@@ -342,8 +342,8 @@ class Scanner:
         signal_string = ""
         self.advance
         #  create signal string by iterating advance()
-        while self.current_character not in ["]", ""]:
+        while self.current_character not in ["]", "\n"]:
             signal_string += self.current_character
             self.advance()
         signal_string += self.current_character
-        return signal_string  # returns the signal string (eg. "[1, 2, 3, 4]"")
+        return signal_string  # returns the signal string
