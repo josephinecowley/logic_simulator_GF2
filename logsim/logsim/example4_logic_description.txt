@@ -9,7 +9,7 @@ DEVICES {
     data = SIGGEN(0, [1, 2, 4, 8]);
     dtype1 = DTYPE;
     rc1 = RC(5);
-    set1 = SWITCH(1);
+    set1 = SWITCH(0);
     clock = CLOCK(1);
 }
 
