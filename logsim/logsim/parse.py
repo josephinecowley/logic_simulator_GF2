@@ -496,18 +496,17 @@ class Parser:
 
             # If semicolon missing and unknown symbol (including EOF)
             elif self.symbol.type != self.scanner.SEMICOLON:
-                self.display_error(self.symbol, self.NO_SEMICOLON)
-                return False
+                self.display_error(
+                    self.symbol, self.NO_SEMICOLON, proceed=False)
 
     def device(self):
         """Parse a user defined device.
 
         Make the device if there are no errors."""
 
-        # If symbol type is now a close brace '{'
+        # If symbol type is now a close brace '}'
         if self.symbol.type == self.scanner.BRACE_CLOSE:
             return
-
         # Check that we have a valid user defined name
         if self.symbol.type == self.scanner.NAME:
 
@@ -914,8 +913,8 @@ class Parser:
 
             # If semicolon missing and unknown symbol (including EOF)
             elif self.symbol.type != self.scanner.SEMICOLON:
-                self.display_error(self.symbol, self.NO_SEMICOLON)
-                return False
+                self.display_error(
+                    self.symbol, self.NO_SEMICOLON, proceed=False)
 
     def connection(self):
         """Parse a connection.
@@ -1052,7 +1051,7 @@ class Parser:
             self.display_error(
                 self.symbol, self.NO_SEMICOLON, proceed=False)
 
-            # Check if semicolon was missing and now symbol is at the close brace '{' symbol
+            # Check if semicolon was missing and now symbol is at the close brace '}' symbol
             if self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.symbol = self.scanner.get_symbol()
                 return False
@@ -1102,8 +1101,8 @@ class Parser:
 
             # If semicolon missing and unknown symbol (including EOF)
             elif self.symbol.type != self.scanner.SEMICOLON:
-                self.display_error(self.symbol, self.NO_SEMICOLON)
-                return False
+                self.display_error(
+                    self.symbol, self.NO_SEMICOLON, proceed=False)
 
     def assign_monitor(self, monitor_device_id, monitor_port_id):
         """Assign a single monitor to the given output port."""
