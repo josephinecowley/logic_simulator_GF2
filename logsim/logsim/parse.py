@@ -747,12 +747,15 @@ class Parser:
                                 else:
                                     self.display_error(self.symbol, self.NO_BRACKET_CLOSE,
                                                        proceed=False)
+                                    return None, None
                             else:
                                 self.display_error(self.symbol, self.NO_SIGNAL_LIST,
                                                    proceed=False)
+                                return None, None
                         else:
                             self.display_error(self.symbol, self.NO_COMMA,
                                                proceed=False)
+                            return None, None
 
                     else:
                         self.display_error(self.symbol, self.BINARY_NUMBER_OUT_OF_RANGE,
