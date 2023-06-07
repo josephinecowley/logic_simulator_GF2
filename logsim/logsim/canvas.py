@@ -220,6 +220,8 @@ class MyGLCanvas(wxcanvas.GLCanvas):
                         2 - self.y_spacing * (len(self.traces) - 1), 0.0)
         GL.glScaled(self.zoom, self.zoom, self.zoom)
 
+        self.init = False
+
         self.Refresh()
 
     def clear_traces(self):
@@ -240,7 +242,6 @@ class MyGLCanvas(wxcanvas.GLCanvas):
             self.init_gl()
             self.init = True
 
-        size = self.GetClientSize()
         self.render()
 
     def on_size(self, event):
