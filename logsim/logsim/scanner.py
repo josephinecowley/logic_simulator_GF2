@@ -346,4 +346,4 @@ class Scanner:
             signal_string += self.current_character
             self.advance()
         signal_string += self.current_character
-        return signal_string  # returns the signal string (eg. "[1, 2, 3, 4]"")
+        return signal_string  # returns the signal string 
