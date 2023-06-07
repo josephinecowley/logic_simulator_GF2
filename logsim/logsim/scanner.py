@@ -301,14 +301,18 @@ class Scanner:
             self.skip_spaces()  # current_character now non-whitespace, line_number and position updated
         else:
             self.advance()  # get first character in comment
-            # closed by " (have to break PEP8 for this)
-            while not self.current_character == '"':
+            # closed by " (have to break PEP8 for this) or EOF
+            while not self.current_character in ['"', ""]:
                 if self.current_character == "\n":
                     self.line_number += 1
                     self.position = 0
                 self.advance()
-            self.advance()
-            self.skip_spaces()
+            if self.current_character == "":
+                return
+            else:
+                self.advance()
+                self.skip_spaces()
+                return
 
     def get_name(self):
         """Assumes that current character is alphabetical and returns an alphanumeric
