@@ -62,7 +62,7 @@ class Parser:
 
     check_device_is_valid(self): Check if device is valid and return both device type ID and the input ID.
 
-    is_valid_list_string(self, string): Check that sigen signal is valid.
+    is_valid_list_string(self, string): Check that siggen signal is valid.
 
     connection_list(self): Parse connection list.
 
@@ -834,7 +834,7 @@ class Parser:
             return None, None
 
     def is_valid_list_string(self, string):
-        """Check that sigen signal is valid."""
+        """Check that siggen signal is valid."""
         if string.startswith('[') and string.endswith(']'):
             elements = string[1:-1].split(',')
             for element in elements:
