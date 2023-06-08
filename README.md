@@ -10,6 +10,7 @@ Our project Kanban board can be found here https://github.com/users/josephinecow
 
 - Download wxpython 
 - Write the Logic Description File
-- In the Final folder directory, type `python3 logsim.py <you_example_LDF_file_here>`
+- In the `final` folder directory, type in the terminal `python3 logsim.py <you_example_LDF_file_here>`
+- To carry out the unit tests, you can write in the terminal `pytest`
 - Follow the commands in the welcome pop up box to get started!
 
