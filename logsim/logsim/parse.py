@@ -62,6 +62,8 @@ class Parser:
 
     check_device_is_valid(self): Check if device is valid and return both device type ID and the input ID.
 
+    is_valid_list_string(self, string): Check that sigen signal is valid.
+
     connection_list(self): Parse connection list.
 
     connection(self): Parse a connection.
@@ -286,7 +288,7 @@ class Parser:
         elif error_type == self.NO_SIGNAL_LIST:
             # Semantic error
             print(
-                "Siggen signal input is not valid. Must be a list e.g. [1,2,5,3].", end="\n \n")
+                "Siggen signal input is not valid. Must be a list of digits e.g. [1,2,5,3].", end="\n \n")
         else:
             raise ValueError("Expected a valid error code")
 
@@ -724,29 +726,39 @@ class Parser:
 
                         # Check that the symbol is a coma
                         if self.symbol.type == self.scanner.COMMA:
+                            # Take previous symbol because if error arises with signal type, the line number gives None
+                            previous_symbol = self.symbol
                             self.symbol = self.scanner.get_symbol()
 
                             # Check we get a SIGNAL type
-                            print('hereeeee', self.symbol.type)
                             if self.symbol.type == self.scanner.SIGNAL:
                                 signal_string = self.names.get_name_string(
                                     self.symbol.id)
-                                signal = signal_string.strip('][').split(',')
-                                signal = list(map(int, signal))
 
-                                siggen_property = (
-                                    siggen_initial_state, signal)
+                                # Check that siggen signal is valid
+                                is_signal_valid = self.is_valid_list_string(
+                                    signal_string)
+                                if is_signal_valid:
+                                    signal = signal_string.strip(
+                                        '][').split(',')
+                                    signal = list(map(int, signal))
+                                    siggen_property = (
+                                        siggen_initial_state, signal)
 
-                                self.symbol = self.scanner.get_symbol()
-
-                                # Check that the close symbol comes next
-                                if self.symbol.type == self.scanner.BRACKET_CLOSE:
                                     self.symbol = self.scanner.get_symbol()
 
-                                    # Return device kind and the signal list
-                                    return device_kind, siggen_property
+                                    # Check that the close symbol comes next
+                                    if self.symbol.type == self.scanner.BRACKET_CLOSE:
+                                        self.symbol = self.scanner.get_symbol()
+
+                                        # Return device kind and the signal list
+                                        return device_kind, siggen_property
+                                    else:
+                                        self.display_error(self.symbol, self.NO_BRACKET_CLOSE,
+                                                           proceed=False)
+                                        return None, None
                                 else:
-                                    self.display_error(self.symbol, self.NO_BRACKET_CLOSE,
+                                    self.display_error(previous_symbol, self.NO_SIGNAL_LIST, display=True, display_marker=False,
                                                        proceed=False)
                                     return None, None
                             else:
@@ -820,6 +832,22 @@ class Parser:
             self.display_error(self.symbol, self.INVALID_COMPONENT,
                                proceed=False)
             return None, None
+
+    def is_valid_list_string(self, string):
+        """Check that sigen signal is valid."""
+        if string.startswith('[') and string.endswith(']'):
+            elements = string[1:-1].split(',')
+            for element in elements:
+                element = element.strip()
+                if not element.isdigit():
+                    # Not all elements are integers
+                    return False
+            if len(elements) == 1 and elements[0].strip() == '':
+                # Empty list
+                return False
+            return True
+            # Does not end with ']' (will always have '[' )
+        return False
 
     def connection_list(self):
         """Parse connection list."""
