@@ -92,7 +92,7 @@ class Devices:
 
     make_siggen(self, device_id, initial_state, period_list): Make a siggen device
                                with the specified initial state and signal periods.
-    
+
     make_RC(self, device_id, RC_period): Make a RC device with the specified period.
 
     make_gate(self, device_id, device_kind, no_of_inputs): Makes logic gates

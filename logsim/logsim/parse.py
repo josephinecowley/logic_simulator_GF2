@@ -111,14 +111,51 @@ class Parser:
         self.error_count = 0
 
         # List of syntax errors
-        self.syntax_errors = [self.NO_DEVICES_KEYWORD, self.NO_CONNECTIONS_KEYWORD, self.NO_MONITORS_KEYWORD, self.NO_END_KEYWORD, self.NO_BRACE_OPEN,
-                              self.NO_BRACE_CLOSE, self.INVALID_NAME, self.NO_EQUALS, self.INVALID_COMPONENT, self.NO_BRACKET_OPEN, self.NO_BRACKET_CLOSE,
-                              self.NO_NUMBER, self.INPUT_OUT_OF_RANGE, self.CLK_OUT_OF_RANGE, self.BINARY_NUMBER_OUT_OF_RANGE, self.UNDEFINED_NAME,
-                              self.NO_FULLSTOP, self.NO_SEMICOLON, self.NO_Q_OR_QBAR, self.NO_INPUT_SUFFIX, self.SYMBOL_AFTER_END, self.EMPTY_FILE,
-                              self.TERMINATE, self.WRONG_ORDER, self.NO_COMMA, self.EMPTY_DEVICE_LIST, self.RC_OUT_OF_RANGE, self.EMPTY_CONNECTION_LIST, self.NO_SIGNAL_LIST] = self.names.unique_error_codes(29)
+        self.syntax_errors = [
+            self.NO_DEVICES_KEYWORD,
+            self.NO_CONNECTIONS_KEYWORD,
+            self.NO_MONITORS_KEYWORD,
+            self.NO_END_KEYWORD,
+            self.NO_BRACE_OPEN,
+            self.NO_BRACE_CLOSE,
+            self.INVALID_NAME,
+            self.NO_EQUALS,
+            self.INVALID_COMPONENT,
+            self.NO_BRACKET_OPEN,
+            self.NO_BRACKET_CLOSE,
+            self.NO_NUMBER,
+            self.INPUT_OUT_OF_RANGE,
+            self.CLK_OUT_OF_RANGE,
+            self.BINARY_NUMBER_OUT_OF_RANGE,
+            self.UNDEFINED_NAME,
+            self.NO_FULLSTOP,
+            self.NO_SEMICOLON,
+            self.NO_Q_OR_QBAR,
+            self.NO_INPUT_SUFFIX,
+            self.SYMBOL_AFTER_END,
+            self.EMPTY_FILE,
+            self.TERMINATE,
+            self.WRONG_ORDER,
+            self.NO_COMMA,
+            self.EMPTY_DEVICE_LIST,
+            self.RC_OUT_OF_RANGE,
+            self.EMPTY_CONNECTION_LIST,
+            self.NO_SIGNAL_LIST] = self.names.unique_error_codes(29)
 
-    # Stopping symbols automatically assigned to semi-colons, braces and keywords
-    def display_error(self,  symbol, error_type, display=True, display_marker=True, proceed=True, stopping_symbol_types=[2, 3, 6, 8]):
+    # Stopping symbols automatically assigned to semi-colons, braces and
+    # keywords
+    def display_error(
+        self,
+        symbol,
+        error_type,
+        display=True,
+        display_marker=True,
+        proceed=True,
+        stopping_symbol_types=[
+            2,
+            3,
+            6,
+            8]):
         """Display the error message and where it occured.
 
         Calls the error handling method to resume from the next available point."""
@@ -133,7 +170,7 @@ class Parser:
             raise ValueError("Cannot have a negative error code")
         elif not isinstance(symbol, Symbol):
             raise TypeError("Expected an instance of the Symbol class")
-        elif not isinstance(stopping_symbol_types,  list):
+        elif not isinstance(stopping_symbol_types, list):
             raise TypeError(
                 "Expected stopping symbol to be an integer type argument")
         elif ((len(stopping_symbol_types) >= 12) or (len(stopping_symbol_types) <= 0)):
@@ -158,7 +195,9 @@ class Parser:
             print("Expected the keyword MONITORS", end="\n \n")
         elif error_type == self.NO_END_KEYWORD:
             # Syntax error
-            print("Expected the keyword END straight after monitors list", end="\n \n")
+            print(
+                "Expected the keyword END straight after monitors list",
+                end="\n \n")
         elif error_type == self.NO_BRACE_OPEN:
             # Syntax error
             print("Expected a '{' symbol", end="\n \n")
@@ -186,15 +225,18 @@ class Parser:
         elif error_type == self.INPUT_OUT_OF_RANGE:
             # Semantic error
             print(
-                "Input number of gates is out of range. Must be an integer between 1 and 16", end="\n \n")
+                "Input number of gates is out of range. Must be an integer between 1 and 16",
+                end="\n \n")
         elif error_type == self.CLK_OUT_OF_RANGE:
             # Semantic error
             print(
-                "Input clock half period is out of range. Must be a positive integer", end="\n \n")
+                "Input clock half period is out of range. Must be a positive integer",
+                end="\n \n")
         elif error_type == self.BINARY_NUMBER_OUT_OF_RANGE:
             # Semantic error
             print(
-                "Input number is out of range. Must be either 1 or 0", end="\n \n")
+                "Input number is out of range. Must be either 1 or 0",
+                end="\n \n")
         elif error_type == self.UNDEFINED_NAME:
             # Syntax error
             print("Undefined device name given", end="\n \n")
@@ -212,14 +254,17 @@ class Parser:
             print("Expected a valid input suffix", end="\n \n")
         elif error_type == self.SYMBOL_AFTER_END:
             # Syntax error
-            print("There should not be any text after the keyword END", end="\n \n")
+            print(
+                "There should not be any text after the keyword END",
+                end="\n \n")
         elif error_type == self.EMPTY_FILE:
             # Syntax error
             print("Cannot parse an empty file", end="\n \n")
         elif error_type == self.TERMINATE:
             # Syntax error
             print(
-                "Could not find parsing point to restart, program terminated early", end="\n \n")
+                "Could not find parsing point to restart, program terminated early",
+                end="\n \n")
         elif error_type == self.devices.INVALID_QUALIFIER:
             # Semantic error
             print("Invalid device property", end="\n \n")
@@ -240,35 +285,43 @@ class Parser:
         elif error_type == self.network.INPUT_TO_INPUT:
             # Semantic error
             print(
-                "Cannot connect an input port to another input port", end="\n \n")
+                "Cannot connect an input port to another input port",
+                end="\n \n")
         elif error_type == self.network.OUTPUT_TO_OUTPUT:
             # Semantic error
             print(
-                "Cannot connect an output port to another output port", end="\n \n")
+                "Cannot connect an output port to another output port",
+                end="\n \n")
         elif error_type == self.network.INPUT_CONNECTED:
             # Semantic error
             print(
-                "Cannot connect input port as it is already connected", end="\n \n")
+                "Cannot connect input port as it is already connected",
+                end="\n \n")
         elif error_type == self.network.PORT_ABSENT:
             # Semantic error
             print(
-                "Cannot make connection as specified port does not exist", end="\n \n")
+                "Cannot make connection as specified port does not exist",
+                end="\n \n")
         elif error_type == self.network.DEVICE_ABSENT:
             # Semantic error
             print(
-                "Cannot make connection as device is undefined in DEVICE list", end="\n \n")
+                "Cannot make connection as device is undefined in DEVICE list",
+                end="\n \n")
         elif error_type == self.monitors.NOT_OUTPUT:
             # Semantic error
             print(
-                "Cannot assign a monitor as specified device port is not an output port", end="\n \n")
+                "Cannot assign a monitor as specified device port is not an output port",
+                end="\n \n")
         elif error_type == self.monitors.MONITOR_PRESENT:
             # Semantic error
             print(
-                "Cannot assign more than one monitor to a single device output port", end="\n \n")
+                "Cannot assign more than one monitor to a single device output port",
+                end="\n \n")
         elif error_type == self.WRONG_ORDER:
             # Syntax error
             print(
-                "Wrong keyword entered, ensure order of lists is: DEVICES, CONNECTIONS, MONITORS, END.\n          Program terminated early as this is an error which cannot be handled.", end="\n \n")
+                "Wrong keyword entered, ensure order of lists is: DEVICES, CONNECTIONS, MONITORS, END.\n          Program terminated early as this is an error which cannot be handled.",
+                end="\n \n")
         elif error_type == self.NO_COMMA:
             # Syntax error
             print(
@@ -276,19 +329,23 @@ class Parser:
         elif error_type == self.EMPTY_DEVICE_LIST:
             # Syntax error
             print(
-                "Cannot parse an empty device list.\n          Program terminated early as this is an error which cannot be handled.", end="\n \n")
+                "Cannot parse an empty device list.\n          Program terminated early as this is an error which cannot be handled.",
+                end="\n \n")
         elif error_type == self.EMPTY_CONNECTION_LIST:
             # Syntax error
             print(
-                "Cannot parse an empty connections list.\n          Program terminated early as this is an error which cannot be handled.", end="\n \n")
+                "Cannot parse an empty connections list.\n          Program terminated early as this is an error which cannot be handled.",
+                end="\n \n")
         elif error_type == self.RC_OUT_OF_RANGE:
             # Semantic error
             print(
-                "Input RC period is out of range. Must be a positive integer", end="\n \n")
+                "Input RC period is out of range. Must be a positive integer",
+                end="\n \n")
         elif error_type == self.NO_SIGNAL_LIST:
             # Semantic error
             print(
-                "Siggen signal input is not valid. Must be a list of digits e.g. [1,2,5,3].", end="\n \n")
+                "Siggen signal input is not valid. Must be a list of digits e.g. [1,2,5,3].",
+                end="\n \n")
         else:
             raise ValueError("Expected a valid error code")
 
@@ -297,19 +354,22 @@ class Parser:
             return
 
         # Display error line and visual marker if display is True
-        if display == True:
-            # Display error line and indicator (latter only if display_marker is true)
+        if display:
+            # Display error line and indicator (latter only if display_marker
+            # is true)
             self.scanner.display_line_and_marker(symbol)
         #   self.scanner.display_line_and_marker(symbol, display_marker)
 
-        if proceed == True:
+        if proceed:
             return
         else:
-            # Call error recovery function to resume parsing at appropriate point
+            # Call error recovery function to resume parsing at appropriate
+            # point
             self.error_recovery(error_type, stopping_symbol_types)
             return
 
-    # Stopping symbols automatically assigned to semi-colons, braces and keywords
+    # Stopping symbols automatically assigned to semi-colons, braces and
+    # keywords
 
     def error_recovery(self, error_type, stopping_symbol_types=[2, 3, 6, 8]):
         """Recover from an error by resuming parsing at an appropriate point."""
@@ -331,7 +391,8 @@ class Parser:
 
         self.symbol = self.scanner.get_symbol()
         # To skip symbols to recover parsing
-        while ((self.symbol.type not in stopping_symbol_types) and (self.symbol.type != self.scanner.EOF)):
+        while ((self.symbol.type not in stopping_symbol_types)
+               and (self.symbol.type != self.scanner.EOF)):
             self.symbol = self.scanner.get_symbol()
         # Stop when stopping symbol is encountered
         if self.symbol.type in stopping_symbol_types:
@@ -383,7 +444,10 @@ class Parser:
                     self.display_error(
                         self.symbol, missing_error_type, display=False)
                     self.display_error(
-                        self.symbol, self.NO_BRACE_OPEN, display=False, proceed=False)
+                        self.symbol,
+                        self.NO_BRACE_OPEN,
+                        display=False,
+                        proceed=False)
                     self.symbol = self.scanner.get_symbol()
                     return
 
@@ -406,7 +470,9 @@ class Parser:
                 if not (self.symbol.type == self.scanner.BRACE_OPEN):
                     # Case 5. KEYWORD ...
                     self.display_error(
-                        previous_symbol, self.NO_BRACE_OPEN, display_marker=False)
+                        previous_symbol,
+                        self.NO_BRACE_OPEN,
+                        display_marker=False)
                     return
 
                 # If symbol type is open brace '{'
@@ -418,11 +484,15 @@ class Parser:
             # If symbol id is incorrect
             else:
                 # Case 7: Wrong keyword given (e.g. END is called after device_list).
-                # We will treat this as a special case and terminate the program early
+                # We will treat this as a special case and terminate the
+                # program early
                 previous_symbol = self.symbol
                 self.symbol = self.scanner.get_symbol()
                 self.display_error(
-                    previous_symbol, self.WRONG_ORDER, proceed=False, stopping_symbol_types=[11])
+                    previous_symbol,
+                    self.WRONG_ORDER,
+                    proceed=False,
+                    stopping_symbol_types=[11])
                 return
 
     def device_list(self):
@@ -439,8 +509,12 @@ class Parser:
 
         # If Device list is empty
         if self.symbol.type == self.scanner.BRACE_CLOSE:
-            self.display_error(self.symbol, self.EMPTY_DEVICE_LIST,
-                               display=False, proceed=False, stopping_symbol_types=[11])
+            self.display_error(
+                self.symbol,
+                self.EMPTY_DEVICE_LIST,
+                display=False,
+                proceed=False,
+                stopping_symbol_types=[11])
             return True
 
         # Parse device
@@ -451,21 +525,25 @@ class Parser:
             self.display_error(
                 self.symbol, self.NO_SEMICOLON, proceed=False)
 
-            # Check if semicolon was missing and now symbol is at the close brace '{' symbol
+            # Check if semicolon was missing and now symbol is at the close
+            # brace '{' symbol
             if self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.symbol = self.scanner.get_symbol()
                 return False
 
-            # Check if semicolon and close brace '{' was missing and now symbol is at the next keyword
+            # Check if semicolon and close brace '{' was missing and now symbol
+            # is at the next keyword
             elif self.symbol.type == self.scanner.KEYWORD:
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
                 return False
 
         # Check all devices in list, which are all separated by a ';'
-        while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
+        while ((self.symbol.type == self.scanner.SEMICOLON) and (
+                self.symbol.type != self.scanner.BRACE_CLOSE)):
             self.symbol = self.scanner.get_symbol()
 
-            # Incase a KEYWORD is entered straight after a ';', assume '}' was missed and go on to monitor list
+            # Incase a KEYWORD is entered straight after a ';', assume '}' was
+            # missed and go on to monitor list
             if (self.symbol.type == self.scanner.KEYWORD):
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
                 return False
@@ -478,12 +556,14 @@ class Parser:
             # Parse device
             self.device()
 
-            # If semicolon is missing, but new NAME type symbol is entered, call error and parse to next stopping symbol
+            # If semicolon is missing, but new NAME type symbol is entered,
+            # call error and parse to next stopping symbol
             if self.symbol.type == self.scanner.NAME:
                 self.display_error(self.symbol, self.NO_SEMICOLON,
                                    proceed=False)
 
-                # If stopping symbol reached is a semicolon, need to pass, else if brace, need to return False
+                # If stopping symbol reached is a semicolon, need to pass, else
+                # if brace, need to return False
                 if self.symbol.type == self.scanner.BRACE_CLOSE:
                     self.symbol = self.scanner.get_symbol()
                     return False
@@ -543,8 +623,25 @@ class Parser:
         Return both device kind (eg AND gate) and the device property (eg number of inputs)."""
 
         # Specify ID numbers of devices
-        [AND_ID, NAND_ID, OR_ID, NOR_ID, XOR_ID, DTYPE_ID, SWITCH_ID, CLK_ID, SIGGEN_ID, RC_ID] = self.names.lookup(
-            ["AND", "NAND", "OR", "NOR", "XOR", "DTYPE",  "SWITCH", "CLOCK", "SIGGEN", "RC"])
+        [AND_ID,
+         NAND_ID,
+         OR_ID,
+         NOR_ID,
+         XOR_ID,
+         DTYPE_ID,
+         SWITCH_ID,
+         CLK_ID,
+         SIGGEN_ID,
+         RC_ID] = self.names.lookup(["AND",
+                                     "NAND",
+                                     "OR",
+                                     "NOR",
+                                     "XOR",
+                                     "DTYPE",
+                                     "SWITCH",
+                                     "CLOCK",
+                                     "SIGGEN",
+                                     "RC"])
 
         # Specify input ranges
         one_to_sixteen = list(range(1, 17))
@@ -568,7 +665,8 @@ class Parser:
                     number_of_inputs = int(
                         self.names.get_name_string(self.symbol.id))
 
-                    # Check that input number (which describes the number of input ports) is within client specified range of 1 - 16
+                    # Check that input number (which describes the number of
+                    # input ports) is within client specified range of 1 - 16
                     if number_of_inputs in one_to_sixteen:
                         self.symbol = self.scanner.get_symbol()
 
@@ -585,8 +683,8 @@ class Parser:
                             return None, None
 
                     else:
-                        self.display_error(self.symbol, self.INPUT_OUT_OF_RANGE,
-                                           proceed=False)
+                        self.display_error(
+                            self.symbol, self.INPUT_OUT_OF_RANGE, proceed=False)
                         return None, None
 
                 else:
@@ -637,7 +735,8 @@ class Parser:
                         if self.symbol.type == self.scanner.BRACKET_CLOSE:
                             self.symbol = self.scanner.get_symbol()
 
-                            # Return device kind and the initial switch state as device property
+                            # Return device kind and the initial switch state
+                            # as device property
                             return device_kind, switch_initial_state
                         else:
                             self.display_error(
@@ -645,8 +744,8 @@ class Parser:
                                 proceed=False)
                             return None, None
                     else:
-                        self.display_error(self.symbol, self.BINARY_NUMBER_OUT_OF_RANGE,
-                                           proceed=False)
+                        self.display_error(
+                            self.symbol, self.BINARY_NUMBER_OUT_OF_RANGE, proceed=False)
                         return None, None
                 else:
                     self.display_error(self.symbol, self.NO_NUMBER,
@@ -674,14 +773,16 @@ class Parser:
                     number_of_cycles = int(self.names.get_name_string(
                         self.symbol.id))
 
-                    # Check that input number is negative (this is a semantic check!)
+                    # Check that input number is negative (this is a semantic
+                    # check!)
                     if number_of_cycles > 0:
                         # Check that the next symbol is a close bracket
                         self.symbol = self.scanner.get_symbol()
                         if self.symbol.type == self.scanner.BRACKET_CLOSE:
                             self.symbol = self.scanner.get_symbol()
 
-                            # Return device kind and the number of cycles as device property
+                            # Return device kind and the number of cycles as
+                            # device property
                             return device_kind, number_of_cycles
                         else:
                             self.display_error(
@@ -726,7 +827,8 @@ class Parser:
 
                         # Check that the symbol is a coma
                         if self.symbol.type == self.scanner.COMMA:
-                            # Take previous symbol because if error arises with signal type, the line number gives None
+                            # Take previous symbol because if error arises with
+                            # signal type, the line number gives None
                             previous_symbol = self.symbol
                             self.symbol = self.scanner.get_symbol()
 
@@ -751,19 +853,24 @@ class Parser:
                                     if self.symbol.type == self.scanner.BRACKET_CLOSE:
                                         self.symbol = self.scanner.get_symbol()
 
-                                        # Return device kind and the signal list
+                                        # Return device kind and the signal
+                                        # list
                                         return device_kind, siggen_property
                                     else:
-                                        self.display_error(self.symbol, self.NO_BRACKET_CLOSE,
-                                                           proceed=False)
+                                        self.display_error(
+                                            self.symbol, self.NO_BRACKET_CLOSE, proceed=False)
                                         return None, None
                                 else:
-                                    self.display_error(previous_symbol, self.NO_SIGNAL_LIST, display=True, display_marker=False,
-                                                       proceed=False)
+                                    self.display_error(
+                                        previous_symbol,
+                                        self.NO_SIGNAL_LIST,
+                                        display=True,
+                                        display_marker=False,
+                                        proceed=False)
                                     return None, None
                             else:
-                                self.display_error(self.symbol, self.NO_SIGNAL_LIST,
-                                                   proceed=False)
+                                self.display_error(
+                                    self.symbol, self.NO_SIGNAL_LIST, proceed=False)
                                 return None, None
                         else:
                             self.display_error(self.symbol, self.NO_COMMA,
@@ -771,8 +878,8 @@ class Parser:
                             return None, None
 
                     else:
-                        self.display_error(self.symbol, self.BINARY_NUMBER_OUT_OF_RANGE,
-                                           proceed=False)
+                        self.display_error(
+                            self.symbol, self.BINARY_NUMBER_OUT_OF_RANGE, proceed=False)
                         return None, None
                 else:
                     self.display_error(self.symbol, self.NO_NUMBER,
@@ -800,14 +907,16 @@ class Parser:
                     number_of_cycles = int(self.names.get_name_string(
                         self.symbol.id))
 
-                    # Check that input number is positive (this is a semantic check!)
+                    # Check that input number is positive (this is a semantic
+                    # check!)
                     if number_of_cycles > 0:
                         # Check that the next symbol is a close bracket
                         self.symbol = self.scanner.get_symbol()
                         if self.symbol.type == self.scanner.BRACKET_CLOSE:
                             self.symbol = self.scanner.get_symbol()
 
-                            # Return device kind and the number of cycles as device property
+                            # Return device kind and the number of cycles as
+                            # device property
                             return device_kind, number_of_cycles
                         else:
                             self.display_error(
@@ -862,7 +971,8 @@ class Parser:
         if self.symbol.type == self.scanner.EOF:
             return True
 
-        # Bool to decide whether it is possible to pass an empty connection list (ie all the devices have no inputs)
+        # Bool to decide whether it is possible to pass an empty connection
+        # list (ie all the devices have no inputs)
         is_empty_allowed = True
 
         # Check to see if we have an empty connection list
@@ -871,14 +981,20 @@ class Parser:
             # Loop through each device and check that there are no inputs
             for device in self.devices.devices_list:
 
-                # If there are inputs (ie the dictionaries of each device has a non-zero length), then it is not possible to have an empty connections list.
+                # If there are inputs (ie the dictionaries of each device has a
+                # non-zero length), then it is not possible to have an empty
+                # connections list.
                 if len(device.inputs.items()) != 0:
                     is_empty_allowed = False
 
             # If not possible, throw and error and terminate the program early
             if not is_empty_allowed:
-                self.display_error(self.symbol, self.EMPTY_CONNECTION_LIST,
-                                   display=False, proceed=False, stopping_symbol_types=[11])
+                self.display_error(
+                    self.symbol,
+                    self.EMPTY_CONNECTION_LIST,
+                    display=False,
+                    proceed=False,
+                    stopping_symbol_types=[11])
                 self.symbol = self.scanner.get_symbol()
                 return True
             # If it is possible, return now as not necessary to continue
@@ -894,21 +1010,25 @@ class Parser:
             self.display_error(
                 self.symbol, self.NO_SEMICOLON, proceed=False)
 
-            # Check if semicolon was missing and now symbol is at the close brace '{' symbol
+            # Check if semicolon was missing and now symbol is at the close
+            # brace '{' symbol
             if self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.symbol = self.scanner.get_symbol()
                 return False
 
-            # Check if semicolon and close brace '{' was missing and now symbol is at the next keyword
+            # Check if semicolon and close brace '{' was missing and now symbol
+            # is at the next keyword
             elif self.symbol.type == self.scanner.KEYWORD:
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
                 return False
 
         # Repeat checking connections in list until the close brace "}"
-        while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
+        while ((self.symbol.type == self.scanner.SEMICOLON) and (
+                self.symbol.type != self.scanner.BRACE_CLOSE)):
             self.symbol = self.scanner.get_symbol()
 
-            # Incase a KEYWORD is entered straight after a ';', assume '{' was missed
+            # Incase a KEYWORD is entered straight after a ';', assume '{' was
+            # missed
             if (self.symbol.type == self.scanner.KEYWORD):
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
                 return False
@@ -921,12 +1041,14 @@ class Parser:
             # Parse a connection
             self.connection()
 
-            # If semicolon is missing, but new NAME type symbol is entered, call error and parse to next stopping symbol
+            # If semicolon is missing, but new NAME type symbol is entered,
+            # call error and parse to next stopping symbol
             if self.symbol.type == self.scanner.NAME:
                 self.display_error(self.symbol, self.NO_SEMICOLON,
                                    proceed=False)
 
-                # If stopping symbol reached is a semicolon, need to pass, else if brace, need to return False
+                # If stopping symbol reached is a semicolon, need to pass, else
+                # if brace, need to return False
                 if self.symbol.type == self.scanner.BRACE_CLOSE:
                     self.symbol = self.scanner.get_symbol()
                     return False
@@ -949,13 +1071,15 @@ class Parser:
 
         If there are no errors, make the connection."""
 
-        # If after the semicolon we have a } , assume we can move onto the monitor_list without making a connection
+        # If after the semicolon we have a } , assume we can move onto the
+        # monitor_list without making a connection
         if self.symbol.type == self.scanner.BRACE_CLOSE:
             return
         else:
             [input_device_id, input_port_id] = self.input()
 
-            # Incase we have had to error handle and recover, such that the symbol is now a ';'
+            # Incase we have had to error handle and recover, such that the
+            # symbol is now a ';'
             while self.symbol.type == self.scanner.SEMICOLON:
                 self.symbol = self.scanner.get_symbol()
                 [input_device_id, input_port_id] = self.input()
@@ -984,7 +1108,8 @@ class Parser:
 
         valid_output_id_list = self.names.lookup(["Q", "QBAR"])
 
-        # If after the semicolon we have a '}' , assume we can move onto the monitor_list
+        # If after the semicolon we have a '}' , assume we can move onto the
+        # monitor_list
         if self.symbol.type == self.scanner.BRACE_CLOSE:
             return None, None
 
@@ -993,7 +1118,8 @@ class Parser:
             output_device_ID = self.symbol.id
             self.symbol = self.scanner.get_symbol()
 
-            # Check if gate is followed by a full stop (it has more than one output)
+            # Check if gate is followed by a full stop (it has more than one
+            # output)
             if self.symbol.type == self.scanner.FULLSTOP:
                 self.symbol = self.scanner.get_symbol()
 
@@ -1021,8 +1147,28 @@ class Parser:
 
         Return None, None if error occurs."""
 
-        valid_input_suffix_id_list = self.names.lookup(["I1", "I2", "I3", "I4", "I5", "I6", "I7", "I8", "I9",
-                                                        "I10", "I11", "I12", "I13", "I14", "I15", "I16", "DATA", "CLK", "SET", "CLEAR"])
+        valid_input_suffix_id_list = self.names.lookup(
+            [
+                "I1",
+                "I2",
+                "I3",
+                "I4",
+                "I5",
+                "I6",
+                "I7",
+                "I8",
+                "I9",
+                "I10",
+                "I11",
+                "I12",
+                "I13",
+                "I14",
+                "I15",
+                "I16",
+                "DATA",
+                "CLK",
+                "SET",
+                "CLEAR"])
 
         # Check that the input is valid syntax
         if self.symbol.type == self.scanner.NAME:
@@ -1060,7 +1206,8 @@ class Parser:
         # Common initial error handling
         self.initial_error_checks(MONITORS_ID, self.NO_MONITORS_KEYWORD)
 
-        # If catastrophic error occors, and symbol type is now EOF. Also return true to indicate that this needs to terminate early
+        # If catastrophic error occors, and symbol type is now EOF. Also return
+        # true to indicate that this needs to terminate early
         if self.symbol.type == self.scanner.EOF:
             return True
 
@@ -1079,21 +1226,25 @@ class Parser:
             self.display_error(
                 self.symbol, self.NO_SEMICOLON, proceed=False)
 
-            # Check if semicolon was missing and now symbol is at the close brace '}' symbol
+            # Check if semicolon was missing and now symbol is at the close
+            # brace '}' symbol
             if self.symbol.type == self.scanner.BRACE_CLOSE:
                 self.symbol = self.scanner.get_symbol()
                 return False
 
-            # Check if semicolon and close brace '{' was missing and now symbol is at the next keyword
+            # Check if semicolon and close brace '{' was missing and now symbol
+            # is at the next keyword
             elif self.symbol.type == self.scanner.KEYWORD:
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
                 return False
 
         # Repeat checking monitors in list until the close brace "}"
-        while ((self.symbol.type == self.scanner.SEMICOLON) and (self.symbol.type != self.scanner.BRACE_CLOSE)):
+        while ((self.symbol.type == self.scanner.SEMICOLON) and (
+                self.symbol.type != self.scanner.BRACE_CLOSE)):
             self.symbol = self.scanner.get_symbol()
 
-            # Incase a KEYWORD is entered straight after a ';', assume '}' was missed and go on to END function
+            # Incase a KEYWORD is entered straight after a ';', assume '}' was
+            # missed and go on to END function
             if (self.symbol.type == self.scanner.KEYWORD):
                 self.display_error(self.symbol, self.NO_BRACE_CLOSE)
                 return False
@@ -1109,12 +1260,14 @@ class Parser:
             # Assign the monitor
             self.assign_monitor(monitor_device_id, monitor_port_id)
 
-            # If semicolon is missing, but new NAME type symbol is entered, call error and parse to next stopping symbol
+            # If semicolon is missing, but new NAME type symbol is entered,
+            # call error and parse to next stopping symbol
             if self.symbol.type == self.scanner.NAME:
                 self.display_error(self.symbol, self.NO_SEMICOLON,
                                    proceed=False)
 
-                # If stopping symbol reached is a semicolon, need to pass, else if brace, need to return False
+                # If stopping symbol reached is a semicolon, need to pass, else
+                # if brace, need to return False
                 if self.symbol.type == self.scanner.BRACE_CLOSE:
                     self.symbol = self.scanner.get_symbol()
                     return False
@@ -1148,12 +1301,14 @@ class Parser:
         # Check that the final symbol is the keyword END
         END_ID = self.names.lookup(["END"])[0]
 
-        # If nothing after monitors class, assume missing, display error and end program
+        # If nothing after monitors class, assume missing, display error and
+        # end program
         if self.symbol.type == self.scanner.EOF:
             self.display_error(self.symbol, self.NO_END_KEYWORD, display=False)
             return
 
-        # If symbol is anything other than END, display error and pass until END keyword
+        # If symbol is anything other than END, display error and pass until
+        # END keyword
         elif not (self.symbol.id == END_ID):
             self.display_error(self.symbol, self.NO_END_KEYWORD, display=False)
             self.symbol = self.scanner.get_symbol()
@@ -1162,7 +1317,8 @@ class Parser:
             if self.symbol.type == self.scanner.EOF:
                 return
 
-            while ((self.symbol.id != END_ID) and (self.symbol.type != self.scanner.EOF)):
+            while ((self.symbol.id != END_ID) and (
+                    self.symbol.type != self.scanner.EOF)):
                 self.symbol = self.scanner.get_symbol()
 
             # If EOF is reached and no keyword END is encountered
@@ -1186,11 +1342,14 @@ class Parser:
         else:
 
             # Parse device list
-            # If returns propogated error = True, this signifies we have parsed to the EOF
+            # If returns propogated error = True, this signifies we have parsed
+            # to the EOF
             propagated_error = self.device_list()
 
-            # If nothing after device list (excluding cases where we have identified a propagated error)
-            if (self.symbol.type == self.scanner.EOF) and (propagated_error != True):
+            # If nothing after device list (excluding cases where we have
+            # identified a propagated error)
+            if (self.symbol.type == self.scanner.EOF) and (
+                    propagated_error != True):
                 self.display_error(self.symbol, self.EMPTY_FILE, display=False)
             else:
 
@@ -1201,43 +1360,62 @@ class Parser:
                     # If there are no errors, check the 'built' network
                     if self.error_count == 0:
 
-                        # If network is not valid (check there are no floating inputs)
+                        # If network is not valid (check there are no floating
+                        # inputs)
                         if not self.network.check_network():
 
-                            # Initiate lists to hold missing input id ports and corresponding devices
+                            # Initiate lists to hold missing input id ports and
+                            # corresponding devices
                             missing_input_id_list = []
                             device_missing_input_id_list = []
 
-                            # Loop through device list to identify where the missing input connection is
+                            # Loop through device list to identify where the
+                            # missing input connection is
                             for i in self.devices.devices_list:
 
                                 # Look through each item in each device class
                                 for input_id, value in i.inputs.items():
-                                    if value == None:
+                                    if value is None:
 
-                                        # Increase error count by one as this is a semantic error (floating input error)
+                                        # Increase error count by one as this
+                                        # is a semantic error (floating input
+                                        # error)
                                         self.error_count += 1
 
-                                        # For the missing input port, assign this port id and corresponding device id
+                                        # For the missing input port, assign
+                                        # this port id and corresponding device
+                                        # id
                                         missing_input_id_list.append(input_id)
                                         device_missing_input_id_list.append(i)
 
-                            # Carry out display error for FLOATING_INPUT here to allow us to display missing/incorrect input port
+                            # Carry out display error for FLOATING_INPUT here
+                            # to allow us to display missing/incorrect input
+                            # port
                             print(
-                                "Cannot build network as not all inputs have a valid connection", end="\n \n")
+                                "Cannot build network as not all inputs have a valid connection",
+                                end="\n \n")
                             print(
-                                f"Missing {self.error_count} input(s): ", end="\n \n")
+                                f"Missing {self.error_count} input(s): ",
+                                end="\n \n")
                             for j in range(len(missing_input_id_list)):
-                                print(self.names.get_name_string(
-                                    device_missing_input_id_list[j].device_id)+"."+self.names.get_name_string(missing_input_id_list[j]), end="\n \n")
+                                print(
+                                    self.names.get_name_string(
+                                        device_missing_input_id_list[j].device_id) +
+                                    "." +
+                                    self.names.get_name_string(
+                                        missing_input_id_list[j]),
+                                    end="\n \n")
 
                     # If nothing after connections list
-                    if (self.symbol.type == self.scanner.EOF) and (propagated_error != True):
+                    if (self.symbol.type == self.scanner.EOF) and (
+                            propagated_error != True):
                         self.display_error(
                             self.symbol, self.EMPTY_FILE, display=False)
                     else:
                         if not propagated_error:
-                            # Parse monitor list. If catastrophic error occurs (ie order of keywords wrong, terminate the program early)
+                            # Parse monitor list. If catastrophic error occurs
+                            # (ie order of keywords wrong, terminate the
+                            # program early)
                             propagated_error = self.monitor_list()
 
                         # Display the signals to terminal
@@ -1247,7 +1425,8 @@ class Parser:
                         if not propagated_error:
                             self.end()
 
-            # Check if there are errors, and return True if error count is zero, otherwise return falsex
+            # Check if there are errors, and return True if error count is
+            # zero, otherwise return falsex
             if self.error_count == 0:
                 print("No errors detected ")
                 return True

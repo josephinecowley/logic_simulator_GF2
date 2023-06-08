@@ -45,7 +45,8 @@ def create_testing_file_to_scan(names_fixture):
     """This is an in-house helper function not strictly related to testing parse.py"""
     def _create_testing_file(testing_example, scan_through_all=False):
         with open("testing_file.txt", "w") as file:
-            # by structure, this will always create testing_file.txt within this directory
+            # by structure, this will always create testing_file.txt within
+            # this directory
             file_path = file.name
             file.write(testing_example)
 
@@ -73,8 +74,22 @@ def test_create_testing_file_to_scan(create_testing_file_to_scan):
     }
     """, scan_through_all=True)
 
-    assert scanner.names.names_list == ['DEVICES', 'CONNECTIONS', 'MONITORS', 'END', 'dtype1', 'DTYPE', 'dtype2',
-                                        'dtype3', 'dtype4', 'clock', 'CLK', '25', 'data', 'SWITCH', '0']
+    assert scanner.names.names_list == [
+        'DEVICES',
+        'CONNECTIONS',
+        'MONITORS',
+        'END',
+        'dtype1',
+        'DTYPE',
+        'dtype2',
+        'dtype3',
+        'dtype4',
+        'clock',
+        'CLK',
+        '25',
+        'data',
+        'SWITCH',
+        '0']
 
 
 @pytest.fixture
@@ -127,10 +142,19 @@ def scanner_fixture(create_testing_file_to_scan):
 
 
 @pytest.fixture
-def parser_fixture(names_fixture, devices_fixture, network_fixture, monitors_fixture):
+def parser_fixture(
+        names_fixture,
+        devices_fixture,
+        network_fixture,
+        monitors_fixture):
     """Return a new parser instance"""
     def _parser_fixture(scanner):
-        return Parser(names_fixture, devices_fixture, network_fixture, monitors_fixture, scanner)
+        return Parser(
+            names_fixture,
+            devices_fixture,
+            network_fixture,
+            monitors_fixture,
+            scanner)
     return _parser_fixture
 
 
@@ -151,9 +175,35 @@ def test_parser_fixture(parser_fixture, create_testing_file_to_scan):
     parser = parser_fixture(scanner)
 
     assert isinstance(parser, Parser)
-    assert parser.names.names_list == \
-        ['AND', 'OR', 'NAND', 'NOR', 'XOR', 'CLOCK', 'SWITCH', 'DTYPE', 'SIGGEN', 'RC', 'CLK', 'SET', 'CLEAR', 'DATA', 'Q',
-            'QBAR', 'DEVICES', 'CONNECTIONS', 'MONITORS', 'END', 'dtype1', 'dtype2', 'dtype3', 'dtype4', 'clock', '25', 'data', '0']
+    assert parser.names.names_list == [
+        'AND',
+        'OR',
+        'NAND',
+        'NOR',
+        'XOR',
+        'CLOCK',
+        'SWITCH',
+        'DTYPE',
+        'SIGGEN',
+        'RC',
+        'CLK',
+        'SET',
+        'CLEAR',
+        'DATA',
+        'Q',
+        'QBAR',
+        'DEVICES',
+        'CONNECTIONS',
+        'MONITORS',
+        'END',
+        'dtype1',
+        'dtype2',
+        'dtype3',
+        'dtype4',
+        'clock',
+        '25',
+        'data',
+        '0']
 
 
 @pytest.fixture
@@ -214,11 +264,13 @@ def test_parser_initialisation(scanner_fixture, parser_fixture):
     assert isinstance(parser.scanner, Scanner)
 
     assert parser.error_count == 0
-    # Check unique error coes are appended onto existing syntax_errors of which there are 15 from devices, network and monitors initialisation
+    # Check unique error coes are appended onto existing syntax_errors of
+    # which there are 15 from devices, network and monitors initialisation
     assert parser.syntax_errors == range(15, 44)
 
 
-def test_parser_display_error_instance_handling(scanner_fixture, parser_fixture):
+def test_parser_display_error_instance_handling(
+        scanner_fixture, parser_fixture):
     """Test the parser exception handling"""
     scanner = scanner_fixture(scan_through_all=False)
     parser = parser_fixture(scanner)
@@ -241,8 +293,8 @@ def test_parser_display_error_instance_handling(scanner_fixture, parser_fixture)
                              stopping_symbol_types="not a list")
     with pytest.raises(ValueError):
         # Expected stopping symbol to be within range of given symbols
-        parser.display_error(symbol, error_type,
-                             stopping_symbol_types=list(range(max(parser.syntax_errors) + 16)))
+        parser.display_error(symbol, error_type, stopping_symbol_types=list(
+            range(max(parser.syntax_errors) + 16)))
     with pytest.raises(ValueError):
         # Expected stopping symbol to be within range of given symbols
         parser.display_error(symbol, error_type, proceed,
@@ -256,7 +308,8 @@ def test_parser_display_error_instance_handling(scanner_fixture, parser_fixture)
         parser.display_error(symbol, error_type, proceed="not a bool")
 
 
-def test_parser_display_error_see_error_count_increment_by_one(scanner_fixture, parser_fixture):
+def test_parser_display_error_see_error_count_increment_by_one(
+        scanner_fixture, parser_fixture):
     """Test display_error functionality"""
     scanner = scanner_fixture()
     parser = parser_fixture(scanner)
@@ -330,7 +383,8 @@ def test_parser_display_error_see_error_count_increment_by_one(scanner_fixture, 
 
 
 ])
-def test_parser_display_error_show_appropriate_error_message(scanner_fixture, parser_fixture, capfd, error_type, expected_message):
+def test_parser_display_error_show_appropriate_error_message(
+        scanner_fixture, parser_fixture, capfd, error_type, expected_message):
     """Test display_error returns the correct error strings"""
     scanner = scanner_fixture(False)
     parser = parser_fixture(scanner)
@@ -346,7 +400,10 @@ def test_parser_display_error_show_appropriate_error_message(scanner_fixture, pa
     assert output_lines[1] == expected_message
 
 
-def test_parser_display_error_valid_error_code(scanner_fixture, parser_fixture, correct_error_arguments):
+def test_parser_display_error_valid_error_code(
+        scanner_fixture,
+        parser_fixture,
+        correct_error_arguments):
     """Test display_error returns ValueError for out of range error_code"""
     scanner = scanner_fixture()
     parser = parser_fixture(scanner)
@@ -358,7 +415,8 @@ def test_parser_display_error_valid_error_code(scanner_fixture, parser_fixture, 
                              proceed, stopping_symbol_types)
 
 
-def test_parser_display_error_symbol_is_EOF(parser_fixture, create_testing_file_to_scan):
+def test_parser_display_error_symbol_is_EOF(
+        parser_fixture, create_testing_file_to_scan):
     """Test display_error when symbol is EOF"""
     scanner = create_testing_file_to_scan(
         """
@@ -372,7 +430,10 @@ def test_parser_display_error_symbol_is_EOF(parser_fixture, create_testing_file_
     assert parser.display_error(symbol, error_type) is None
 
 
-def test_error_recovery_instance_handling(scanner_fixture, parser_fixture, correct_error_arguments):
+def test_error_recovery_instance_handling(
+        scanner_fixture,
+        parser_fixture,
+        correct_error_arguments):
     """Test exception handling in error_recovery function"""
     scanner = scanner_fixture()
     parser = parser_fixture(scanner)
@@ -414,7 +475,8 @@ def test_error_recovery_instance_handling(scanner_fixture, parser_fixture, corre
             error_type, stopping_symbol_types=list(range(-8)))
 
 
-def test_parser_error_recovery_check_built_in_error_handling(scanner_fixture, parser_fixture):
+def test_parser_error_recovery_check_built_in_error_handling(
+        scanner_fixture, parser_fixture):
     """Test error_recovery returns None type"""
     scanner = scanner_fixture()
     parser = parser_fixture(scanner)
@@ -424,7 +486,8 @@ def test_parser_error_recovery_check_built_in_error_handling(scanner_fixture, pa
     assert parser.error_recovery(error_type) is None
 
 
-def test_parser_error_recovery_check_built_in_error_handling_semantic_error(scanner_fixture, parser_fixture):
+def test_parser_error_recovery_check_built_in_error_handling_semantic_error(
+        scanner_fixture, parser_fixture):
     """Test error_recovery returns None type when semantic error is encountered"""
     scanner = scanner_fixture()
     parser = parser_fixture(scanner)
@@ -434,7 +497,8 @@ def test_parser_error_recovery_check_built_in_error_handling_semantic_error(scan
     assert parser.error_recovery(error_type) is None
 
 
-def test_parser_error_recovery_stops_when_stopping_symbol_or_EOF_is_encountered(create_testing_file_to_scan, parser_fixture):
+def test_parser_error_recovery_stops_when_stopping_symbol_or_EOF_is_encountered(
+        create_testing_file_to_scan, parser_fixture):
     """Test error_recovery returns None when EOF symbol is encounterred"""
     scanner = create_testing_file_to_scan(
         """
@@ -455,17 +519,37 @@ def test_parser_error_recovery_stops_when_stopping_symbol_or_EOF_is_encountered(
 
 
 @pytest.mark.parametri
-@pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol, expected_message", [
-    ('MONITOS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;',
-     'dtype1', '\n  Line 2: Expected the keyword MONITORS\n \n        MONITOS { dtype1.Q;'),
-    ('CONNETIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;',
-     'dtype1', '\n  Line 2: Expected the keyword CONNECTIONS\n \n        CONNETIONS { dtype1.Q = dtype2.DATA;'),
-
-    ('DVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;',
-     'dtype1', '\n  Line 2: Expected the keyword DEVICES\n \n        DVICES { dtype1 = DTYPE;')
-
-])
-def test_parser_initial_error_checks_case_2(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol, expected_message):
+@pytest.mark.parametrize(
+    "KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol, expected_message",
+    [
+        ('MONITOS',
+         'scanner.names.lookup(["MONITORS"])[0]',
+         'parser.NO_MONITORS_KEYWORD',
+         'dtype1.Q;',
+         'dtype1',
+         '\n  Line 2: Expected the keyword MONITORS\n \n        MONITOS { dtype1.Q;'),
+        ('CONNETIONS',
+         'scanner.names.lookup(["CONNECTIONS"])[0]',
+         'parser.NO_CONNECTIONS_KEYWORD',
+         'dtype1.Q = dtype2.DATA;',
+         'dtype1',
+         '\n  Line 2: Expected the keyword CONNECTIONS\n \n        CONNETIONS { dtype1.Q = dtype2.DATA;'),
+        ('DVICES',
+         'scanner.names.lookup(["DEVICES"])[0]',
+         'parser.NO_DEVICES_KEYWORD',
+         'dtype1 = DTYPE;',
+         'dtype1',
+         '\n  Line 2: Expected the keyword DEVICES\n \n        DVICES { dtype1 = DTYPE;')])
+def test_parser_initial_error_checks_case_2(
+        parser_fixture,
+        create_testing_file_to_scan,
+        capfd,
+        KEYWORD,
+        KEYWORD_ID,
+        missing_error_type,
+        correct_example,
+        expected_symbol,
+        expected_message):
     """Test initial_error_checks for Case 2:  KYWORD { ..."""
     scanner = create_testing_file_to_scan(
         f"""
@@ -480,7 +564,8 @@ def test_parser_initial_error_checks_case_2(parser_fixture, create_testing_file_
     captured = capfd.readouterr()
     output_lines = captured.out.splitlines()
     semicolon_location = captured.out.index(";")
-    # only up to and including the semicolon, i.e., ignore the caret/tilde/placement line
+    # only up to and including the semicolon, i.e., ignore the
+    # caret/tilde/placement line
     printed_message = captured.out[:semicolon_location + 1]
 
     assert printed_message == expected_message
@@ -489,16 +574,37 @@ def test_parser_initial_error_checks_case_2(parser_fixture, create_testing_file_
     assert parser.names.get_name_string(symbol_id) == expected_symbol
 
 
-@pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_message_1, expected_message_2", [
-    ('MONITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;',
-     '\n  Line 2: Expected the keyword MONITORS\n \n\n', "\n  Line 2: Expected a '{' symbol\n \n\n"),
-    ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;',
-     '\n  Line 2: Expected the keyword DEVICES\n \n\n', "\n  Line 2: Expected a '{' symbol\n \n\n"),
-    ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;',
-     '\n  Line 2: Expected the keyword CONNECTIONS\n \n\n', "\n  Line 2: Expected a '{' symbol\n \n\n")
-
-])
-def test_parser_initial_error_checks_case_4(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_message_1, expected_message_2):
+@pytest.mark.parametrize(
+    "KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_message_1, expected_message_2",
+    [
+        ('MONITORS',
+         'scanner.names.lookup(["MONITORS"])[0]',
+         'parser.NO_MONITORS_KEYWORD',
+         'dtype1.Q;',
+         '\n  Line 2: Expected the keyword MONITORS\n \n\n',
+         "\n  Line 2: Expected a '{' symbol\n \n\n"),
+        ('DEVICES',
+         'scanner.names.lookup(["DEVICES"])[0]',
+         'parser.NO_DEVICES_KEYWORD',
+         'dtype1 = DTYPE;',
+         '\n  Line 2: Expected the keyword DEVICES\n \n\n',
+         "\n  Line 2: Expected a '{' symbol\n \n\n"),
+        ('CONNECTIONS',
+         'scanner.names.lookup(["CONNECTIONS"])[0]',
+         'parser.NO_CONNECTIONS_KEYWORD',
+         'dtype1.Q = dtype2.DATA;',
+         '\n  Line 2: Expected the keyword CONNECTIONS\n \n\n',
+         "\n  Line 2: Expected a '{' symbol\n \n\n")])
+def test_parser_initial_error_checks_case_4(
+        parser_fixture,
+        create_testing_file_to_scan,
+        capfd,
+        KEYWORD,
+        KEYWORD_ID,
+        missing_error_type,
+        correct_example,
+        expected_message_1,
+        expected_message_2):
     """Test initial_error_checks for Case 4:  ..."""
     scanner = create_testing_file_to_scan(
         f"""
@@ -519,15 +625,38 @@ def test_parser_initial_error_checks_case_4(parser_fixture, create_testing_file_
     assert parser.symbol.type == parser.scanner.EOF
 
 
-@pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol, expected_message", [
-    ('DEVICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;',
-     'dtype1', "\n  Line 2: Expected a '{' symbol\n \n        DEVICES dtype1 = DTYPE;\n"),
-    ('CONNECTIONS', 'scanner.names.lookup(["CONNECTIONS"])[0]', 'parser.NO_CONNECTIONS_KEYWORD', 'dtype1.Q = dtype2.DATA;',
-     'dtype1', "\n  Line 2: Expected a '{' symbol\n \n        CONNECTIONS dtype1.Q = dtype2.DATA;\n"),
-    ('MONITORS', 'scanner.names.lookup(["MONITORS"])[0]', 'parser.NO_MONITORS_KEYWORD', 'dtype1.Q;',
-     'dtype1', "\n  Line 2: Expected a '{' symbol\n \n        MONITORS dtype1.Q;\n"),
-])
-def test_parser_initial_error_checks_case_5(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol, expected_message):
+@pytest.mark.parametrize(
+    "KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_symbol, expected_message",
+    [
+        ('DEVICES',
+         'scanner.names.lookup(["DEVICES"])[0]',
+         'parser.NO_DEVICES_KEYWORD',
+         'dtype1 = DTYPE;',
+         'dtype1',
+         "\n  Line 2: Expected a '{' symbol\n \n        DEVICES dtype1 = DTYPE;\n"),
+        ('CONNECTIONS',
+         'scanner.names.lookup(["CONNECTIONS"])[0]',
+         'parser.NO_CONNECTIONS_KEYWORD',
+         'dtype1.Q = dtype2.DATA;',
+         'dtype1',
+         "\n  Line 2: Expected a '{' symbol\n \n        CONNECTIONS dtype1.Q = dtype2.DATA;\n"),
+        ('MONITORS',
+         'scanner.names.lookup(["MONITORS"])[0]',
+         'parser.NO_MONITORS_KEYWORD',
+         'dtype1.Q;',
+         'dtype1',
+         "\n  Line 2: Expected a '{' symbol\n \n        MONITORS dtype1.Q;\n"),
+    ])
+def test_parser_initial_error_checks_case_5(
+        parser_fixture,
+        create_testing_file_to_scan,
+        capfd,
+        KEYWORD,
+        KEYWORD_ID,
+        missing_error_type,
+        correct_example,
+        expected_symbol,
+        expected_message):
     """Test initial_error_checks for Case 5:  { ..."""
     scanner = create_testing_file_to_scan(
         f"""
@@ -549,11 +678,25 @@ def test_parser_initial_error_checks_case_5(parser_fixture, create_testing_file_
     assert parser.names.get_name_string(symbol_id) == expected_symbol
 
 
-@pytest.mark.parametrize("KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_message_1, expected_message_2", [
-    ('DEICES', 'scanner.names.lookup(["DEVICES"])[0]', 'parser.NO_DEVICES_KEYWORD', 'dtype1 = DTYPE;',
-     '\n  Line 2: Expected the keyword DEVICES\n \n\n', "  Line 2: Expected a '{' symbol\n \n")
-])
-def test_parser_initial_error_checks_case_6(parser_fixture, create_testing_file_to_scan, capfd, KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_message_1, expected_message_2):
+@pytest.mark.parametrize(
+    "KEYWORD, KEYWORD_ID, missing_error_type, correct_example, expected_message_1, expected_message_2",
+    [
+        ('DEICES',
+         'scanner.names.lookup(["DEVICES"])[0]',
+         'parser.NO_DEVICES_KEYWORD',
+         'dtype1 = DTYPE;',
+         '\n  Line 2: Expected the keyword DEVICES\n \n\n',
+         "  Line 2: Expected a '{' symbol\n \n")])
+def test_parser_initial_error_checks_case_6(
+        parser_fixture,
+        create_testing_file_to_scan,
+        capfd,
+        KEYWORD,
+        KEYWORD_ID,
+        missing_error_type,
+        correct_example,
+        expected_message_1,
+        expected_message_2):
     """Test initial_error_checks for Case 6:  { ..."""
     scanner = create_testing_file_to_scan(
         f"""
@@ -590,7 +733,8 @@ def test_parser_initial_error_checks_case_6(parser_fixture, create_testing_file_
     ("XOR", "(parser.symbol.id, None)"),
     ("DTYPE", "(parser.symbol.id, None)")
 ])
-def test_parser_check_device_is_valid_correct_example(parser_fixture, create_testing_file_to_scan, example, expected):
+def test_parser_check_device_is_valid_correct_example(
+        parser_fixture, create_testing_file_to_scan, example, expected):
     """Test check_device_is_valid works with some correct examples covering all gate types"""
     scanner = create_testing_file_to_scan(
         f"""
@@ -610,7 +754,8 @@ def test_parser_check_device_is_valid_correct_example(parser_fixture, create_tes
     ("AND()", "  Line 2: Expected a positive integer\n"),
     ("AND 12)", "  Line 2: Expected a '(' for an input\n"),
 ])
-def test_parser_check_device_is_valid_erroneous_examples(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+def test_parser_check_device_is_valid_erroneous_examples(
+        parser_fixture, create_testing_file_to_scan, capfd, example, expected):
     """Test check_device_is_valid works with some correct examples"""
     scanner = create_testing_file_to_scan(
         f"""
@@ -627,7 +772,8 @@ def test_parser_check_device_is_valid_erroneous_examples(parser_fixture, create_
     assert printed_message == expected
 
 
-def test_parser_device_correct_parsing_of_device_list(parser_fixture, create_testing_file_to_scan):
+def test_parser_device_correct_parsing_of_device_list(
+        parser_fixture, create_testing_file_to_scan):
     """Test parsing of whole device list and check no device_list yet"""
     scanner = create_testing_file_to_scan(
         """
@@ -661,7 +807,8 @@ def test_parser_device_correct_parsing_of_device_list(parser_fixture, create_tes
     }
     """, "  Line 3: Expected an '=' symbol\n")
 ])
-def test_parser_device_erroneous_parsing_of_device_line(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+def test_parser_device_erroneous_parsing_of_device_line(
+        parser_fixture, create_testing_file_to_scan, capfd, example, expected):
     """Test parsing of device list invalid name error"""
 
     scanner = create_testing_file_to_scan(
@@ -685,7 +832,12 @@ def test_parser_device_erroneous_parsing_of_device_line(parser_fixture, create_t
     ("[1, 2, 3,]", False),
     ("[1.0, 2, 3,4]", False)
 ])
-def test_parser_is_valid_list_string(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+def test_parser_is_valid_list_string(
+        parser_fixture,
+        create_testing_file_to_scan,
+        capfd,
+        example,
+        expected):
     """Test is_valid_list_string"""
     scanner = create_testing_file_to_scan(example, scan_through_all=False)
 
@@ -695,7 +847,8 @@ def test_parser_is_valid_list_string(parser_fixture, create_testing_file_to_scan
     assert parser.is_valid_list_string(example) == expected
 
 
-def test_parser_input_correct_parsing_of_input(parser_fixture, create_testing_file_to_scan):
+def test_parser_input_correct_parsing_of_input(
+        parser_fixture, create_testing_file_to_scan):
     """Test parsing of single correct input"""
     scanner = create_testing_file_to_scan(
         """
@@ -708,7 +861,8 @@ def test_parser_input_correct_parsing_of_input(parser_fixture, create_testing_fi
     assert parser.input() is not (None, None)
 
 
-def test_parser_output_correct_parsing_of_output(parser_fixture, create_testing_file_to_scan):
+def test_parser_output_correct_parsing_of_output(
+        parser_fixture, create_testing_file_to_scan):
     """Test parsing of single correct output"""
     scanner = create_testing_file_to_scan(
         """
@@ -732,7 +886,12 @@ def test_parser_output_correct_parsing_of_output(parser_fixture, create_testing_
     dtype1.ni
     """, "  Line 2: Expected a valid input suffix\n")
 ])
-def test_parser_erroneous_input_parsing(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+def test_parser_erroneous_input_parsing(
+        parser_fixture,
+        create_testing_file_to_scan,
+        capfd,
+        example,
+        expected):
     """Test parsing of device list invalid name error"""
 
     scanner = create_testing_file_to_scan(
@@ -756,7 +915,12 @@ def test_parser_erroneous_input_parsing(parser_fixture, create_testing_file_to_s
     dtype1.qbar
     """, "  Line 2: Expected a Q or QBAR after the full stop\n")
 ])
-def test_parser_erroneous_output_parsing(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+def test_parser_erroneous_output_parsing(
+        parser_fixture,
+        create_testing_file_to_scan,
+        capfd,
+        example,
+        expected):
     """Test parsing of device list invalid name error"""
 
     scanner = create_testing_file_to_scan(
@@ -772,7 +936,8 @@ def test_parser_erroneous_output_parsing(parser_fixture, create_testing_file_to_
     assert printed_message == expected
 
 
-def test_parser_correct_parsing_of_connection_line(parser_fixture, create_testing_file_to_scan):
+def test_parser_correct_parsing_of_connection_line(
+        parser_fixture, create_testing_file_to_scan):
     """Test parsing of single connection line"""
     scanner = create_testing_file_to_scan(
         """
@@ -783,7 +948,7 @@ def test_parser_correct_parsing_of_connection_line(parser_fixture, create_testin
     parser.symbol = parser.scanner.get_symbol()
 
     assert parser.connection() is None
-    assert parser.network.check_network() == True
+    assert parser.network.check_network()
 
 
 @pytest.mark.parametrize("example, expected", [
@@ -791,7 +956,12 @@ def test_parser_correct_parsing_of_connection_line(parser_fixture, create_testin
     dtype1.SET set;
     """, "  Line 2: Expected an '=' symbol\n")
 ])
-def test_parser_incorrect_connection_line_parsing(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+def test_parser_incorrect_connection_line_parsing(
+        parser_fixture,
+        create_testing_file_to_scan,
+        capfd,
+        example,
+        expected):
     """Test parsing of incorrect connection line"""
 
     scanner = create_testing_file_to_scan(
@@ -807,7 +977,8 @@ def test_parser_incorrect_connection_line_parsing(parser_fixture, create_testing
     assert printed_message == expected
 
 
-def test_parser_correct_parsing_of_connection_list(parser_fixture, create_testing_file_to_scan):
+def test_parser_correct_parsing_of_connection_list(
+        parser_fixture, create_testing_file_to_scan):
     """Test parsing of single connection list"""
     scanner = create_testing_file_to_scan(
         """
@@ -823,7 +994,7 @@ def test_parser_correct_parsing_of_connection_list(parser_fixture, create_testin
     parser.symbol = parser.scanner.get_symbol()
 
     assert parser.connection_list() is False
-    assert parser.network.check_network() == True
+    assert parser.network.check_network()
 
 
 @pytest.mark.parametrize("example, expected", [
@@ -850,7 +1021,12 @@ def test_parser_correct_parsing_of_connection_list(parser_fixture, create_testin
     }
     """, "  Line 16: Expected a semicolon\n")
 ])
-def test_parser_incorrect_connection_list_parsing(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+def test_parser_incorrect_connection_list_parsing(
+        parser_fixture,
+        create_testing_file_to_scan,
+        capfd,
+        example,
+        expected):
     """Test parsing of incorrect connection list"""
 
     scanner = create_testing_file_to_scan(
@@ -878,7 +1054,8 @@ def test_parser_incorrect_connection_list_parsing(parser_fixture, create_testing
     assert parser.network.check_network() == False
 
 
-def test_parser_correct_parsing_of_monitors_list(parser_fixture, create_testing_file_to_scan):
+def test_parser_correct_parsing_of_monitors_list(
+        parser_fixture, create_testing_file_to_scan):
     """Test parsing of single monitors list"""
     scanner = create_testing_file_to_scan(
         """
@@ -921,7 +1098,12 @@ def test_parser_correct_parsing_of_monitors_list(parser_fixture, create_testing_
 }
     """, "  Line 38: Expected a semicolon\n")
 ])
-def test_parser_incorrect_monitors_list_parsing(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+def test_parser_incorrect_monitors_list_parsing(
+        parser_fixture,
+        create_testing_file_to_scan,
+        capfd,
+        example,
+        expected):
     """Test parsing of incorrect monitors list"""
 
     scanner = create_testing_file_to_scan("""DEVICES {
@@ -967,10 +1149,11 @@ CONNECTIONS {
     printed_message = captured.out.splitlines(True)[1]
 
     assert printed_message == expected
-    assert parser.network.check_network() == True
+    assert parser.network.check_network()
 
 
-def test_parser_correct_parsing_of_assign_monitor(parser_fixture, create_testing_file_to_scan):
+def test_parser_correct_parsing_of_assign_monitor(
+        parser_fixture, create_testing_file_to_scan):
     """Test parsing of assign monitor"""
     scanner = create_testing_file_to_scan(
         """
@@ -988,7 +1171,9 @@ def test_parser_correct_parsing_of_assign_monitor(parser_fixture, create_testing
     assert isinstance(monitor_port_id, int)
 
 
-def test_parser_correct_parsing_of_end(parser_fixture, create_testing_file_to_scan):
+def test_parser_correct_parsing_of_end(
+        parser_fixture,
+        create_testing_file_to_scan):
     """Test parsing of correct keyword END"""
     scanner = create_testing_file_to_scan(
         """
@@ -1009,7 +1194,12 @@ def test_parser_correct_parsing_of_end(parser_fixture, create_testing_file_to_sc
     end
     """, "  Line 2: Expected the keyword END straight after monitors list\n")
 ])
-def test_parser_incorrect_keyword_END(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+def test_parser_incorrect_keyword_END(
+        parser_fixture,
+        create_testing_file_to_scan,
+        capfd,
+        example,
+        expected):
     """Test parsing of incorrect keyword END"""
 
     scanner = create_testing_file_to_scan(
@@ -1030,7 +1220,12 @@ def test_parser_incorrect_keyword_END(parser_fixture, create_testing_file_to_sca
     ("./example1_logic_description.txt", True),
     ("./example2_logic_description.txt", True)
 ])
-def test_parser_correct_file(scanner_fixture, names_fixture, parser_fixture, file_path, expected):
+def test_parser_correct_file(
+        scanner_fixture,
+        names_fixture,
+        parser_fixture,
+        file_path,
+        expected):
     """Test complete parsing of whole correct file"""
 
     # If errors are arising - check that example files are free of errors
@@ -1044,7 +1239,12 @@ def test_parser_correct_file(scanner_fixture, names_fixture, parser_fixture, fil
 @pytest.mark.parametrize("example, expected", [
     ("""""", "  Line 1: Cannot parse an empty file\n")
 ])
-def test_parser_empty_file(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+def test_parser_empty_file(
+        parser_fixture,
+        create_testing_file_to_scan,
+        capfd,
+        example,
+        expected):
     """Test parsing of empty file"""
 
     scanner = create_testing_file_to_scan(
@@ -1090,7 +1290,11 @@ def test_parser_empty_file(parser_fixture, create_testing_file_to_scan, capfd, e
     END
     """, False)
 ])
-def test_parser_incorrect_file(parser_fixture, create_testing_file_to_scan, example, expected):
+def test_parser_incorrect_file(
+        parser_fixture,
+        create_testing_file_to_scan,
+        example,
+        expected):
     """Test parsing of file with errors"""
 
     scanner = create_testing_file_to_scan(

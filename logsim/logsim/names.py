@@ -101,7 +101,8 @@ class Names:
         elif name_id < 0:
             raise ValueError(
                 'Expected name_id to be a positive integer argument.')
-        # Check if name_id is within the index range of names_list, else return None
+        # Check if name_id is within the index range of names_list, else return
+        # None
         elif name_id >= len(self.names_list):
             return None
         return self.names_list[name_id]

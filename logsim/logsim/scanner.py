@@ -302,7 +302,7 @@ class Scanner:
         else:
             self.advance()  # get first character in comment
             # closed by " (have to break PEP8 for this) or EOF
-            while not self.current_character in ['"', ""]:
+            while self.current_character not in ['"', ""]:
                 if self.current_character == "\n":
                     self.line_number += 1
                     self.position = 0
@@ -346,4 +346,4 @@ class Scanner:
             signal_string += self.current_character
             self.advance()
         signal_string += self.current_character
-        return signal_string  # returns the signal string 
+        return signal_string  # returns the signal string
