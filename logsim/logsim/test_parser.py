@@ -677,6 +677,24 @@ def test_parser_device_erroneous_parsing_of_device_line(parser_fixture, create_t
     assert printed_message == expected
 
 
+@pytest.mark.parametrize("example, expected", [
+    ("[10.2, 2.2, 3.1]", False),
+    ("[1, 2, 3,); \n})", False),
+    ("[10, 2, 3,4]", True),
+    ("[a, b, c, d]", False),
+    ("[1, 2, 3,]", False),
+    ("[1.0, 2, 3,4]", False)
+])
+def test_parser_is_valid_list_string(parser_fixture, create_testing_file_to_scan, capfd, example, expected):
+    """Test is_valid_list_string"""
+    scanner = create_testing_file_to_scan(example, scan_through_all=False)
+
+    parser = parser_fixture(scanner)
+    parser.symbol = parser.scanner.get_symbol()
+
+    assert parser.is_valid_list_string(example) == expected
+
+
 def test_parser_input_correct_parsing_of_input(parser_fixture, create_testing_file_to_scan):
     """Test parsing of single correct input"""
     scanner = create_testing_file_to_scan(
