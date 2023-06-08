@@ -8,7 +8,8 @@ Our project Kanban board can be found here https://github.com/users/josephinecow
 
 ## Installation and running
 
-- download wxpython 
-- supply logic description file
-- TBC
+- Download wxpython 
+- Write the Logic Description File
+- In the Final folder directory, type `python3 logsim.py <you_example_LDF_file_here>'
+- Follow the commands in the welcome pop up box to get started!
 
