@@ -1,0 +1,59 @@
+DEVICES {
+    A1 = AND(2);
+    SW1 = SWITCH(0);
+    SW2 = SWITCH(1);
+
+    A2 = NAND(2);
+    SW3 = SWITCH(1);
+
+    A3 = AND(3);
+    SW5 = SWITCH(0);
+    SW6 = SWITCH(0);
+    SW7 = SWITCH(0);
+
+    A4 = NOR(2);
+    SW8 = SWITCH(0);
+    SW9 = SWITCH(1);
+
+    B1 = NAND(3);
+    SW4 = SWITCH(1);
+
+    B2 = XOR;
+    SW10 = SWITCH(1);
+
+    C1 = OR(2);
+}
+
+CONNECTIONS {
+    A1.I1=  SW1;
+    A1.I2 =  SW2;
+
+    A2.I1 = A1;
+    A2.I2 = SW3;
+
+    A3.I1 =  SW5;
+    A3.I2 = SW6;
+    A3.I3 = SW7;
+
+    A4.I1 =  SW8;
+    A4.I2 = SW9;
+
+    B1.I1 = A2;
+    B1.I2 = SW4;
+    B1.I3 = A3;
+
+    B2.I1 = A4;
+    B2.I2 = SW10;
+
+    C1.I1 = B1;
+    C1.I2 = B2;
+    
+}
+
+MONITORS {
+    B1;
+    B2;
+    C1;
+}
+
+END

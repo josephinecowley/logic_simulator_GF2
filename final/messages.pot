@@ -1,0 +1,227 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-06-06 16:27+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: gui.py:76
+msgid "GF2 P2 Team 7 Logic Simulator GUI: "
+msgstr ""
+
+#: gui.py:82
+msgid "&About"
+msgstr ""
+
+#: gui.py:83
+msgid "&Exit"
+msgstr ""
+
+#: gui.py:84
+msgid "&File"
+msgstr ""
+
+#: gui.py:133
+msgid ""
+"Logic Simulator\n"
+"Created by Josephine Cowley (jhmdc2), Tom Hill (th621), Khalid Omar (ko366)\n"
+"2023"
+msgstr ""
+
+#: gui.py:134
+msgid "About Logsim"
+msgstr ""
+
+#: gui.py:148
+msgid "GF2 P2 Team 7 Logic Simulator GUI"
+msgstr ""
+
+#: gui.py:166
+msgid "Welcome to our Logic Simulator!\n"
+msgstr ""
+
+#: gui.py:172
+msgid "Need some help?"
+msgstr ""
+
+#: gui.py:178
+msgid "Tutorial"
+msgstr ""
+
+#: gui.py:180
+msgid "Click here to learn how to use our Logic Simulator"
+msgstr ""
+
+#: gui.py:183
+msgid ""
+"Pre-loaded\n"
+"Logic Description File: "
+msgstr ""
+
+#: gui.py:191
+msgid "Upload new file"
+msgstr ""
+
+#: gui.py:193
+msgid "Upload a new Logic Description File"
+msgstr ""
+
+#: gui.py:196
+msgid "Continue"
+msgstr ""
+
+#: gui.py:198
+msgid "Continue with preloaded logic description file"
+msgstr ""
+
+#: gui.py:267 gui.py:577
+msgid "An error occurred."
+msgstr ""
+
+#: gui.py:322
+msgid "NO. CYCLES"
+msgstr ""
+
+#: gui.py:349
+msgid "RUN"
+msgstr ""
+
+#: gui.py:357
+msgid "Begin running the simulation"
+msgstr ""
+
+#: gui.py:363
+msgid "CLEAR"
+msgstr ""
+
+#: gui.py:371
+msgid "Clear all signal traces"
+msgstr ""
+
+#: gui.py:377
+msgid "RESET"
+msgstr ""
+
+#: gui.py:385
+msgid "Reset the simulation from initialisation"
+msgstr ""
+
+#: gui.py:415
+msgid "QUIT"
+msgstr ""
+
+#: gui.py:423
+msgid "Quit the simulation"
+msgstr ""
+
+#: gui.py:439
+msgid "UPLOAD"
+msgstr ""
+
+#: gui.py:441
+msgid "Upload logic description file"
+msgstr ""
+
+#: gui.py:451
+msgid "SETTINGS"
+msgstr ""
+
+#: gui.py:453
+msgid "Change system settings"
+msgstr ""
+
+#: gui.py:462
+msgid "HELP"
+msgstr ""
+
+#: gui.py:464
+msgid "Help on running logic simulation"
+msgstr ""
+
+#: gui.py:481
+msgid "CONTINUE"
+msgstr ""
+
+#: gui.py:483
+msgid "Continue running the simulation"
+msgstr ""
+
+#: gui.py:519
+msgid "Error! Network oscillating."
+msgstr ""
+
+#: gui.py:609
+msgid "Configure Logic Simulator GUI settings"
+msgstr ""
+
+#: gui.py:623
+msgid "GUI Settings"
+msgstr ""
+
+#: gui.py:631
+msgid "Select language"
+msgstr ""
+
+#: gui.py:640
+msgid "CONFIRM SETTINGS"
+msgstr ""
+
+#: gui.py:642
+msgid "Confirm settings changes"
+msgstr ""
+
+#: gui.py:697
+msgid "Tutorial on GF2 Team 7 Logic Simulator"
+msgstr ""
+
+#: gui.py:767
+msgid "ADD NEW MONITOR"
+msgstr ""
+
+#: gui.py:785 gui.py:816
+msgid "Select output"
+msgstr ""
+
+#: gui.py:801
+msgid "Add a monitor"
+msgstr ""
+
+#: gui.py:806
+msgid "DELETE MONITOR"
+msgstr ""
+
+#: gui.py:832
+msgid "Delete an existing monitor"
+msgstr ""
+
+#: gui.py:842
+msgid "RECENTER"
+msgstr ""
+
+#: gui.py:850
+msgid "Recenter the signal traces"
+msgstr ""
+
+#: gui.py:953
+msgid "INPUTS"
+msgstr ""
+
+#: gui.py:984 gui.py:1024 gui.py:1124
+msgid "ON"
+msgstr ""
+
+#: gui.py:988 gui.py:1037 gui.py:1152
+msgid "OFF"
+msgstr ""

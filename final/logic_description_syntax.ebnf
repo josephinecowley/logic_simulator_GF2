@@ -1,0 +1,28 @@
+network = device_list , connection_list , monitor_list, "END" ;
+
+device_list = "DEVICES” , “{“ , name , “=” , component , { “;” , name , “=” , component } , “;” , “}” ;
+
+component =  “AND” , “(“ , number , “)”  |
+		“NAND” , “(“ , number , “)” |
+		“OR” , “(“ , number , “)” |
+		“NOR” , “(“ , number , “)” |
+		“XOR” |
+		“SWITCH” , “(“ , number , “)” |
+		“DTYPE” |
+		“CLK” , “(“ , number , “)” |
+		”SIGGEN” , ”(” , number , ”,” , siggen_signal, ”)” |
+		”RC” , ”(” , number , ”)”;
+
+connection_list = "CONNECTIONS" , “{”, output , "=" , input , { “;” , output , "=" , input } , “;” ,  ”}” ;
+input = name , “.” , input_suffix ;
+input_suffix = ( "I" , number | "DATA" | "CLK" | "SET" | "CLEAR" ) ;
+output =  name , [ “.” , “Q” | “QBAR” ] ;
+siggen_signal = ”[”, number, { ”,” , number } , ”]”;
+
+monitor_list = “MONITORS”, “{“, output , { “;” , output} , “;” ,  “}” ;
+
+digit = “0” | “1” | “2” | “3” | “4” | “5” | “6” | “7” | “8” | “9” ;
+number =  digit , {digit} ;
+letter = “a” | “b” | “c” | “d” | “e” | “f” | “g” | “h” | “i” | “j” | “k” | “l” | “m” | “o” | “n” | “p” | “q” | “r” | “s” | “t” | “u” | “v” | “w” | “x” | “y” | “z” |  “A” | “B” | “C” | “D”| “E” | “F” | “G” | “H” | “I” | “J” | “K” | “L” | “M” | “N” | “O” | “P” | “Q” | “R” | “S” | “T” | “U” | “V” | “W” | “X” | “Y” | “Z”  ;
+name = letter , {letter | digit} ;
+

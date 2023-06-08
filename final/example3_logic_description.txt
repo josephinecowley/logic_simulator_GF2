@@ -1,0 +1,55 @@
+DEVICES {
+    A1 = NAND(2);
+    SW1 = SWITCH(0);
+
+    A2 = AND(2);
+    SW2 = SWITCH(1);
+
+    SW3 = SWITCH(0);
+
+    B1 = OR(2);
+
+    dtype1 = DTYPE;
+    set1 = SWITCH(0);
+    clear1 = SWITCH(0);
+
+    dtype2 = DTYPE;
+    set2 = SWITCH(0);
+    clear2 = SWITCH(0);
+
+    C1 = XOR;
+
+    clock = CLOCK(25);
+}
+
+CONNECTIONS {
+    A1.I1 = SW1;
+    A1.I2 = clock;
+
+    A2.I1 = SW2;
+    A2.I2 = clock;
+
+    B1.I1 = A2;
+    B1.I2 = SW3;
+
+    dtype1.DATA = A1;
+    dtype1.SET = set1;
+    dtype1.CLEAR = clear1;
+    dtype1.CLK = clock;
+
+    dtype2.DATA = B1;
+    dtype2.SET = set2;
+    dtype2.CLEAR = clear2;
+    dtype2.CLK = clock;
+
+    C1.I1 = dtype1.Q;
+    C1.I2 = dtype2.QBAR;
+}
+
+MONITORS {
+    A1;
+    dtype1.Q;
+    dtype2.QBAR;
+}
+
+END

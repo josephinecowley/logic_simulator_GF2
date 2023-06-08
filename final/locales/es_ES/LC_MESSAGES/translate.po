@@ -1,0 +1,267 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: Khalid Omar <khalidomar2001@hotmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Welcome to our Logic Simulator!\n"
+msgstr "Bienvenido a nuestro simulador de lógica!\n"
+
+msgid "To get started you need a valid Logic Description File. This is one which follows our defined language syntax.\n"
+msgstr "Para comenzar, necesita un archivo de descripción lógica válido. Este es uno que sigue nuestra sintaxis de lenguaje definida.\n"
+
+msgid "Click on the “UPLOAD” button in the bottom right corner of the simulator tab and follow the command prompt to select your logic description file.\n"
+msgstr "Haga clic en el botón CARGAR en la esquina inferior derecha de la pestaña del simulador y siga el símbolo del sistema para seleccionar su archivo de descripción lógica.\n"
+
+msgid "Upon clicking this, if you have uploaded a valid Logic Description File, you should see the y-axis of each monitor you have specified, along with all of the valid switches you have added in your logic circuit.\n"
+msgstr "Al hacer clic aquí, si ha cargado un archivo de descripción lógica válido, debería ver el eje Y de cada monitor que ha especificado, junto con todos los interruptores válidos que ha agregado en su circuito lógico.\n"
+
+msgid "You can update the number of monitors using the “Add new monitor” and “Zap a monitor” drop down boxes, which provides names of device output ports which you could monitor. \n"
+msgstr "Puede actualizar la cantidad de monitores mediante los cuadros desplegables Agregar nuevo monitor y Eliminar un monitor, que proporcionan los nombres de los puertos de salida del dispositivo que puede monitorear.\n"
+
+msgid "Once you have specified the monitor that you want to add or zap, you must press the corresponding “+” (for adding a monitor) or “-” (for zapping a monitor) buttons on the right of these dropdown boxes.\n"
+msgstr "Una vez que haya especificado el monitor que desea agregar o eliminar, debe presionar los botones correspondientes + (para agregar un monitor) o - (para eliminar un monitor) a la derecha de estos cuadros desplegables.\n"
+
+msgid "Upon doing so, you should see the monitors update.\n"
+msgstr "Al hacerlo, debería ver la actualización de los monitores.\n"
+
+msgid "You can also change the initial state of the switches in your circuit by using the toggle buttons. Blue indicates the switch state is ON and grey indicates the switch state is OFF.\n"
+msgstr "También puede cambiar el estado inicial de los interruptores en su circuito usando los botones de alternancia. El azul indica que el estado del interruptor está ENCENDIDO y el gris indica que el estado del interruptor está APAGADO.\n"
+
+msgid "Now specify the number of cycles you wish to run by using the spin button in the bottom left corner of the simulator.\n"
+msgstr "Ahora especifique la cantidad de ciclos que desea ejecutar usando el botón giratorio en la esquina inferior izquierda del simulador.\n"
+
+msgid "Now you can press the large green “RUN” button in the bottom left hand corner.\n"
+msgstr "Ahora puede presionar el botón verde grande EJECUTAR en la esquina inferior izquierda.\n"
+
+msgid "If successful, you should see the signal traces update for each monitored device.\n"
+msgstr "Si tiene éxito, debería ver la actualización de los rastros de señal para cada dispositivo monitoreado.\n"
+
+msgid "Note that upon clicking “RUN” this button will change to an orange “CONTINUE” button. Click this if you want to add further simulations. \n"
+msgstr "Tenga en cuenta que al hacer clic en EJECUTAR, este botón cambiará a un botón naranja CONTINUAR. Haga clic aquí si desea agregar más simulaciones.\n"
+
+msgid "You can always change the number of cycles specified or the switch states or monitors in between each simulation."
+msgstr "Siempre puede cambiar la cantidad de ciclos especificados o los estados del interruptor o los monitores entre cada simulación."
+
+#: gui.py:74
+msgid "Hello"
+msgstr "Hola"
+
+#: gui.py:77
+msgid "GF2 P2 Team 7 Logic Simulator GUI: "
+msgstr "GUI del simulador lógico Equipo 7: "
+
+#: gui.py:83
+msgid "&About"
+msgstr ""
+
+#: gui.py:84
+msgid "&Exit"
+msgstr "Salga"
+
+#: gui.py:85
+msgid "&File"
+msgstr "Archivo"
+
+#: gui.py:130
+msgid ""
+"Logic Simulator\n"
+"Created by Josephine Cowley (jhmdc2), Tom Hill (th621), Khalid Omar (ko366)\n"
+"2023"
+msgstr ""
+"Simulador Lógico\n"
+"Creado por Josephine Cowley (jhmdc2), Tom Hill (th621), Khalid Omar (ko366)\n"
+"2023"
+
+#: gui.py:131
+msgid "About Logsim"
+msgstr "Acerca de Logsim"
+
+#: gui.py:148
+msgid "GF2 P2 Team 7 Logic Simulator GUI"
+msgstr "GUI del simulador lógico Equipo 7"
+
+#: gui.py:172
+msgid "Need some help?"
+msgstr "¿Necesito ayuda?"
+
+#: gui.py:178
+msgid "Tutorial"
+msgstr "Tutorial"
+
+#: gui.py:180
+msgid "Click here to learn how to use our Logic Simulator"
+msgstr "Haga clic aquí para aprender a usar nuestro Simulador Lógico"
+
+#: gui.py:183
+msgid ""
+"Pre-loaded\n"
+"Logic Description File: "
+msgstr ""
+"Precargado\n"
+"Archivo de descripción lógica:"
+
+#: gui.py:191
+msgid "Upload new file"
+msgstr "Subir archivo nuevo"
+
+#: gui.py:193
+msgid "Upload a new Logic Description File"
+msgstr "Subir archivo nuevo"
+
+#: gui.py:196
+msgid "Continue"
+msgstr "Continuar"
+
+#: gui.py:198
+msgid "Continue with preloaded logic description file"
+msgstr "Continuar con el archivo de descripción lógica precargado"
+
+#: gui.py:181
+msgid "NO. CYCLES"
+msgstr "NO. CICLOS"
+
+#: gui.py:208
+msgid "RUN"
+msgstr "CORRA"
+
+#: gui.py:219
+msgid "Begin running the simulation"
+msgstr "Comenzar a ejecutar la simulación"
+
+#: gui.py:222
+msgid "CLEAR"
+msgstr "ACLARE"
+
+#: gui.py:233
+msgid "Clear all signal traces"
+msgstr "Borrar todos los rastros de señal"
+
+#: gui.py:236
+msgid "RESET"
+msgstr "REINICIE"
+
+#: gui.py:247
+msgid "Reset the simulation from initialisation"
+msgstr "Restablecer la simulación desde la inicialización"
+
+#: gui.py:267
+#: gui.py:577
+msgid "An error occurred."
+msgstr "Ocurrió un error."
+
+#: gui.py:277
+msgid "QUIT"
+msgstr "SALGA"
+
+#: gui.py:288
+msgid "Quit the simulation"
+msgstr "Salir de la simulación"
+
+#: gui.py:303
+msgid "UPLOAD"
+msgstr "SUBE"
+
+#: gui.py:308
+msgid "Upload logic description file"
+msgstr "Subir archivo de descripción lógica"
+
+#: gui.py:314
+msgid "HELP"
+msgstr "AYUDE"
+
+#: gui.py:314
+msgid "SETTINGS"
+msgstr "AJUSTES"
+
+#: gui.py:316
+msgid "Change system settings"
+msgstr "Cambiar la configuración del sistema"
+
+#: gui.py:319
+msgid "Help on running logic simulation"
+msgstr "Ayuda para ejecutar la simulación lógica"
+
+#: gui.py:336
+msgid "CONTINUE"
+msgstr "CONTINÚA"
+
+#: gui.py:346
+msgid "Continue running the simulation"
+msgstr "Continuar ejecutando la simulación."
+
+#: gui.py:381
+msgid "Error! Network oscillating."
+msgstr "¡Error! Red oscilante."
+
+#: gui.py:472
+msgid "Configure Logic Simulator GUI settings"
+msgstr "Configurar los ajustes de la GUI del simulador lógico"
+
+#: gui.py:486
+msgid "GUI Settings"
+msgstr "Configuración de la interfaz gráfica de usuario"
+
+#: gui.py:494
+msgid "Select language"
+msgstr "Seleccione el idioma"
+
+#: gui.py:503
+msgid "CONFIRM SETTINGS"
+msgstr "CONFIRMAR AJUSTES"
+
+#: gui.py:505
+msgid "Confirm settings changes"
+msgstr "Confirmar cambios de configuración"
+
+#: gui.py:444
+msgid "Tutorial on GF2 Team 7 Logic Simulator"
+msgstr "Tutorial sobre el simulador lógico GF2 Equipo 7"
+
+#: gui.py:527
+msgid "Select output"
+msgstr "Seleccione una salida"
+
+#: gui.py:505
+msgid "ADD NEW MONITOR"
+msgstr "AGREGAR NUEVO MONITOR"
+
+#: gui.py:544
+msgid "DELETE MONITOR"
+msgstr "ELIMINAR MONITOR"
+
+#: gui.py:548
+msgid "Add a monitor"
+msgstr "Añadir un monitor"
+
+#: gui.py:579
+msgid "Delete an existing monitor"
+msgstr "Eliminar un monitor existente"
+
+#: gui.py:589
+msgid "RECENTER"
+msgstr "A CENTRAR"
+
+#: gui.py:597
+msgid "Recenter the signal traces"
+msgstr "Vuelva a centrar las trazas de la señal"
+
+#: gui.py:672
+msgid "INPUTS"
+msgstr "ENTRADAS"
+
+#: gui.py:733
+#: gui.py:825
+msgid "ON"
+msgstr "ENCENDIDO"
+
+#: gui.py:740
+#: gui.py:854
+msgid "OFF"
+msgstr "APAGADO"
+
