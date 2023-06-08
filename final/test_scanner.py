@@ -7,7 +7,7 @@ from names import Names
 @pytest.fixture
 def path_fixture():
     """Returns the required relative path of the file to read."""
-    return "logsim/logsim/test_scanner_example1_logic_description.txt"
+    return "test_scanner_example1_logic_description.txt"
 
 
 @pytest.fixture
